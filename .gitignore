@@ -1,0 +1,22 @@
+# Secrets — NE JAMAIS publier
+.env
+
+# Données d'exécution (propres à chaque instance)
+admins.json
+agents_autorises.json
+agents_lang.json
+inscriptions_en_attente.json
+noms_en_attente.json
+super_admin.json
+logements_entreprise.json
+checklist_i18n.json
+
+# Dossiers de données
+archives/
+media/
+exports/
+
+# Python
+venv/
+__pycache__/
+*.pyc
