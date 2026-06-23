@@ -258,6 +258,10 @@ T = {
         "point_done": "Étape {num}/{n} — {label} → {mark}",
         "checklist_done": "Checklist terminée, beau travail ! 🎉 Dernière étape : filme une courte vidéo du logement propre et prêt à accueillir les voyageurs. 📹",
         "photo_ok": "Photo reçue ✓ Merci !",
+        "photo_doute": "🤔 Hmm, cette photo ne semble pas montrer « {label} » ({raison}). Tu peux la garder quand même, ou en reprendre une.",
+        "btn_keep_photo": "✅ Garder quand même",
+        "btn_retake_photo": "📷 Reprendre la photo",
+        "photo_retake": "Pas de souci, renvoie la bonne photo 📷",
         "mission_archived": "Mission terminée ✓ Tout est enregistré, merci pour ton travail ! 🙌\nStatut : {statut}.",
         "st_ok": "Validé", "st_check": "À vérifier",
         "incident_prompt": "Décris-moi le problème en quelques mots (dans ta langue), ou envoie une photo. Je préviens le responsable tout de suite. 📝",
@@ -310,6 +314,10 @@ T = {
         "point_done": "Step {num}/{n} — {label} → {mark}",
         "checklist_done": "Checklist done, great work! 🎉 Last step: film a short video of the clean apartment, ready to welcome guests. 📹",
         "photo_ok": "Photo received ✓ Thanks!",
+        "photo_doute": "🤔 Hmm, this photo doesn't seem to show « {label} » ({raison}). You can keep it anyway, or take a new one.",
+        "btn_keep_photo": "✅ Keep it anyway",
+        "btn_retake_photo": "📷 Retake the photo",
+        "photo_retake": "No problem, send the correct photo 📷",
         "mission_archived": "Mission complete ✓ Everything is saved, thank you for your work! 🙌\nStatus: {statut}.",
         "st_ok": "Validated", "st_check": "To check",
         "incident_prompt": "Describe the problem in a few words (in your language), or send a photo. I'll notify the manager right away. 📝",
@@ -362,6 +370,10 @@ T = {
         "point_done": "Paso {num}/{n} — {label} → {mark}",
         "checklist_done": "¡Checklist completada, buen trabajo! 🎉 Último paso: graba un vídeo corto del apartamento limpio y listo para recibir huéspedes. 📹",
         "photo_ok": "Foto recibida ✓ ¡Gracias!",
+        "photo_doute": "🤔 Mmm, esta foto no parece mostrar « {label} » ({raison}). Puedes conservarla igualmente o hacer otra.",
+        "btn_keep_photo": "✅ Conservar igualmente",
+        "btn_retake_photo": "📷 Repetir la foto",
+        "photo_retake": "Sin problema, envía la foto correcta 📷",
         "mission_archived": "Misión completada ✓ Todo está guardado, ¡gracias por tu trabajo! 🙌\nEstado: {statut}.",
         "st_ok": "Validado", "st_check": "Por revisar",
         "incident_prompt": "Describe el problema en pocas palabras (en tu idioma), o envía una foto. Aviso al responsable enseguida. 📝",
@@ -414,6 +426,10 @@ T = {
         "point_done": "الخطوة {num}/{n} — {label} ← {mark}",
         "checklist_done": "اكتملت القائمة، عمل رائع! 🎉 الخطوة الأخيرة: صوّر فيديو قصيراً للشقة نظيفة وجاهزة لاستقبال الضيوف. 📹",
         "photo_ok": "تم استلام الصورة ✓ شكراً!",
+        "photo_doute": "🤔 يبدو أن هذه الصورة لا تُظهر « {label} » ({raison}). يمكنك الاحتفاظ بها على أي حال، أو التقاط صورة أخرى.",
+        "btn_keep_photo": "✅ الاحتفاظ بها",
+        "btn_retake_photo": "📷 إعادة التقاط الصورة",
+        "photo_retake": "لا مشكلة، أرسل الصورة الصحيحة 📷",
         "mission_archived": "اكتملت المهمة ✓ تم حفظ كل شيء، شكراً على عملك! 🙌\nالحالة: {statut}.",
         "st_ok": "صالح", "st_check": "للمراجعة",
         "incident_prompt": "صِف المشكلة بكلمات قليلة (بلغتك)، أو أرسل صورة. سأبلّغ المسؤول على الفور. 📝",
@@ -466,6 +482,10 @@ T = {
         "point_done": "Pasul {num}/{n} — {label} → {mark}",
         "checklist_done": "Listă completă, treabă bună! 🎉 Ultimul pas: filmează un video scurt cu apartamentul curat și pregătit să primească oaspeții. 📹",
         "photo_ok": "Poză primită ✓ Mulțumesc!",
+        "photo_doute": "🤔 Hmm, această poză nu pare să arate « {label} » ({raison}). O poți păstra oricum sau poți face alta.",
+        "btn_keep_photo": "✅ Păstrează oricum",
+        "btn_retake_photo": "📷 Refă poza",
+        "photo_retake": "Nicio problemă, trimite poza corectă 📷",
         "mission_archived": "Misiune completă ✓ Totul este salvat, mulțumesc pentru munca ta! 🙌\nStare: {statut}.",
         "st_ok": "Validat", "st_check": "De verificat",
         "incident_prompt": "Descrie problema în câteva cuvinte (în limba ta), sau trimite o poză. Anunț responsabilul imediat. 📝",
@@ -910,6 +930,36 @@ async def claude_text(system: str, user: str, max_tokens: int = 900, model: str 
         r = await client.post("https://api.anthropic.com/v1/messages", headers=headers, json=body)
         r.raise_for_status()
         return r.json()["content"][0]["text"]
+
+
+async def claude_photo_check(path: str, label: str) -> tuple:
+    """Verifie via l'IA si la photo correspond a l'element demande. Retourne (ok, raison).
+    En cas de doute technique, retourne (True, '') pour ne jamais bloquer l'agent."""
+    if not ANTHROPIC_API_KEY:
+        return True, ""
+    try:
+        with open(path, "rb") as f:
+            b64 = base64.b64encode(f.read()).decode()
+    except Exception:
+        return True, ""
+    system = (
+        "Tu verifies des photos de menage. La photo est censee montrer un element precis. "
+        "Reponds UNIQUEMENT en JSON compact : {\"ok\": true|false, \"raison\": \"<5 mots max>\"}. "
+        "Sois tolerant (angle, luminosite, flou, cadrage). Mets ok=false UNIQUEMENT si la photo "
+        "n'a clairement aucun rapport avec l'element demande."
+    )
+    content = [
+        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b64}},
+        {"type": "text", "text": f"Element demande : {label}. La photo correspond-elle ?"},
+    ]
+    try:
+        raw = await claude_text(system, content, max_tokens=120, model=ANTHROPIC_MODEL)
+        mt = re.search(r"\{.*\}", raw or "", re.S)
+        data = json.loads(mt.group(0)) if mt else {}
+        return bool(data.get("ok", True)), str(data.get("raison", ""))
+    except Exception:
+        logger.exception("Echec verification photo")
+        return True, ""
 
 
 async def on_monid(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -2450,10 +2500,62 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await tg_file.download_to_drive(path)
     m["media"]["photos"].append({"point": fr, "path": path})
     logger.info("Photo recue (%s) : %s", fr, path)
+    # Verification visuelle par l'IA (ne bloque jamais : l'agent peut garder quand meme)
+    label = _cl(m)[m["sec_index"]]["items"][m["item_index"]]["label"]
+    ok, raison = await claude_photo_check(path, label)
+    if not ok:
+        m["photo_check"] = {"path": path, "typ": typ}
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(t(lang, "btn_keep_photo"), callback_data="pkeep")],
+            [InlineKeyboardButton(t(lang, "btn_retake_photo"), callback_data="pretake")],
+        ])
+        await update.message.reply_text(
+            t(lang, "photo_doute", label=label, raison=raison or "—"), reply_markup=kb)
+        return
     await update.message.reply_text(t(lang, "photo_ok"))
     if typ == "photo":  # une seule photo attendue -> on avance
         await advance_step(context, chat_id, state)
     # type "photos" (lot) : on reste, l'agent envoie d'autres photos ou « Photos terminees »
+
+
+async def on_photo_keep(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """L'agent garde quand meme une photo signalee comme douteuse."""
+    query = update.callback_query
+    await query.answer()
+    chat_id = query.from_user.id
+    state = get_state(chat_id)
+    lang = state.get("lang") or "fr"
+    m = state.get("mission")
+    pc = m.get("photo_check") if m else None
+    if not m or not pc:
+        await query.edit_message_text(t(lang, "photo_ok"))
+        return
+    typ = pc.get("typ")
+    m["photo_check"] = None
+    await query.edit_message_text(t(lang, "photo_ok"))
+    if typ == "photo":
+        await advance_step(context, chat_id, state)
+
+
+async def on_photo_retake(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """L'agent veut reprendre la photo : on retire la photo douteuse, il en renvoie une."""
+    query = update.callback_query
+    await query.answer()
+    chat_id = query.from_user.id
+    state = get_state(chat_id)
+    lang = state.get("lang") or "fr"
+    m = state.get("mission")
+    pc = m.get("photo_check") if m else None
+    if m and pc:
+        path = pc.get("path")
+        m["media"]["photos"] = [p for p in m["media"]["photos"] if p.get("path") != path]
+        try:
+            if path and os.path.exists(path):
+                os.remove(path)
+        except Exception:
+            logger.exception("Echec suppression photo reprise")
+        m["photo_check"] = None
+    await query.edit_message_text(t(lang, "photo_retake"))
 
 
 async def resume_checklist(context, chat_id, state) -> None:
@@ -2625,6 +2727,8 @@ def main() -> None:
     app.add_handler(CallbackQueryHandler(on_msg_no, pattern=r"^msgno$"))
     app.add_handler(CallbackQueryHandler(on_del_ok, pattern=r"^delmissok$"))
     app.add_handler(CallbackQueryHandler(on_del_no, pattern=r"^delmissno$"))
+    app.add_handler(CallbackQueryHandler(on_photo_keep, pattern=r"^pkeep$"))
+    app.add_handler(CallbackQueryHandler(on_photo_retake, pattern=r"^pretake$"))
     app.add_handler(CallbackQueryHandler(on_auth, pattern=r"^auth:"))
     app.add_handler(CallbackQueryHandler(on_admin_panel, pattern=r"^adm:"))
     app.add_handler(CallbackQueryHandler(on_delagent, pattern=r"^delagent:"))
