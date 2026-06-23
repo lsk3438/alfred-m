@@ -1822,6 +1822,14 @@ ADMIN_TOOLS = [
      "input_schema": {"type": "object", "properties": {
          "agent_chat_id": {"type": "string"}, "agent": {"type": "string"},
          "texte": {"type": "string"}}, "required": ["texte"]}},
+    {"name": "supprimer_mission",
+     "description": "Supprime DEFINITIVEMENT une mission archivee (rapport + photos + videos). "
+                    "Reserve a l'admin principal (super admin). Identifie la mission par mission_id "
+                    "(preferable) ou par appartement + date. La suppression ne part qu'apres confirmation.",
+     "input_schema": {"type": "object", "properties": {
+         "mission_id": {"type": "string"},
+         "appartement": {"type": "string"},
+         "date": {"type": "string", "description": "date AAAA-MM-JJ"}}, "required": []}},
 ]
 
 
@@ -1835,8 +1843,73 @@ async def claude_tools_call(system: str, messages: list, tools: list, model: str
         return r.json()
 
 
+def _mission_files_matching(mission_id="", appartement="", date="") -> list:
+    """Retourne [(chemin_json, donnees)] des missions correspondant aux criteres."""
+    out = []
+    for fp in glob.glob(os.path.join(ARCHIVES_DIR, "**", "*.json"), recursive=True):
+        try:
+            with open(fp, encoding="utf-8") as f:
+                d = json.load(f)
+        except Exception:
+            continue
+        if mission_id and str(d.get("mission_id")) != str(mission_id):
+            continue
+        if appartement:
+            toks = [t for t in str(appartement).lower().split() if t]
+            nom = str(d.get("appart", {}).get("nom_interne", "")).lower()
+            if not all(t in nom for t in toks):
+                continue
+        if date and str(d.get("heure_debut", ""))[:10] != date:
+            continue
+        out.append((fp, d))
+    return out
+
+
+def _delete_mission_files(fp: str, d: dict) -> bool:
+    """Supprime les medias (photos/videos) puis le fichier JSON de la mission."""
+    medias = [d.get("video_avant"), d.get("video_fin")] + [ph.get("path") for ph in d.get("photos", [])]
+    for p in medias:
+        if p:
+            try:
+                if os.path.exists(p):
+                    os.remove(p)
+            except Exception:
+                logger.exception("Echec suppression media %s", p)
+    try:
+        os.remove(fp)
+    except Exception:
+        logger.exception("Echec suppression rapport %s", fp)
+        return False
+    return True
+
+
 async def execute_admin_tool(name, inp, context, chat_id, state) -> str:
     inp = inp or {}
+    if name == "supprimer_mission":
+        if not is_super(chat_id):
+            return "La suppression de missions est reservee a l'admin principal."
+        matches = _mission_files_matching(inp.get("mission_id", ""), inp.get("appartement", ""),
+                                          inp.get("date", ""))
+        if not matches:
+            return "Aucune mission ne correspond. Precise l'appartement et la date exacte."
+        if len(matches) > 1:
+            lignes = [f"- {d.get('appart', {}).get('nom_interne', '?')} "
+                      f"{str(d.get('heure_debut', ''))[:16]} (id {d.get('mission_id')})"
+                      for _, d in matches[:10]]
+            return ("Plusieurs missions correspondent, precise la date exacte (ou l'id) :\n"
+                    + "\n".join(lignes))
+        fp, d = matches[0]
+        appart = d.get("appart", {}).get("nom_interne", "?")
+        dt = str(d.get("heure_debut", ""))[:10]
+        state["pending_delete"] = {"fp": fp, "label": f"{appart} — {dt}"}
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton("🗑️ Supprimer", callback_data="delmissok"),
+                                    InlineKeyboardButton("✖️ Annuler", callback_data="delmissno")]])
+        await context.bot.send_message(
+            chat_id,
+            f"⚠️ Supprimer DEFINITIVEMENT cette mission ?\n{appart} — {dt}\n"
+            "(photos + videos + rapport effaces, action irreversible)",
+            reply_markup=kb)
+        return "Confirmation de suppression demandee a l'admin principal."
     if name in ("envoyer_photos", "envoyer_videos", "exporter_rapport"):
         matches = match_missions(inp.get("appartement", ""), inp.get("date", ""), inp.get("agent", ""),
                                  inp.get("date_debut", ""), inp.get("date_fin", ""))
@@ -1903,7 +1976,8 @@ async def answer_admin(update, context, state, question) -> None:
         "CHECKOUTS (planning Lodgify). "
         f"{repere} Interprete les dates relatives par rapport a aujourd'hui. Le property_id est l'identifiant fiable.\n\n"
         "Tu disposes d'OUTILS pour AGIR : envoyer_photos, envoyer_videos, exporter_rapport "
-        "(genere un fichier rapport HTML imprimable en PDF), message_agent. "
+        "(genere un fichier rapport HTML imprimable en PDF), message_agent, et supprimer_mission "
+        "(effacer definitivement une mission — uniquement pour l'admin principal, avec confirmation). "
         "Des que le responsable demande des photos, des videos, un rapport / fichier / export / PDF / document, "
         "ou d'ecrire a un agent, UTILISE l'outil correspondant — ne dis JAMAIS que tu ne peux pas generer de fichier. "
         "Pour une simple question d'analyse, reponds normalement en texte (precis, avec chiffres, en croisant "
@@ -1968,6 +2042,39 @@ async def on_msg_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await query.answer()
     get_state(query.from_user.id)["pending_msg"] = None
     await query.edit_message_text("Message annule.")
+
+
+async def on_del_ok(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Confirme la suppression d'une mission (admin principal uniquement)."""
+    query = update.callback_query
+    await query.answer()
+    chat_id = query.from_user.id
+    if not is_super(chat_id):
+        await query.edit_message_text("Reserve a l'admin principal.")
+        return
+    state = get_state(chat_id)
+    pend = state.get("pending_delete")
+    if not pend:
+        await query.edit_message_text("Rien a supprimer.")
+        return
+    fp = pend["fp"]
+    ok = False
+    try:
+        with open(fp, encoding="utf-8") as f:
+            d = json.load(f)
+        ok = _delete_mission_files(fp, d)
+    except Exception:
+        logger.exception("Echec suppression mission")
+    state["pending_delete"] = None
+    await query.edit_message_text(
+        f"🗑️ Mission supprimee : {pend['label']}." if ok else "❌ Echec de la suppression.")
+
+
+async def on_del_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    get_state(query.from_user.id)["pending_delete"] = None
+    await query.edit_message_text("Suppression annulee.")
 
 
 # =====================================================================
@@ -2516,6 +2623,8 @@ def main() -> None:
     app.add_handler(CommandHandler("photos", on_photos))
     app.add_handler(CallbackQueryHandler(on_msg_ok, pattern=r"^msgok$"))
     app.add_handler(CallbackQueryHandler(on_msg_no, pattern=r"^msgno$"))
+    app.add_handler(CallbackQueryHandler(on_del_ok, pattern=r"^delmissok$"))
+    app.add_handler(CallbackQueryHandler(on_del_no, pattern=r"^delmissno$"))
     app.add_handler(CallbackQueryHandler(on_auth, pattern=r"^auth:"))
     app.add_handler(CallbackQueryHandler(on_admin_panel, pattern=r"^adm:"))
     app.add_handler(CallbackQueryHandler(on_delagent, pattern=r"^delagent:"))
