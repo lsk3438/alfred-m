@@ -1,0 +1,72 @@
+====================================================================
+   METTRE LE SITE WEB ALFRED EN LIGNE (sur le même serveur VPS)
+====================================================================
+Serveur : 82.22.77.248   Dépôt : https://github.com/lsk3438/alfred-m
+Le site tournera sur le port 8000 :  http://82.22.77.248:8000
+
+--------------------------------------------------------------------
+1) Se connecter au serveur
+--------------------------------------------------------------------
+Dans PowerShell :
+    ssh root@82.22.77.248
+(puis ton mot de passe root)
+
+--------------------------------------------------------------------
+2) Choisir le mot de passe du site
+--------------------------------------------------------------------
+AVANT de coller le bloc ci-dessous, remplace seulement la valeur
+TON_MOT_DE_PASSE par le mot de passe que TU veux pour te connecter
+au site (garde les guillemets). L'identifiant sera : admin
+
+--------------------------------------------------------------------
+3) Coller TOUT le bloc d'un coup
+--------------------------------------------------------------------
+cd /opt/alfred && git pull && ./venv/bin/pip install -r requirements.txt
+MDP="TON_MOT_DE_PASSE"
+grep -q '^WEB_PASS=' .env || cat >> .env <<ENV
+
+# --- Site web admin ---
+WEB_USER=admin
+WEB_PASS=$MDP
+WEB_SECRET=$(head -c 24 /dev/urandom | xxd -p)
+WEB_COMPANY=Cosmopolitan Colours
+WEB_PORT=8000
+ENV
+cat > /etc/systemd/system/alfred-web.service <<'SVC'
+[Unit]
+Description=ALFRED-M site web admin
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/alfred
+ExecStart=/opt/alfred/venv/bin/gunicorn -w 2 -b 0.0.0.0:8000 app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+SVC
+cat > /usr/local/bin/maj-alfred <<'SH'
+#!/bin/bash
+cd /opt/alfred && git pull --ff-only && ./venv/bin/pip install -q -r requirements.txt
+systemctl restart alfred alfred-web
+SH
+chmod +x /usr/local/bin/maj-alfred
+ufw allow 8000/tcp 2>/dev/null
+systemctl daemon-reload && systemctl enable --now alfred-web && sleep 3 && systemctl status alfred-web --no-pager
+
+--------------------------------------------------------------------
+4) Vérifier
+--------------------------------------------------------------------
+Tu dois voir une ligne verte "active (running)".
+Ouvre dans ton navigateur :   http://82.22.77.248:8000
+Connecte-toi :  identifiant = admin  /  mot de passe = celui choisi.
+
+--------------------------------------------------------------------
+NOTES
+--------------------------------------------------------------------
+- Le site lit les MÊMES données que le bot (missions, photos, rapports)
+  et l'assistant utilise la même IA.
+- "maj-alfred" met désormais à jour le bot ET le site en une commande.
+- HTTPS (cadenas) et nom de domaine : étape suivante, plus tard.
+====================================================================
