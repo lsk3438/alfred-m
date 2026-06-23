@@ -305,6 +305,8 @@ T = {
         "not_video": "Je n'attends pas de vidéo pour le moment 🙂",
         "not_photo": "Je n'attends pas de photo à cette étape 🙂",
         "follow": "Suis simplement les étapes en cours 🙂 Utilise les boutons et envoie les photos/vidéos demandées.",
+        "mission_cancel": "🚫 Mission en cours annulée. Tu peux repartir à zéro avec /start.",
+        "mission_none": "Aucune mission en cours à annuler. 🙂",
         "press_start": "Appuie sur le bouton ci-dessous pour démarrer une mission. 👇",
         "reg_ask_name": "Bienvenue ! 👋 Avant de commencer, écris-moi ton nom et ton prénom :",
         "reg_name_short": "Il me faut ton nom complet (nom + prénom) pour continuer :",
@@ -393,6 +395,8 @@ T = {
         "not_video": "I'm not expecting a video right now 🙂",
         "not_photo": "I'm not expecting a photo at this step 🙂",
         "follow": "Just follow the current steps 🙂 Use the buttons and send the requested photos/videos.",
+        "mission_cancel": "🚫 Current mission cancelled. You can start over with /start.",
+        "mission_none": "No mission in progress to cancel. 🙂",
         "press_start": "Tap the button below to start a mission. 👇",
         "reg_ask_name": "Welcome to Genius BnB! 👋 Before we start, write me your first and last name:",
         "reg_name_short": "I need your full name (first and last) to continue:",
@@ -481,6 +485,8 @@ T = {
         "not_video": "No espero un vídeo ahora mismo 🙂",
         "not_photo": "No espero una foto en este paso 🙂",
         "follow": "Solo sigue los pasos actuales 🙂 Usa los botones y envía las fotos/vídeos pedidos.",
+        "mission_cancel": "🚫 Misión en curso cancelada. Puedes empezar de nuevo con /start.",
+        "mission_none": "No hay ninguna misión en curso que cancelar. 🙂",
         "press_start": "Pulsa el botón de abajo para empezar una misión. 👇",
         "reg_ask_name": "¡Bienvenid@ a Genius BnB! 👋 Antes de empezar, escríbeme tu nombre y apellido:",
         "reg_name_short": "Necesito tu nombre completo (nombre y apellido) para continuar:",
@@ -569,6 +575,8 @@ T = {
         "not_video": "لا أنتظر فيديو الآن 🙂",
         "not_photo": "لا أنتظر صورة في هذه الخطوة 🙂",
         "follow": "فقط اتبع الخطوات الحالية 🙂 استخدم الأزرار وأرسل الصور/الفيديوهات المطلوبة.",
+        "mission_cancel": "🚫 تم إلغاء المهمة الجارية. يمكنك البدء من جديد عبر /start.",
+        "mission_none": "لا توجد مهمة جارية لإلغائها. 🙂",
         "press_start": "اضغط الزر بالأسفل لبدء مهمة. 👇",
         "reg_ask_name": "مرحباً بك في Genius BnB! 👋 قبل أن نبدأ، اكتب لي اسمك الأول واسم العائلة:",
         "reg_name_short": "أحتاج اسمك الكامل (الاسم واللقب) للمتابعة:",
@@ -657,6 +665,8 @@ T = {
         "not_video": "Nu aștept un video acum 🙂",
         "not_photo": "Nu aștept o poză la acest pas 🙂",
         "follow": "Urmează pur și simplu pașii curenți 🙂 Folosește butoanele și trimite pozele/videourile cerute.",
+        "mission_cancel": "🚫 Misiune în curs anulată. Poți reîncepe cu /start.",
+        "mission_none": "Nicio misiune în curs de anulat. 🙂",
         "press_start": "Apasă butonul de mai jos pentru a începe o misiune. 👇",
         "reg_ask_name": "Bun venit la Genius BnB! 👋 Înainte să începem, scrie-mi numele și prenumele tău:",
         "reg_name_short": "Am nevoie de numele tău complet (nume și prenume) ca să continui:",
@@ -1633,6 +1643,7 @@ async def on_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(t(lang, "a_super_co"))
         return
     state["admin_mode"] = True
+    state["mission"] = None  # une mission inachevee ne doit pas bloquer le mode rapport
     prenom = display_name(chat_id, state) or update.effective_user.first_name or "admin"
     logger.info("Panneau admin ouvert par %s (chat_id=%s)", prenom, chat_id)
     await update.message.reply_text(
@@ -2362,6 +2373,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     state = get_state(chat_id)
     state["prenom"] = agent.first_name
     state["admin_mode"] = False
+    state["mission"] = None  # repart toujours d'un etat propre
     logger.info("/start de %s (chat_id=%s, tg_lang=%s)", agent.first_name, chat_id, agent.language_code)
     if not is_agent_authorized(chat_id):
         await ask_or_block(update, context, chat_id, state)
@@ -2375,6 +2387,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
           soc=person_company(chat_id) or "ta conciergerie"),
         reply_markup=welcome_keyboard(state["lang"]),
     )
+
+
+async def on_annuler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Abandonne la mission de menage en cours (sans rien archiver)."""
+    chat_id = update.effective_chat.id
+    state = get_state(chat_id)
+    lang = state.get("lang") or AGENT_LANG.get(str(chat_id)) or "fr"
+    if state.get("mission"):
+        state["mission"] = None
+        logger.info("Mission annulee par chat_id=%s", chat_id)
+        await update.message.reply_text(t(lang, "mission_cancel"),
+                                        reply_markup=welcome_keyboard(lang))
+    else:
+        await update.message.reply_text(t(lang, "mission_none"),
+                                        reply_markup=welcome_keyboard(lang))
 
 
 async def on_lang(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -2901,10 +2928,12 @@ async def finir_mission(update, context, chat_id, state) -> None:
 # =====================================================================
 AGENT_CMDS = [
     BotCommand("start", "Commencer / Start / Empezar"),
+    BotCommand("annuler", "Annuler la mission en cours / Cancel"),
     BotCommand("langue", "Changer de langue / Language"),
 ]
 ADMIN_CMDS = [
     BotCommand("start", "Commencer / Start / Empezar"),
+    BotCommand("annuler", "Annuler la mission en cours / Cancel"),
     BotCommand("langue", "Changer de langue / Language"),
     BotCommand("admin", "Panneau admin (rapports, agents)"),
 ]
@@ -2939,6 +2968,7 @@ def main() -> None:
         raise SystemExit("\n>>> ERREUR : TELEGRAM_TOKEN absent du fichier .env.\n")
     app = Application.builder().token(TELEGRAM_TOKEN).post_init(_post_init).build()
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("annuler", on_annuler))
     app.add_handler(CommandHandler("admin", on_admin))
     app.add_handler(CommandHandler("langue", on_langue))
     app.add_handler(CommandHandler("monid", on_monid))
