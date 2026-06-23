@@ -262,6 +262,38 @@ T = {
         "btn_keep_photo": "✅ Garder quand même",
         "btn_retake_photo": "📷 Reprendre la photo",
         "photo_retake": "Pas de souci, renvoie la bonne photo 📷",
+        "a_panel": "🔧 Espace admin — bonjour {prenom} !\n\nÉcris-moi directement tes questions sur tes rapports, photos et données de ménage (ex. « quels logements nettoyés aujourd'hui ? », « photos de X hier », « génère un rapport »).\nLes boutons ci-dessous servent à gérer ton équipe. Tape /start pour quitter.",
+        "a_b_agents": "👥 Gérer les agents",
+        "a_b_logements": "🏠 Assigner les logements",
+        "a_b_admins": "🧑‍💼 Gérer les responsables",
+        "a_reports": "📊 Mode rapport activé.\nPose ta question (logements nettoyés aujourd'hui, incidents urgents de la semaine, « génère un rapport »…). Tape /start pour quitter.",
+        "a_agents_none": "👥 Aucun agent pour l'instant. Quand un agent s'inscrit pour ton entreprise, tu reçois un message avec un bouton Autoriser.",
+        "a_agents_mine": "👥 Tes agents :",
+        "a_agents_all": "👥 Tous les agents :",
+        "a_remove": "❌ Retirer {nom}",
+        "a_admins_title": "🧑‍💼 Responsables :",
+        "a_admins_none": "(Aucun autre responsable pour l'instant.)",
+        "a_super_only": "Réservé à l'admin principal.",
+        "a_log_title": "🏠 Assigner les logements\nClique un logement pour choisir son entreprise (❓ = non assigné).",
+        "a_log_none": "Aucun logement trouvé dans Lodgify.",
+        "a_log_err": "Je n'arrive pas à récupérer la liste des logements. Réessaie.",
+        "a_log_pick": "À quelle entreprise appartient ce logement ?",
+        "a_unassigned": "❌ Non assigné",
+        "a_back": "⬅️ Retour",
+        "a_super_co": "Avant tout, configurons ton profil. Quel est le nom de ton entreprise ?",
+        "a_super_co_short": "Nom d'entreprise trop court, réessaie :",
+        "a_super_role": "Parfait. Et quel est ton rôle ? (ex : gérant)",
+        "a_super_done": "✅ Profil enregistré.",
+        "a_new_admin": "🆕 Nouvelle demande RESPONSABLE\n👤 {nom}\n🏢 {ent}\n💼 {role}\n\nValider ?",
+        "a_new_agent": "🆕 Nouvelle demande AGENT\n👤 {nom}\n🏢 {ent}\n\nValider ?",
+        "a_btn_auth": "✅ Autoriser",
+        "a_btn_refuse": "❌ Refuser",
+        "a_done_admin": "✅ {nom} validé (responsable — {ent}).",
+        "a_done_agent": "✅ {nom} validé (agent — {ent}).",
+        "a_refused": "❌ Demande de {nom} refusée.",
+        "a_already": "Cette demande a déjà été traitée.",
+        "a_agent_removed": "🗑️ Agent retiré : {nom}.",
+        "a_admin_removed": "🗑️ Responsable retiré : {nom}.",
         "mission_archived": "Mission terminée ✓ Tout est enregistré, merci pour ton travail ! 🙌\nStatut : {statut}.",
         "st_ok": "Validé", "st_check": "À vérifier",
         "incident_prompt": "Décris-moi le problème en quelques mots (dans ta langue), ou envoie une photo. Je préviens le responsable tout de suite. 📝",
@@ -318,6 +350,38 @@ T = {
         "btn_keep_photo": "✅ Keep it anyway",
         "btn_retake_photo": "📷 Retake the photo",
         "photo_retake": "No problem, send the correct photo 📷",
+        "a_panel": "🔧 Admin space — hello {prenom}!\n\nWrite your questions directly about your reports, photos and cleaning data (e.g. « which units cleaned today? », « photos of X yesterday », « generate a report »).\nThe buttons below manage your team. Type /start to exit.",
+        "a_b_agents": "👥 Manage agents",
+        "a_b_logements": "🏠 Assign properties",
+        "a_b_admins": "🧑‍💼 Manage managers",
+        "a_reports": "📊 Report mode on.\nAsk your question (units cleaned today, urgent incidents this week, « generate a report »…). Type /start to exit.",
+        "a_agents_none": "👥 No agent yet. When an agent registers for your company, you'll get a message with an Authorize button.",
+        "a_agents_mine": "👥 Your agents:",
+        "a_agents_all": "👥 All agents:",
+        "a_remove": "❌ Remove {nom}",
+        "a_admins_title": "🧑‍💼 Managers:",
+        "a_admins_none": "(No other manager yet.)",
+        "a_super_only": "Main admin only.",
+        "a_log_title": "🏠 Assign properties\nTap a property to choose its company (❓ = unassigned).",
+        "a_log_none": "No property found in Lodgify.",
+        "a_log_err": "I can't fetch the property list. Please try again.",
+        "a_log_pick": "Which company does this property belong to?",
+        "a_unassigned": "❌ Unassigned",
+        "a_back": "⬅️ Back",
+        "a_super_co": "First, let's set up your profile. What's your company name?",
+        "a_super_co_short": "Company name too short, try again:",
+        "a_super_role": "Great. And what's your role? (e.g. manager)",
+        "a_super_done": "✅ Profile saved.",
+        "a_new_admin": "🆕 New MANAGER request\n👤 {nom}\n🏢 {ent}\n💼 {role}\n\nApprove?",
+        "a_new_agent": "🆕 New AGENT request\n👤 {nom}\n🏢 {ent}\n\nApprove?",
+        "a_btn_auth": "✅ Authorize",
+        "a_btn_refuse": "❌ Refuse",
+        "a_done_admin": "✅ {nom} approved (manager — {ent}).",
+        "a_done_agent": "✅ {nom} approved (agent — {ent}).",
+        "a_refused": "❌ Request from {nom} refused.",
+        "a_already": "This request has already been handled.",
+        "a_agent_removed": "🗑️ Agent removed: {nom}.",
+        "a_admin_removed": "🗑️ Manager removed: {nom}.",
         "mission_archived": "Mission complete ✓ Everything is saved, thank you for your work! 🙌\nStatus: {statut}.",
         "st_ok": "Validated", "st_check": "To check",
         "incident_prompt": "Describe the problem in a few words (in your language), or send a photo. I'll notify the manager right away. 📝",
@@ -374,6 +438,38 @@ T = {
         "btn_keep_photo": "✅ Conservar igualmente",
         "btn_retake_photo": "📷 Repetir la foto",
         "photo_retake": "Sin problema, envía la foto correcta 📷",
+        "a_panel": "🔧 Espacio admin — ¡hola {prenom}!\n\nEscríbeme directamente tus preguntas sobre tus informes, fotos y datos de limpieza (ej. « ¿qué alojamientos se limpiaron hoy? », « fotos de X ayer », « genera un informe »).\nLos botones de abajo sirven para gestionar tu equipo. Pulsa /start para salir.",
+        "a_b_agents": "👥 Gestionar agentes",
+        "a_b_logements": "🏠 Asignar alojamientos",
+        "a_b_admins": "🧑‍💼 Gestionar responsables",
+        "a_reports": "📊 Modo informe activado.\nHaz tu pregunta (alojamientos limpiados hoy, incidentes urgentes de la semana, « genera un informe »…). Pulsa /start para salir.",
+        "a_agents_none": "👥 Ningún agente por ahora. Cuando un agente se registre para tu empresa, recibirás un mensaje con un botón Autorizar.",
+        "a_agents_mine": "👥 Tus agentes:",
+        "a_agents_all": "👥 Todos los agentes:",
+        "a_remove": "❌ Quitar {nom}",
+        "a_admins_title": "🧑‍💼 Responsables:",
+        "a_admins_none": "(Ningún otro responsable por ahora.)",
+        "a_super_only": "Reservado al admin principal.",
+        "a_log_title": "🏠 Asignar alojamientos\nPulsa un alojamiento para elegir su empresa (❓ = sin asignar).",
+        "a_log_none": "Ningún alojamiento encontrado en Lodgify.",
+        "a_log_err": "No puedo obtener la lista de alojamientos. Inténtalo de nuevo.",
+        "a_log_pick": "¿A qué empresa pertenece este alojamiento?",
+        "a_unassigned": "❌ Sin asignar",
+        "a_back": "⬅️ Volver",
+        "a_super_co": "Antes de nada, configuremos tu perfil. ¿Cuál es el nombre de tu empresa?",
+        "a_super_co_short": "Nombre de empresa demasiado corto, inténtalo de nuevo:",
+        "a_super_role": "Perfecto. ¿Y cuál es tu rol? (ej. gerente)",
+        "a_super_done": "✅ Perfil guardado.",
+        "a_new_admin": "🆕 Nueva solicitud RESPONSABLE\n👤 {nom}\n🏢 {ent}\n💼 {role}\n\n¿Validar?",
+        "a_new_agent": "🆕 Nueva solicitud AGENTE\n👤 {nom}\n🏢 {ent}\n\n¿Validar?",
+        "a_btn_auth": "✅ Autorizar",
+        "a_btn_refuse": "❌ Rechazar",
+        "a_done_admin": "✅ {nom} validado (responsable — {ent}).",
+        "a_done_agent": "✅ {nom} validado (agente — {ent}).",
+        "a_refused": "❌ Solicitud de {nom} rechazada.",
+        "a_already": "Esta solicitud ya ha sido tratada.",
+        "a_agent_removed": "🗑️ Agente quitado: {nom}.",
+        "a_admin_removed": "🗑️ Responsable quitado: {nom}.",
         "mission_archived": "Misión completada ✓ Todo está guardado, ¡gracias por tu trabajo! 🙌\nEstado: {statut}.",
         "st_ok": "Validado", "st_check": "Por revisar",
         "incident_prompt": "Describe el problema en pocas palabras (en tu idioma), o envía una foto. Aviso al responsable enseguida. 📝",
@@ -430,6 +526,38 @@ T = {
         "btn_keep_photo": "✅ الاحتفاظ بها",
         "btn_retake_photo": "📷 إعادة التقاط الصورة",
         "photo_retake": "لا مشكلة، أرسل الصورة الصحيحة 📷",
+        "a_panel": "🔧 مساحة المسؤول — مرحباً {prenom}!\n\nاكتب لي أسئلتك مباشرة عن تقاريرك وصورك وبيانات التنظيف (مثال: « ما الشقق التي نُظّفت اليوم؟ »، « صور X أمس »، « أنشئ تقريراً »).\nالأزرار بالأسفل لإدارة فريقك. اضغط /start للخروج.",
+        "a_b_agents": "👥 إدارة العمال",
+        "a_b_logements": "🏠 تعيين الشقق",
+        "a_b_admins": "🧑‍💼 إدارة المسؤولين",
+        "a_reports": "📊 وضع التقارير مُفعّل.\nاطرح سؤالك (الشقق المنظّفة اليوم، الحوادث العاجلة هذا الأسبوع، « أنشئ تقريراً »…). اضغط /start للخروج.",
+        "a_agents_none": "👥 لا يوجد عامل بعد. عندما يسجّل عامل لشركتك، ستصلك رسالة بزر التفعيل.",
+        "a_agents_mine": "👥 عمالك:",
+        "a_agents_all": "👥 جميع العمال:",
+        "a_remove": "❌ إزالة {nom}",
+        "a_admins_title": "🧑‍💼 المسؤولون:",
+        "a_admins_none": "(لا يوجد مسؤول آخر بعد.)",
+        "a_super_only": "خاص بالمسؤول الرئيسي.",
+        "a_log_title": "🏠 تعيين الشقق\nاضغط على شقة لاختيار شركتها (❓ = غير معيّنة).",
+        "a_log_none": "لا توجد شقة في Lodgify.",
+        "a_log_err": "لا أستطيع جلب قائمة الشقق. حاول مرة أخرى.",
+        "a_log_pick": "لأي شركة تنتمي هذه الشقة؟",
+        "a_unassigned": "❌ غير معيّنة",
+        "a_back": "⬅️ رجوع",
+        "a_super_co": "أولاً، لنُعدّ ملفك. ما اسم شركتك؟",
+        "a_super_co_short": "اسم الشركة قصير جداً، حاول مرة أخرى:",
+        "a_super_role": "ممتاز. وما هو دورك؟ (مثال: مدير)",
+        "a_super_done": "✅ تم حفظ الملف.",
+        "a_new_admin": "🆕 طلب مسؤول جديد\n👤 {nom}\n🏢 {ent}\n💼 {role}\n\nالموافقة؟",
+        "a_new_agent": "🆕 طلب عامل جديد\n👤 {nom}\n🏢 {ent}\n\nالموافقة؟",
+        "a_btn_auth": "✅ تفعيل",
+        "a_btn_refuse": "❌ رفض",
+        "a_done_admin": "✅ تم تفعيل {nom} (مسؤول — {ent}).",
+        "a_done_agent": "✅ تم تفعيل {nom} (عامل — {ent}).",
+        "a_refused": "❌ تم رفض طلب {nom}.",
+        "a_already": "تمت معالجة هذا الطلب بالفعل.",
+        "a_agent_removed": "🗑️ تمت إزالة العامل: {nom}.",
+        "a_admin_removed": "🗑️ تمت إزالة المسؤول: {nom}.",
         "mission_archived": "اكتملت المهمة ✓ تم حفظ كل شيء، شكراً على عملك! 🙌\nالحالة: {statut}.",
         "st_ok": "صالح", "st_check": "للمراجعة",
         "incident_prompt": "صِف المشكلة بكلمات قليلة (بلغتك)، أو أرسل صورة. سأبلّغ المسؤول على الفور. 📝",
@@ -486,6 +614,38 @@ T = {
         "btn_keep_photo": "✅ Păstrează oricum",
         "btn_retake_photo": "📷 Refă poza",
         "photo_retake": "Nicio problemă, trimite poza corectă 📷",
+        "a_panel": "🔧 Spațiu admin — bună {prenom}!\n\nScrie-mi direct întrebările despre rapoartele, pozele și datele tale de curățenie (ex. « ce locuințe au fost curățate azi? », « pozele de la X ieri », « generează un raport »).\nButoanele de mai jos servesc la gestionarea echipei. Apasă /start pentru a ieși.",
+        "a_b_agents": "👥 Gestionează agenții",
+        "a_b_logements": "🏠 Atribuie locuințele",
+        "a_b_admins": "🧑‍💼 Gestionează responsabilii",
+        "a_reports": "📊 Mod raport activat.\nPune-ți întrebarea (locuințe curățate azi, incidente urgente din săptămână, « generează un raport »…). Apasă /start pentru a ieși.",
+        "a_agents_none": "👥 Niciun agent deocamdată. Când un agent se înscrie pentru firma ta, primești un mesaj cu un buton Autorizează.",
+        "a_agents_mine": "👥 Agenții tăi:",
+        "a_agents_all": "👥 Toți agenții:",
+        "a_remove": "❌ Elimină {nom}",
+        "a_admins_title": "🧑‍💼 Responsabili:",
+        "a_admins_none": "(Niciun alt responsabil deocamdată.)",
+        "a_super_only": "Rezervat administratorului principal.",
+        "a_log_title": "🏠 Atribuie locuințele\nApasă o locuință pentru a alege firma ei (❓ = neatribuită).",
+        "a_log_none": "Nicio locuință găsită în Lodgify.",
+        "a_log_err": "Nu pot prelua lista locuințelor. Încearcă din nou.",
+        "a_log_pick": "Cărei firme îi aparține această locuință?",
+        "a_unassigned": "❌ Neatribuită",
+        "a_back": "⬅️ Înapoi",
+        "a_super_co": "Mai întâi, să-ți configurăm profilul. Care este numele firmei tale?",
+        "a_super_co_short": "Numele firmei e prea scurt, încearcă din nou:",
+        "a_super_role": "Perfect. Și care este rolul tău? (ex: manager)",
+        "a_super_done": "✅ Profil salvat.",
+        "a_new_admin": "🆕 Cerere nouă RESPONSABIL\n👤 {nom}\n🏢 {ent}\n💼 {role}\n\nValidezi?",
+        "a_new_agent": "🆕 Cerere nouă AGENT\n👤 {nom}\n🏢 {ent}\n\nValidezi?",
+        "a_btn_auth": "✅ Autorizează",
+        "a_btn_refuse": "❌ Refuză",
+        "a_done_admin": "✅ {nom} validat (responsabil — {ent}).",
+        "a_done_agent": "✅ {nom} validat (agent — {ent}).",
+        "a_refused": "❌ Cerere de la {nom} refuzată.",
+        "a_already": "Această cerere a fost deja tratată.",
+        "a_agent_removed": "🗑️ Agent eliminat: {nom}.",
+        "a_admin_removed": "🗑️ Responsabil eliminat: {nom}.",
         "mission_archived": "Misiune completă ✓ Totul este salvat, mulțumesc pentru munca ta! 🙌\nStare: {statut}.",
         "st_ok": "Validat", "st_check": "De verificat",
         "incident_prompt": "Descrie problema în câteva cuvinte (în limba ta), sau trimite o poză. Anunț responsabilul imediat. 📝",
@@ -675,6 +835,11 @@ def get_state(chat_id: int) -> dict:
                            "apparts_today": {}, "mission": None, "admin_mode": False,
                            "reg": None}
     return AGENTS[chat_id]
+
+
+def ui_lang(chat_id) -> str:
+    """Langue d'interface d'une personne (admin/agent)."""
+    return AGENT_LANG.get(str(chat_id)) or "fr"
 
 
 def display_name(chat_id, state=None) -> str:
@@ -1137,23 +1302,24 @@ async def on_reg_company(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def handle_super_profile_step(update, context, state, reg) -> None:
     """Configuration de l'entreprise et du role du super admin (1re fois)."""
     chat_id = update.effective_chat.id
+    lang = ui_lang(chat_id)
     txt = (update.message.text or "").strip()
     if reg.get("step") == "super_entreprise":
         if len(txt) < 2:
-            await update.message.reply_text("Nom d'entreprise trop court, réessaie :")
+            await update.message.reply_text(t(lang, "a_super_co_short"))
             return
         SUPER_PROFILE["entreprise"] = txt
         _save_super_profile()
         reg["step"] = "super_role"
-        await update.message.reply_text("Parfait. Et quel est ton rôle ? (ex : gérant)")
+        await update.message.reply_text(t(lang, "a_super_role"))
         return
     SUPER_PROFILE["role"] = txt or "Gérant"
     _save_super_profile()
     state["reg"] = None
     state["admin_mode"] = True
-    prenom = state.get("prenom") or "admin"
+    prenom = display_name(chat_id, state) or "admin"
     await update.message.reply_text(
-        "✅ Profil enregistré.\n\n" + ADMIN_PANEL_TXT.format(prenom=prenom),
+        t(lang, "a_super_done") + "\n\n" + t(lang, "a_panel", prenom=prenom),
         reply_markup=admin_panel_kb(chat_id),
     )
 
@@ -1229,7 +1395,6 @@ async def notify_validators(context, code: str) -> None:
     role = reg.get("role", "")
     if typ == "admin":
         targets = [str(MANAGER_CHAT_ID)] if MANAGER_CHAT_ID else []
-        info = f"🆕 Nouvelle demande RESPONSABLE\n👤 {nom}\n🏢 {ent}\n💼 {role}\n🔑 {code}"
     else:
         targets = []
         if MANAGER_CHAT_ID:
@@ -1237,14 +1402,18 @@ async def notify_validators(context, code: str) -> None:
         for c, i in ADMINS.items():
             if co_key(i.get("entreprise", "")) == co_key(ent) and c not in targets:
                 targets.append(c)
-        info = f"🆕 Nouvelle demande AGENT\n👤 {nom}\n🏢 {ent}\n🔑 {code}"
-    kb = InlineKeyboardMarkup([[
-        InlineKeyboardButton("✅ Autoriser", callback_data=f"auth:ok:{code}"),
-        InlineKeyboardButton("❌ Refuser", callback_data=f"auth:no:{code}"),
-    ]])
     for aid in targets:
+        al = ui_lang(aid)
+        if typ == "admin":
+            info = t(al, "a_new_admin", nom=nom, ent=ent, role=role)
+        else:
+            info = t(al, "a_new_agent", nom=nom, ent=ent)
+        kb = InlineKeyboardMarkup([[
+            InlineKeyboardButton(t(al, "a_btn_auth"), callback_data=f"auth:ok:{code}"),
+            InlineKeyboardButton(t(al, "a_btn_refuse"), callback_data=f"auth:no:{code}"),
+        ]])
         try:
-            await context.bot.send_message(int(aid), info + "\n\nValider ?", reply_markup=kb)
+            await context.bot.send_message(int(aid), info, reply_markup=kb)
         except Exception:
             logger.exception("Echec notification validateur %s", aid)
 
@@ -1254,13 +1423,14 @@ async def on_auth(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
     chat_id = query.from_user.id
+    al = ui_lang(chat_id)
     if not is_admin(chat_id):
-        await query.answer("Reserve aux admins.", show_alert=True)
+        await query.answer(t(al, "a_super_only"), show_alert=True)
         return
     _, action, code = query.data.split(":", 2)
     reg = PENDING.get(code)
     if not reg:
-        await query.edit_message_text("Cette demande a déjà été traitée.")
+        await query.edit_message_text(t(al, "a_already"))
         return
     typ = reg.get("type")
     nom = reg.get("nom", "?")
@@ -1269,10 +1439,10 @@ async def on_auth(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     ll = reg.get("lang", "fr")
     # Permissions
     if typ == "admin" and not is_super(chat_id):
-        await query.answer("Seul l'admin principal valide les responsables.", show_alert=True)
+        await query.answer(t(al, "a_super_only"), show_alert=True)
         return
     if typ == "agent" and not is_super(chat_id) and co_key(admin_company(chat_id) or "") != co_key(ent):
-        await query.answer("Tu ne peux valider que les agents de ton entreprise.", show_alert=True)
+        await query.answer(t(al, "a_super_only"), show_alert=True)
         return
     if action == "no":
         PENDING.pop(code, None)
@@ -1281,7 +1451,7 @@ async def on_auth(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             await context.bot.send_message(int(code), t(ll, "reg_refused"))
         except Exception:
             pass
-        await query.edit_message_text(f"❌ Demande de {nom} refusée.")
+        await query.edit_message_text(t(al, "a_refused", nom=nom))
         return
     now = datetime.datetime.now().isoformat(timespec="seconds")
     if typ == "admin":
@@ -1301,8 +1471,8 @@ async def on_auth(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await context.bot.send_message(int(code), msg)
     except Exception:
         logger.exception("Impossible de notifier la personne validee")
-    kind = "responsable" if typ == "admin" else "agent"
-    await query.edit_message_text(f"✅ {nom} validé ({kind} — {ent}).")
+    await query.edit_message_text(
+        t(al, "a_done_admin" if typ == "admin" else "a_done_agent", nom=nom, ent=ent))
 
 
 # Entreprise active pour le cloisonnement des rapports (None = super admin, voit tout)
@@ -1401,10 +1571,11 @@ async def on_photos(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def admin_panel_kb(chat_id) -> InlineKeyboardMarkup:
-    rows = [[InlineKeyboardButton("👥 Gérer les agents", callback_data="adm:agents")]]
+    lang = ui_lang(chat_id)
+    rows = [[InlineKeyboardButton(t(lang, "a_b_agents"), callback_data="adm:agents")]]
     if is_super(chat_id):
-        rows.append([InlineKeyboardButton("🏠 Assigner les logements", callback_data="adm:logements")])
-        rows.append([InlineKeyboardButton("🧑‍💼 Gérer les admins", callback_data="adm:admins")])
+        rows.append([InlineKeyboardButton(t(lang, "a_b_logements"), callback_data="adm:logements")])
+        rows.append([InlineKeyboardButton(t(lang, "a_b_admins"), callback_data="adm:admins")])
     return InlineKeyboardMarkup(rows)
 
 
@@ -1424,20 +1595,20 @@ ADMIN_PANEL_TXT = (
 async def on_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_chat.id
     state = get_state(chat_id)
+    lang = ui_lang(chat_id)
     if not is_admin(chat_id):
-        await update.message.reply_text("Cette commande est reservee aux admins.")
+        await update.message.reply_text(t(lang, "a_super_only"))
         return
     # 1re fois pour le super admin : configurer son entreprise + role
     if is_super(chat_id) and not SUPER_PROFILE.get("entreprise"):
         state["reg"] = {"step": "super_entreprise"}
-        await update.message.reply_text(
-            "Avant tout, configurons ton profil. Quel est le nom de ton entreprise ?")
+        await update.message.reply_text(t(lang, "a_super_co"))
         return
     state["admin_mode"] = True
     prenom = display_name(chat_id, state) or update.effective_user.first_name or "admin"
     logger.info("Panneau admin ouvert par %s (chat_id=%s)", prenom, chat_id)
     await update.message.reply_text(
-        ADMIN_PANEL_TXT.format(prenom=prenom),
+        t(lang, "a_panel", prenom=prenom),
         reply_markup=admin_panel_kb(chat_id),
     )
 
@@ -1447,21 +1618,15 @@ async def on_admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     query = update.callback_query
     await query.answer()
     chat_id = query.from_user.id
+    lang = ui_lang(chat_id)
     if not is_admin(chat_id):
-        await query.answer("Reserve aux admins.", show_alert=True)
+        await query.answer(t(lang, "a_super_only"), show_alert=True)
         return
     state = get_state(chat_id)
     action = query.data.split(":", 1)[1]
     if action == "reports":
         state["admin_mode"] = True
-        await query.edit_message_text(
-            "📊 Mode rapport activé.\n\nPose ta question, par exemple :\n"
-            "• quels appartements ont été nettoyés aujourd'hui ?\n"
-            "• quel agent fait souvent churchill 79 ?\n"
-            "• combien d'incidents cette semaine, et lesquels urgents ?\n"
-            "• liste les missions « À vérifier » et pourquoi.\n\n"
-            "Pose autant de questions que tu veux. Tape /start pour quitter."
-        )
+        await query.edit_message_text(t(lang, "a_reports"))
     elif action == "agents":
         super_ = is_super(chat_id)
         macomp = admin_company(chat_id)
@@ -1469,33 +1634,31 @@ async def on_admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         items = [(c, i) for c, i in AGENTS_AUTH.items()
                  if super_ or co_key(i.get("entreprise", "")) == co_key(macomp or "")]
         if not items:
-            await query.edit_message_text(
-                "👥 Aucun agent pour l'instant.\n"
-                "(Quand un agent s'inscrit pour ton entreprise, tu reçois un message avec un bouton Autoriser.)")
+            await query.edit_message_text(t(lang, "a_agents_none"))
             return
-        txt = "👥 Tes agents :\n" if not super_ else "👥 Tous les agents :\n"
+        txt = (t(lang, "a_agents_all") if super_ else t(lang, "a_agents_mine")) + "\n"
         rows = []
         for code, info in items:
             nom = info.get("prenom", "?")
             ent = info.get("entreprise", "")
             txt += f"• {nom}" + (f" — {ent}" if super_ and ent else "") + "\n"
-            rows.append([InlineKeyboardButton(f"❌ Retirer {nom}", callback_data=f"delagent:{code}")])
+            rows.append([InlineKeyboardButton(t(lang, "a_remove", nom=nom), callback_data=f"delagent:{code}")])
         await query.edit_message_text(txt, reply_markup=InlineKeyboardMarkup(rows))
     elif action == "logements":
         await render_logements(query, chat_id)
     elif action == "admins":
         if not is_super(chat_id):
-            await query.answer("Reserve a l'admin principal.", show_alert=True)
+            await query.answer(t(lang, "a_super_only"), show_alert=True)
             return
         moi = SUPER_PROFILE.get("entreprise", "")
-        txt = f"🧑‍💼 Responsables :\n• (toi, principal) {moi}\n"
+        txt = t(lang, "a_admins_title") + f"\n• ⭐ {moi}\n"
         rows = []
         for code, info in ADMINS.items():
             nom = info.get("prenom", "?")
             txt += f"• {nom} — {info.get('entreprise', '')} ({info.get('role', '')})\n"
-            rows.append([InlineKeyboardButton(f"❌ Retirer {nom}", callback_data=f"deladmin:{code}")])
+            rows.append([InlineKeyboardButton(t(lang, "a_remove", nom=nom), callback_data=f"deladmin:{code}")])
         if not rows:
-            txt += "\n(Aucun autre responsable pour l'instant.)"
+            txt += "\n" + t(lang, "a_admins_none")
         await query.edit_message_text(txt, reply_markup=InlineKeyboardMarkup(rows) if rows else None)
 
 
@@ -1504,38 +1667,39 @@ async def on_delagent(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     query = update.callback_query
     await query.answer()
     chat_id = query.from_user.id
+    lang = ui_lang(chat_id)
     if not is_admin(chat_id):
-        await query.answer("Reserve aux admins.", show_alert=True)
+        await query.answer(t(lang, "a_super_only"), show_alert=True)
         return
     code = query.data.split(":", 1)[1]
     info = AGENTS_AUTH.get(code)
     if not info:
-        await query.edit_message_text("Cet agent n'est plus dans la liste.")
+        await query.edit_message_text(t(lang, "a_agent_removed", nom=""))
         return
     if not is_super(chat_id) and co_key(info.get("entreprise", "")) != co_key(admin_company(chat_id) or ""):
-        await query.answer("Tu ne peux retirer que les agents de ton entreprise.", show_alert=True)
+        await query.answer(t(lang, "a_super_only"), show_alert=True)
         return
     nom = AGENTS_AUTH.pop(code).get("prenom", "")
     _save_agents_auth()
-    await query.edit_message_text(f"🗑️ Agent retire : {nom}.")
+    await query.edit_message_text(t(lang, "a_agent_removed", nom=nom))
 
 
 async def render_logements(query, chat_id) -> None:
     """Affiche la liste des logements avec leur entreprise (super admin uniquement)."""
+    lang = ui_lang(chat_id)
     if not is_super(chat_id):
-        await query.answer("Réservé à l'admin principal.", show_alert=True)
+        await query.answer(t(lang, "a_super_only"), show_alert=True)
         return
     try:
         props = await get_all_properties()
     except Exception:
         logger.exception("Erreur Lodgify (logements)")
-        await query.edit_message_text("Je n'arrive pas à récupérer la liste des logements. Réessaie.")
+        await query.edit_message_text(t(lang, "a_log_err"))
         return
     if not props:
-        await query.edit_message_text("Aucun logement trouvé dans Lodgify.")
+        await query.edit_message_text(t(lang, "a_log_none"))
         return
-    txt = ("🏠 Assigner les logements\nClique sur un logement pour choisir son entreprise.\n"
-           "(❓ = pas encore assigné)\n")
+    txt = t(lang, "a_log_title") + "\n"
     rows = []
     for p in props:
         pid = p["property_id"]
@@ -1550,17 +1714,17 @@ async def on_logpick(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     query = update.callback_query
     await query.answer()
     chat_id = query.from_user.id
+    lang = ui_lang(chat_id)
     if not is_super(chat_id):
-        await query.answer("Reserve a l'admin principal.", show_alert=True)
+        await query.answer(t(lang, "a_super_only"), show_alert=True)
         return
     pid = query.data.split(":", 1)[1]
     companies = list(all_companies().values())
     rows = [[InlineKeyboardButton(f"🏢 {disp}", callback_data=f"logset:{pid}:{idx}")]
             for idx, disp in enumerate(companies)]
-    rows.append([InlineKeyboardButton("❌ Non assigne", callback_data=f"logset:{pid}:x")])
-    rows.append([InlineKeyboardButton("⬅️ Retour", callback_data="adm:logements")])
-    await query.edit_message_text("A quelle entreprise appartient ce logement ?",
-                                  reply_markup=InlineKeyboardMarkup(rows))
+    rows.append([InlineKeyboardButton(t(lang, "a_unassigned"), callback_data=f"logset:{pid}:x")])
+    rows.append([InlineKeyboardButton(t(lang, "a_back"), callback_data="adm:logements")])
+    await query.edit_message_text(t(lang, "a_log_pick"), reply_markup=InlineKeyboardMarkup(rows))
 
 
 async def on_logset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1611,15 +1775,16 @@ async def on_deladmin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     query = update.callback_query
     await query.answer()
     chat_id = query.from_user.id
+    lang = ui_lang(chat_id)
     if not is_super(chat_id):
-        await query.answer("Seul l'admin principal peut retirer un responsable.", show_alert=True)
+        await query.answer(t(lang, "a_super_only"), show_alert=True)
         return
     code = query.data.split(":", 1)[1]
     if code in ADMINS:
         nom = ADMINS.pop(code).get("prenom", "")
         save_admins()
         await apply_agent_menu(context.bot, code)
-        await query.edit_message_text(f"🗑️ Responsable retire : {nom}.")
+        await query.edit_message_text(t(lang, "a_admin_removed", nom=nom))
     else:
         await query.edit_message_text("Ce responsable n'est plus dans la liste.")
 
@@ -2020,8 +2185,12 @@ async def answer_admin(update, context, state, question) -> None:
               f"hier = {(today - datetime.timedelta(days=1)).isoformat()}, "
               f"il y a 3 jours = {(today - datetime.timedelta(days=3)).isoformat()}, "
               f"il y a 7 jours = {(today - datetime.timedelta(days=7)).isoformat()}.")
+    lang = state.get("lang") or AGENT_LANG.get(str(chat_id)) or "fr"
+    langue_nom = {"fr": "francais", "en": "English", "es": "espanol",
+                  "ar": "Arabic (العربية)", "ro": "romana"}.get(lang, "francais")
     system = (
-        "Tu es l'agent admin de Genius BnB (conciergerie / menage). Tu aides le responsable, en francais.\n"
+        "Tu es l'agent admin d'une conciergerie / menage. Tu aides le responsable.\n"
+        f"TRES IMPORTANT : reponds TOUJOURS et uniquement en {langue_nom}, quelle que soit la langue des donnees.\n"
         "Deux jeux de donnees te sont fournis dans le message : MISSIONS (menages realises) et "
         "CHECKOUTS (planning Lodgify). "
         f"{repere} Interprete les dates relatives par rapport a aujourd'hui. Le property_id est l'identifiant fiable.\n\n"
