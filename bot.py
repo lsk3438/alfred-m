@@ -1127,6 +1127,34 @@ async def claude_photo_check(path: str, label: str) -> tuple:
         return True, ""
 
 
+async def claude_report_summary(matches, lang="fr") -> str:
+    """Courte synthèse (2-3 phrases) du rapport, dans la langue de l'admin. '' si indisponible."""
+    if not ANTHROPIC_API_KEY or not matches:
+        return ""
+    resume = []
+    for d in matches:
+        resume.append({
+            "appartement": d.get("appart", {}).get("nom_interne"),
+            "date": str(d.get("heure_debut", ""))[:10],
+            "agent": d.get("agent", {}).get("prenom"),
+            "statut": d.get("statut"),
+            "incidents": [{"resume": i.get("resume"), "urgent": i.get("urgent")}
+                          for i in d.get("incidents", [])],
+        })
+    nom_langue = {"fr": "francais", "en": "English", "es": "espanol",
+                  "ar": "Arabic", "ro": "romana"}.get(lang, "francais")
+    system = (f"Tu rediges une synthese tres breve (2-3 phrases max) pour un rapport de menage. "
+              f"Ecris en {nom_langue}. Mets en avant : nombre de missions, missions a verifier, "
+              f"et surtout les incidents urgents s'il y en a. Ton factuel et professionnel. Pas de liste, du texte continu.")
+    try:
+        out = await claude_text(system, json.dumps(resume, ensure_ascii=False),
+                                max_tokens=200, model=ANTHROPIC_MODEL)
+        return (out or "").strip()
+    except Exception:
+        logger.exception("Echec synthese rapport")
+        return ""
+
+
 async def on_monid(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_chat.id
     state = get_state(chat_id)
@@ -1895,89 +1923,116 @@ def _img_data_uri(path) -> str | None:
 
 
 REPORT_CSS = """
+:root{--ink:#0b1f17;--muted:#6b7b74;--line:#e7ece9;--bg:#eef1f0;--green:#0f7a4f;--green2:#16a34a;--gold:#c8a24a;--ok-bg:#e7f6ec;--ok-tx:#10733f}
 *{box-sizing:border-box}
-body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;margin:0;background:#f4f6f8;color:#1f2937}
-.wrap{max-width:900px;margin:0 auto;padding:0 0 40px}
-.header{background:linear-gradient(135deg,#0f5132,#16a34a);color:#fff;padding:28px 32px}
-.header .brand{font-size:22px;font-weight:700;letter-spacing:.5px}
-.header .sub{opacity:.9;margin-top:2px;font-size:14px}
-.header .meta{margin-top:14px;font-size:13px;opacity:.95}
-.content{padding:24px 32px}
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);
-      padding:20px 22px;margin:0 0 22px}
-.card-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
-          border-bottom:1px solid #eef0f2;padding-bottom:12px;margin-bottom:14px}
-.card-top h2{margin:0;font-size:18px;color:#111827}
-.badge{font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px;white-space:nowrap}
-.badge.ok{background:#dcfce7;color:#15803d}
-.badge.warn{background:#fef3c7;color:#b45309}
-.info{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 0 16px}
-.info .lab{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#6b7280}
-.info .val{font-size:14px;font-weight:600;color:#111827}
-.sec{font-size:13px;font-weight:700;color:#374151;margin:16px 0 8px;text-transform:uppercase;letter-spacing:.4px}
-table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{text-align:left;padding:8px 12px;border-bottom:1px solid #eef0f2}
-th{background:#f9fafb;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
-.pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px}
-.pill.y{background:#dcfce7;color:#15803d}
-.pill.n{background:#fee2e2;color:#b91c1c}
-.inc{background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:10px 14px;margin:6px 0;font-size:14px}
-.inc.urg{background:#fef2f2;border-color:#fecaca}
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:10px}
-.gallery figure{margin:0;background:#f9fafb;border:1px solid #eef0f2;border-radius:8px;overflow:hidden}
-.gallery img{width:100%;height:150px;object-fit:cover;display:block}
-.gallery figcaption{padding:6px 8px;font-size:12px;color:#4b5563;text-align:center}
-.footer{text-align:center;color:#9ca3af;font-size:12px;margin-top:24px}
-@media print{body{background:#fff}.card{box-shadow:none;break-inside:avoid}.header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+html,body{margin:0}
+body{font-family:'Segoe UI',-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.page{max-width:880px;margin:24px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(8,30,22,.10)}
+.cover{position:relative;padding:40px 44px 34px;color:#fff;background:radial-gradient(1200px 300px at 80% -40%,rgba(255,255,255,.18),transparent),linear-gradient(135deg,#0b3d2a 0%,#0f7a4f 55%,#16a34a 100%)}
+.cover .row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo .mark{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800}
+.logo .name{font-size:20px;font-weight:800;letter-spacing:.3px}
+.logo .tag{font-size:12px;opacity:.85;margin-top:1px}
+.cover h1{margin:26px 0 4px;font-size:26px;font-weight:800}
+.cover .when{font-size:13px;opacity:.9}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
+.kpi{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:14px 16px}
+.kpi .num{font-size:26px;font-weight:800;line-height:1}
+.kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.6px;opacity:.9;margin-top:6px}
+.body{padding:30px 44px 12px}
+.synth{background:#f6f9f7;border:1px solid var(--line);border-left:4px solid var(--green);border-radius:12px;padding:16px 18px;margin:0 0 26px;font-size:14px}
+.synth h3{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--green)}
+.mission{border:1px solid var(--line);border-radius:14px;margin:0 0 26px;overflow:hidden}
+.m-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#f6f9f7;border-bottom:1px solid var(--line)}
+.m-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;margin:0}
+.m-title .ico{width:30px;height:30px;border-radius:9px;background:#e7f6ec;display:flex;align-items:center;justify-content:center;font-size:16px}
+.badge{font-size:11.5px;font-weight:800;padding:6px 13px;border-radius:999px;letter-spacing:.3px;white-space:nowrap}
+.badge.ok{background:var(--ok-bg);color:var(--ok-tx)}
+.badge.warn{background:#fdf2e3;color:#a8650d}
+.m-body{padding:18px 20px}
+.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px}
+.meta .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.meta .val{font-size:14.5px;font-weight:700;margin-top:3px}
+.sec{font-size:12px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.7px;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:4px 22px}
+.check{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #f2f5f3;font-size:13.5px}
+.check .dot{width:18px;height:18px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+.dot.y{background:var(--green2)}.dot.n{background:#dc2626}.dot.na{background:#b3bdb8}
+.check .txt{flex:1}.check .num{font-weight:800;color:var(--green)}
+.inc{display:flex;gap:10px;align-items:flex-start;background:#fff8ee;border:1px solid #f6e2bf;border-left:4px solid var(--gold);border-radius:10px;padding:11px 14px;margin:8px 0;font-size:13.5px}
+.inc.urg{background:#fef2f2;border-color:#f6cccc;border-left-color:#dc2626}.inc .u{font-weight:800;color:#dc2626}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gallery figure{margin:0;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#f6f9f7}
+.gallery img{width:100%;height:120px;object-fit:cover;display:block}
+.gallery figcaption{padding:7px 9px;font-size:11.5px;color:var(--muted);text-align:center}
+.foot{padding:18px 44px 30px;text-align:center;color:var(--muted);font-size:11.5px;border-top:1px solid var(--line)}
+.foot b{color:var(--green)}
+@media print{body{background:#fff}.page{box-shadow:none;margin:0;max-width:none;border-radius:0}.mission,.synth{break-inside:avoid}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 """
 
 
-def _build_html_report(matches, titre) -> str:
+def _build_html_report(matches, titre, company="", synthese="") -> str:
     n_ok = sum(1 for d in matches if d.get("statut") == "Valide")
     n_warn = len(matches) - n_ok
-    gen = datetime.datetime.now().strftime("%d/%m/%Y a %H:%M")
-    h = [f"<!doctype html><html lang='fr'><head><meta charset='utf-8'>",
+    company = company or "Genius BnB"
+    mono = (company.strip()[:1] or "A").upper()
+    gen = datetime.datetime.now().strftime("%d/%m/%Y à %H:%M")
+    h = ["<!doctype html><html lang='fr'><head><meta charset='utf-8'>",
          f"<meta name='viewport' content='width=device-width,initial-scale=1'><title>{_esc(titre)}</title>",
-         f"<style>{REPORT_CSS}</style></head><body><div class='wrap'>",
-         "<div class='header'><div class='brand'>Genius BnB</div>",
-         "<div class='sub'>Rapport de menage — preuve d'intervention</div>",
-         f"<div class='meta'>Genere le {gen} &nbsp;•&nbsp; {len(matches)} mission(s) &nbsp;•&nbsp; "
-         f"{n_ok} validee(s), {n_warn} a verifier</div></div>",
-         "<div class='content'>"]
+         f"<style>{REPORT_CSS}</style></head><body><div class='page'>",
+         "<div class='cover'><div class='row'>",
+         f"<div class='logo'><div class='mark'>{_esc(mono)}</div>"
+         f"<div><div class='name'>{_esc(company)}</div><div class='tag'>Conciergerie &amp; ménage</div></div></div>",
+         "<div style='text-align:right;font-size:12px;opacity:.9'>Rapport qualité<br>preuve d'intervention</div>",
+         "</div>",
+         "<h1>Rapport de ménage</h1>",
+         f"<div class='when'>Généré le {gen} &nbsp;·&nbsp; {len(matches)} mission(s)</div>",
+         "<div class='kpis'>"
+         f"<div class='kpi'><div class='num'>{len(matches)}</div><div class='lab'>Missions</div></div>"
+         f"<div class='kpi'><div class='num'>{n_ok}</div><div class='lab'>Validées</div></div>"
+         f"<div class='kpi'><div class='num'>{n_warn}</div><div class='lab'>À vérifier</div></div>"
+         "</div></div>",
+         "<div class='body'>"]
+    if synthese:
+        h.append(f"<div class='synth'><h3>🧠 Synthèse</h3>{_esc(synthese)}</div>")
     for d in matches:
         appart = d.get("appart", {}).get("nom_interne", "?")
         date = str(d.get("heure_debut", ""))[:10]
         statut = d.get("statut", "")
         ok = statut == "Valide"
-        h.append("<div class='card'>")
-        h.append(f"<div class='card-top'><h2>🏠 {_esc(appart)}</h2>"
-                 f"<span class='badge {'ok' if ok else 'warn'}'>{_esc(statut)}</span></div>")
         deb = str(d.get("heure_debut", ""))[11:16]
         fin = str(d.get("heure_fin", ""))[11:16]
-        h.append("<div class='info'>"
+        h.append("<div class='mission'>")
+        h.append(f"<div class='m-head'><h2 class='m-title'><span class='ico'>🏠</span> {_esc(appart)}</h2>"
+                 f"<span class='badge {'ok' if ok else 'warn'}'>{'✓ ' if ok else '⚠ '}{_esc(statut)}</span></div>")
+        h.append("<div class='m-body'>")
+        h.append("<div class='meta'>"
                  f"<div><div class='lab'>Date</div><div class='val'>{_esc(date)}</div></div>"
                  f"<div><div class='lab'>Agent</div><div class='val'>{_esc(d.get('agent', {}).get('prenom') or '-')}</div></div>"
                  f"<div><div class='lab'>Horaire</div><div class='val'>{_esc(deb)} → {_esc(fin)}</div></div>"
                  "</div>")
-        conf = d.get("confirmations", {})
-        if conf:
-            h.append("<div class='sec'>Verifications</div><table><tr><th>Point</th><th>Reponse</th></tr>")
-            for k, v in conf.items():
-                if v is True:
-                    pill = "<span class='pill y'>Fait</span>"
-                elif v is False:
-                    pill = "<span class='pill n'>Non</span>"
-                else:
-                    pill = f"<span class='pill'>{_esc(v)}</span>"  # N/A ou valeur (ex. nb serviettes)
-                h.append(f"<tr><td>{_esc(k)}</td><td>{pill}</td></tr>")
-            h.append("</table>")
         inc = d.get("incidents", [])
         if inc:
-            h.append("<div class='sec'>Incidents signales</div>")
+            h.append("<div class='sec'>Incidents signalés</div>")
             for i in inc:
                 urg = " urg" if i.get("urgent") else ""
-                tag = " <b>(URGENT)</b>" if i.get("urgent") else ""
-                h.append(f"<div class='inc{urg}'>⚠️ {_esc(i.get('resume'))}{tag}</div>")
+                tag = "<span class='u'>URGENT — </span>" if i.get("urgent") else ""
+                h.append(f"<div class='inc{urg}'>⚠️ <div>{tag}{_esc(i.get('resume'))}</div></div>")
+        conf = d.get("confirmations", {})
+        if conf:
+            h.append("<div class='sec'>Vérifications</div><div class='checks'>")
+            for k, v in conf.items():
+                if v is True:
+                    h.append(f"<div class='check'><span class='dot y'>✓</span><span class='txt'>{_esc(k)}</span></div>")
+                elif v is False:
+                    h.append(f"<div class='check'><span class='dot n'>✗</span><span class='txt'>{_esc(k)}</span></div>")
+                elif str(v).upper() == "N/A":
+                    h.append(f"<div class='check'><span class='dot na'>–</span><span class='txt'>{_esc(k)}</span></div>")
+                else:
+                    h.append(f"<div class='check'><span class='txt'>{_esc(k)}</span><span class='num'>{_esc(v)}</span></div>")
+            h.append("</div>")
         photos = [p for p in d.get("photos", []) if _img_data_uri(p.get("path", ""))]
         if photos:
             h.append(f"<div class='sec'>Photos preuve ({len(photos)})</div><div class='gallery'>")
@@ -1985,8 +2040,8 @@ def _build_html_report(matches, titre) -> str:
                 uri = _img_data_uri(ph.get("path", ""))
                 h.append(f"<figure><img src='{uri}'><figcaption>{_esc(ph.get('point', ''))}</figcaption></figure>")
             h.append("</div>")
-        h.append("</div>")
-    h.append(f"<div class='footer'>Document genere automatiquement par ALFRED-M • Genius BnB</div>")
+        h.append("</div></div>")
+    h.append(f"<div class='foot'>Document généré automatiquement par <b>ALFRED</b> · {_esc(company)} · Confidentiel</div>")
     h.append("</div></body></html>")
     path = os.path.join(EXPORTS_DIR, f"rapport_{_stamp()}.html")
     with open(path, "w", encoding="utf-8") as f:
@@ -2137,7 +2192,9 @@ async def execute_admin_tool(name, inp, context, chat_id, state) -> str:
             n = await _send_videos(context, chat_id, matches, inp.get("quelles", "les_deux"))
             return f"{n} video(s) envoyee(s)." if n else "Aucune video disponible pour ces missions."
         if name == "exporter_rapport":
-            path = _build_html_report(matches, "Rapport de menage — Genius BnB")
+            company = admin_company(chat_id) or SUPER_PROFILE.get("entreprise", "") or "Genius BnB"
+            synth = await claude_report_summary(matches, ui_lang(chat_id))
+            path = _build_html_report(matches, f"Rapport de menage — {company}", company, synth)
             with open(path, "rb") as f:
                 await context.bot.send_document(
                     chat_id, document=f, filename=os.path.basename(path),
