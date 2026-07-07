@@ -251,7 +251,16 @@ T = {
         "video_avant_ok": "Vidéo d'arrivée bien reçue ✓\n\nTu peux commencer le ménage 🧽 Prends ton temps et fais les choses bien. Quand tout est terminé, appuie sur le bouton ci-dessous. 👇",
         "btn_done": "✅ J'ai terminé le ménage",
         "btn_incident": "⚠️ Signaler un problème",
-        "menage_done": "Bravo ! 👏 On passe au contrôle final, point par point (quelques photos + vérifications). C'est rapide, laisse-toi guider.",
+        "sec_points_intro": "À contrôler dans cette pièce :",
+        "sec_photos_intro": "📸 Photos à envoyer (minimum {n}) :",
+        "sec_count": "Photos reçues : {c}/{n}",
+        "sec_instructions": "Envoie les photos une par une, puis appuie sur ✅ quand c'est bon.",
+        "sec_validate": "✅ Section validée",
+        "sec_photo_added": "📷 Photo reçue ({c}/{n}). Continue ou valide la section.",
+        "sec_need_more": "⚠️ Il manque encore {r} photo(s) avant de valider ({c}/{n}).",
+        "sec_done": "✅ {titre} — validée !",
+        "ctrl_note": "🔎 Contrôle photo — {sec} : {desc}",
+        "menage_done": "Bravo ! 👏 On passe au contrôle final, pièce par pièce. Pour chaque pièce : envoie les photos demandées, puis valide. Laisse-toi guider.",
         "point_photo": "📸 Étape {num}/{n} — {label}\nEnvoie une photo comme preuve.",
         "btn_yes": "✅ Oui", "btn_no": "⚠️ Non",
         "point_confirm": "Étape {num}/{n} — {label}",
@@ -717,63 +726,75 @@ def label_fr(key: str) -> str:
 # CHECKLIST (codee en dur ; libelles traduits via les cles cl_*)
 # =====================================================================
 CHECKLIST = [
-    {"titre": "1. Chambre(s)", "items": [
-        {"type": "confirm", "label": "Lit refait avec linge propre (draps + housse + taies), borde, sans tache"},
-        {"type": "confirm", "label": "Aucun poil / cheveu sur le lit"},
-        {"type": "confirm", "label": "Surfaces depoussierees (tables de nuit, lampes, etageres, plinthes, hauteur)"},
-        {"type": "confirm", "label": "Poignees + interrupteurs essuyes"},
-        {"type": "photo",   "label": "Sous le lit verifie (rien oublie, pas de poussiere)"},
-        {"type": "confirm", "label": "Miroir sans traces"},
+    {"titre": "1. 🛏️ Chambres", "photos_min": 3, "points": [
+        "Lit refait avec linge propre (draps + housse + taies), borde, sans tache",
+        "Aucun poil / cheveu sur le lit",
+        "Surfaces depoussierees (tables de nuit, lampes, etageres, plinthes)",
+        "Poignees + interrupteurs essuyes",
+        "Miroir sans traces",
+    ], "photos": [
+        "Sous le lit (LA PLUS IMPORTANTE)",
+        "Vue d'ensemble de la chambre",
+        "Vue d'ensemble (autre angle)",
     ]},
-    {"titre": "2. Salle de bain / WC", "items": [
-        {"type": "photo",   "label": "WC entierement lave (interieur sous le rebord + exterieur)"},
-        {"type": "photo",   "label": "Douche / baignoire lavee (parois, robinetterie, sol detartre)"},
-        {"type": "confirm", "label": "Lavabo lave (vasque + robinetterie)"},
-        {"type": "confirm", "label": "Miroir, carrelage et joints propres (sans traces ni moisissure)"},
-        {"type": "photo",   "label": "Siphon douche vide (cheveux retires)"},
-        {"type": "number",  "label": "Serviettes propres posees — nombre exact"},
-        {"type": "confirm", "label": "Papier toilette present (au moins 2 rouleaux)"},
-        {"type": "confirm", "label": "Savon mains present"},
+    {"titre": "2. 🍳 Cuisine", "photos_min": 4, "points": [
+        "Lave-vaisselle vide",
+        "Evier + plan de travail propres et degraisses",
+        "Bouilloire + cafetiere propres et detartrees",
+        "Torchons + eponge propres",
+        "Produit vaisselle present",
+    ], "photos": [
+        "Vaisselle propre et rangee",
+        "Plaques, four et micro-ondes (int + ext)",
+        "Frigo et congelateur ouverts (vides et nettoyes)",
+        "Vue d'ensemble de la cuisine",
     ]},
-    {"titre": "3. Cuisine", "items": [
-        {"type": "photo",   "label": "Vaisselle propre et rangee (casseroles, verres, couverts, assiettes)"},
-        {"type": "confirm", "label": "Lave-vaisselle vide"},
-        {"type": "confirm", "label": "Evier + plan de travail propres et degraisses"},
-        {"type": "photo",   "label": "Plaques, four et micro-ondes propres (int + ext)"},
-        {"type": "confirm", "label": "Bouilloire + cafetiere propres et detartrees"},
-        {"type": "photo",   "label": "Frigo et congelateur vides et nettoyes"},
-        {"type": "confirm", "label": "Torchons + eponge propres"},
-        {"type": "confirm", "label": "Produit vaisselle present"},
+    {"titre": "3. 🚿 Salle de bain", "photos_min": 3, "points": [
+        "Lavabo lave (vasque + robinetterie)",
+        "Miroir, carrelage et joints propres (sans traces ni moisissure)",
+    ], "photos": [
+        "Siphon douche vide, cheveux retires (LA PLUS IMPORTANTE)",
+        "Douche / baignoire lavee (parois, robinetterie, sol)",
+        "Vue d'ensemble de la salle de bain",
     ]},
-    {"titre": "4. Salon / Sejour", "items": [
-        {"type": "confirm", "label": "Canape propre, sans tache (sinon : Signaler un souci + photo)"},
-        {"type": "confirm", "label": "Coussins remis en place"},
-        {"type": "confirm", "label": "Surfaces depoussierees + poignees / interrupteurs essuyes"},
-        {"type": "confirm", "label": "TV presente"},
-        {"type": "confirm", "label": "Telecommande(s) presente(s) + piles OK"},
+    {"titre": "4. 🚽 Toilettes", "photos_min": 2, "points": [
+        "Papier toilette present (au moins 2 rouleaux)",
+    ], "photos": [
+        "WC lave — interieur de la cuvette sous le rebord + exterieur (LA PLUS IMPORTANTE)",
+        "Vue d'ensemble des toilettes",
     ]},
-    {"titre": "5. Sols, vitres & controles generaux", "items": [
-        {"type": "confirm", "label": "Tous les sols aspires (toutes les pieces)"},
-        {"type": "confirm", "label": "Tous les sols laves (toutes les pieces)"},
-        {"type": "confirm", "label": "Toutes les vitres et fenetres sans traces"},
-        {"type": "confirm", "label": "Toutes les poubelles videes + sacs neufs"},
-        {"type": "confirm", "label": "Aucune toile d'araignee"},
-        {"type": "confirm", "label": "Aucun insecte / salete residuelle"},
-        {"type": "confirm", "label": "Toutes les ampoules fonctionnent"},
-        {"type": "confirm", "label": "Seche-cheveux present et fonctionnel"},
-        {"type": "confirm", "label": "Fer a repasser present"},
-        {"type": "confirm", "label": "Sacs poubelle en reserve (3-4)"},
-        {"type": "confirm", "label": "Chauffage eteint"},
+    {"titre": "5. 🛋️ Salon", "photos_min": 2, "points": [
+        "Canape propre, sans tache",
+        "Coussins remis en place",
+        "Surfaces depoussierees + poignees / interrupteurs essuyes",
+        "TV presente",
+        "Telecommande(s) presente(s) + piles OK",
+    ], "photos": [
+        "Vue d'ensemble du salon",
+        "Vue d'ensemble (autre angle)",
     ]},
-    {"titre": "6. Avant de partir", "items": [
-        {"type": "confirm", "label": "Lumieres eteintes + fenetres fermees"},
-        {"type": "confirm", "label": "Porte verrouillee"},
-        {"type": "photo",   "label": "Cles remises dans la boite a cles"},
+    {"titre": "6. ✅ General (fin de menage)", "photos_min": 1, "points": [
+        "Tous les sols aspires (toutes les pieces)",
+        "Tous les sols laves (toutes les pieces)",
+        "Toutes les vitres et fenetres sans traces",
+        "Toutes les poubelles videes + sacs neufs",
+        "Aucune toile d'araignee",
+        "Aucun insecte / salete residuelle",
+        "Toutes les ampoules fonctionnent",
+        "Seche-cheveux present et fonctionnel",
+        "Fer a repasser present",
+        "Sacs poubelle en reserve (3-4)",
+        "Chauffage eteint",
+        "Serviettes et draps fournis pour le nombre de voyageurs",
+        "Lumieres eteintes + fenetres fermees",
+        "Porte verrouillee",
+    ], "photos": [
+        "Cles remises dans la boite a cles",
     ]},
 ]
 
 # --- Traductions de la checklist (auto par Claude, mises en cache sur disque) ---
-CHECKLIST_I18N_FILE = os.path.join(BASE_DIR, "checklist_i18n.json")
+CHECKLIST_I18N_FILE = os.path.join(BASE_DIR, "checklist_i18n_v2.json")
 CHECKLIST_CACHE = {"fr": CHECKLIST}
 try:
     with open(CHECKLIST_I18N_FILE, encoding="utf-8") as _f:
@@ -792,10 +813,10 @@ def _save_checklist_cache() -> None:
 
 
 async def translate_checklist(lang: str) -> list:
-    payload = [{"titre": s["titre"], "items": [it["label"] for it in s["items"]]} for s in CHECKLIST]
+    payload = [{"titre": s["titre"], "points": s["points"], "photos": s["photos"]} for s in CHECKLIST]
     system = (
-        f"Traduis fidelement en langue '{lang}' tous les textes du JSON (titre + items). "
-        "Garde EXACTEMENT la meme structure, le meme nombre d'elements et le meme ordre. "
+        f"Traduis fidelement en langue '{lang}' tous les textes du JSON (titre + points + photos). "
+        "Garde EXACTEMENT la meme structure, les memes cles, le meme nombre d'elements et le meme ordre. "
         "Ne traduis pas les emojis. Reponds UNIQUEMENT avec le JSON traduit, rien d'autre."
     )
     raw = await claude_text(system, json.dumps(payload, ensure_ascii=False), max_tokens=6000)
@@ -805,11 +826,12 @@ async def translate_checklist(lang: str) -> list:
     result = []
     for i, sec in enumerate(CHECKLIST):
         tr = data[i]
-        labels = tr.get("items", [])
-        items = [{"type": sec["items"][j]["type"],
-                  "label": labels[j] if j < len(labels) else sec["items"][j]["label"]}
-                 for j in range(len(sec["items"]))]
-        result.append({"titre": tr.get("titre", sec["titre"]), "items": items})
+        pts = tr.get("points", []) or []
+        phs = tr.get("photos", []) or []
+        points = [pts[j] if j < len(pts) else sec["points"][j] for j in range(len(sec["points"]))]
+        photos = [phs[j] if j < len(phs) else sec["photos"][j] for j in range(len(sec["photos"]))]
+        result.append({"titre": tr.get("titre", sec["titre"]),
+                        "photos_min": sec["photos_min"], "points": points, "photos": photos})
     return result
 
 
@@ -868,9 +890,9 @@ def new_mission(property_id: str, name: str) -> dict:
     return {
         "property_id": property_id, "name": name,
         "etape": ETAPE_VIDEO_AVANT,
-        "sec_index": 0, "item_index": 0, "checklist": None,
+        "sec_index": 0, "sec_photos": 0, "checklist": None,
         "media": {"video_avant": None, "photos": [], "video_fin": None},
-        "confirmations": {}, "incidents": [],
+        "confirmations": {}, "incidents": [], "controles": [],
         "incident_retour": None, "incident_pending": {},
         "debut": datetime.datetime.now().isoformat(timespec="seconds"),
     }
@@ -1118,14 +1140,17 @@ async def claude_photo_check(path: str, label: str) -> tuple:
     except Exception:
         return True, ""
     system = (
-        "Tu verifies des photos de menage. La photo est censee montrer un element precis. "
-        "Reponds UNIQUEMENT en JSON compact : {\"ok\": true|false, \"raison\": \"<5 mots max>\"}. "
-        "Sois tolerant (angle, luminosite, flou, cadrage). Mets ok=false UNIQUEMENT si la photo "
-        "n'a clairement aucun rapport avec l'element demande."
+        "Tu controles des photos de menage prises par un agent. "
+        "Reponds UNIQUEMENT en JSON compact : {\"ok\": true|false, \"raison\": \"<8 mots max>\"}. "
+        "Sois tolerant sur l'angle, la luminosite, le flou et le cadrage. "
+        "Mets ok=false dans DEUX cas seulement : (1) la photo n'a clairement aucun rapport avec "
+        "l'element demande ; (2) on voit clairement un probleme de proprete ou un manque "
+        "(salete, cheveux, poussiere, taches, desordre, poubelle pleine, element manquant). "
+        "Dans ce cas, 'raison' decrit brievement le probleme. Sinon ok=true."
     )
     content = [
         {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b64}},
-        {"type": "text", "text": f"Element demande : {label}. La photo correspond-elle ?"},
+        {"type": "text", "text": f"Element attendu : {label}. La photo est-elle correcte et propre ?"},
     ]
     try:
         raw = await claude_text(system, content, max_tokens=120, model=ANTHROPIC_MODEL)
@@ -2462,14 +2487,6 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if m and m["etape"] == ETAPE_INCIDENT:
         await finaliser_incident(update, context, chat_id, state, update.message.text)
         return
-    # Saisie d'un nombre demande par la checklist (ex. nombre de serviettes)
-    if (m and m["etape"] == ETAPE_CHECKLIST and m["sec_index"] < len(_cl(m))
-            and _cur_type(m) == "number"):
-        val = (update.message.text or "").strip()
-        m["confirmations"][_fr_label(m)] = val
-        await update.message.reply_text(f"✅ {val}")
-        await advance_step(context, chat_id, state)
-        return
     if not is_agent_authorized(chat_id):
         ll = state.get("lang") or AGENT_LANG.get(str(chat_id)) or "fr"
         if str(chat_id) in PENDING:
@@ -2596,7 +2613,7 @@ async def on_fin_menage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         return
     m["etape"] = ETAPE_CHECKLIST
     m["sec_index"] = 0
-    m["item_index"] = 0
+    m["sec_photos"] = 0
     await query.edit_message_text(t(lang, "menage_done"))
     if lang != "fr" and lang not in CHECKLIST_CACHE:
         await context.bot.send_message(chat_id, "⏳ Preparation de la checklist...")
@@ -2620,18 +2637,12 @@ TXT_ENVOIE_PHOTOS = {"fr": "Envoie les photos, puis « Photos terminees » 📷"
 TXT_NOMBRE = {"fr": "Tape le nombre 🔢", "en": "Type the number 🔢", "es": "Escribe el número 🔢",
               "ar": "اكتب الرقم 🔢", "ro": "Scrie numărul 🔢"}
 
-CHECKLIST_TOTAL = sum(len(s["items"]) for s in CHECKLIST)
+CHECKLIST_SECTIONS = len(CHECKLIST)
 
 
 def _cl(m) -> list:
     """Checklist a afficher pour l'agent (traduite si dispo), sinon FR."""
     return m.get("checklist") or CHECKLIST
-
-
-def _progress(m):
-    cl = _cl(m)
-    num = sum(len(cl[i]["items"]) for i in range(m["sec_index"])) + m["item_index"] + 1
-    return num, CHECKLIST_TOTAL
 
 
 def _bar(num, total) -> str:
@@ -2642,54 +2653,49 @@ def _bar(num, total) -> str:
 def _recap_text(state) -> str:
     lang = state.get("lang") or "fr"
     m = state["mission"]
-    conf = m.get("confirmations", {})
-    faits = sum(1 for v in conf.values() if v is True)
-    na = sum(1 for v in conf.values() if v == "N/A")
-    soucis = len(m.get("incidents", []))
+    faits = sum(1 for v in m.get("confirmations", {}).values() if v is True)
+    soucis = len(m.get("incidents", [])) + len(m.get("controles", []))
     photos = len(m.get("media", {}).get("photos", []))
     return (f"📋 {m['name']}\n"
-            f"✅ {faits}   ➖ {na}   ⚠️ {soucis}   📷 {photos}\n\n"
+            f"✅ {faits} sections   ⚠️ {soucis}   📷 {photos}\n\n"
             f"{t(lang, 'checklist_done')}")
 
 
-def _fr_label(m) -> str:
-    return CHECKLIST[m["sec_index"]]["items"][m["item_index"]]["label"]
+def _fr_titre(m) -> str:
+    return CHECKLIST[m["sec_index"]]["titre"]
 
 
 async def send_step(context, chat_id, state) -> None:
+    """Affiche une SECTION entiere : points a controler + photos a envoyer."""
     lang = state.get("lang") or "fr"
     m = state["mission"]
     cl = _cl(m)
     sec = cl[m["sec_index"]]
-    item = sec["items"][m["item_index"]]
-    typ, label = item["type"], item["label"]
-    num, total = _progress(m)
-    header = f"━━━━━━━━━━\n📋 {sec['titre'].upper()}\n━━━━━━━━━━\n\n" if m["item_index"] == 0 else ""
-    prog = f"{_bar(num, total)}   {num}/{total}\n\n"
-    na = InlineKeyboardButton(TXT_NA.get(lang, TXT_NA["fr"]), callback_data="ck:na")
-    inc = InlineKeyboardButton(t(lang, "btn_incident"), callback_data="incident")
-    if typ == "confirm":
-        kb = InlineKeyboardMarkup([[InlineKeyboardButton(TXT_FAIT.get(lang, TXT_FAIT["fr"]), callback_data="ck:ok"), na], [inc]])
-        txt = f"{header}{prog}👉 {label}"
-    elif typ == "photo":
-        kb = InlineKeyboardMarkup([[na], [inc]])
-        txt = f"{header}{prog}📷 {label}\n\n{TXT_ENVOIE_PHOTO.get(lang, TXT_ENVOIE_PHOTO['fr'])}"
-    elif typ == "photos":
-        kb = InlineKeyboardMarkup([[InlineKeyboardButton(TXT_TERMINE.get(lang, TXT_TERMINE["fr"]), callback_data="ck:done")], [na], [inc]])
-        txt = f"{header}{prog}📷 {label}\n\n{TXT_ENVOIE_PHOTOS.get(lang, TXT_ENVOIE_PHOTOS['fr'])}"
-    else:  # number
-        kb = InlineKeyboardMarkup([[na]])
-        txt = f"{header}{prog}🔢 {label}\n\n{TXT_NOMBRE.get(lang, TXT_NOMBRE['fr'])}"
+    m["sec_photos"] = 0
+    n = m["sec_index"] + 1
+    total = len(cl)
+    pmin = sec.get("photos_min", 1)
+    header = f"━━━━━━━━━━\n{sec['titre']}\n━━━━━━━━━━\n"
+    prog = f"{_bar(n, total)}   {n}/{total}\n\n"
+    points = "\n".join("• " + p for p in sec.get("points", []))
+    photos = "\n".join("• " + ph for ph in sec.get("photos", []))
+    txt = (f"{header}{prog}"
+           f"{t(lang, 'sec_points_intro')}\n{points}\n\n"
+           f"{t(lang, 'sec_photos_intro', n=pmin)}\n{photos}\n\n"
+           f"{t(lang, 'sec_count', c=0, n=pmin)}\n"
+           f"{t(lang, 'sec_instructions')}")
+    kb = InlineKeyboardMarkup([
+        [InlineKeyboardButton(t(lang, "sec_validate"), callback_data="ck:valider")],
+        [InlineKeyboardButton(t(lang, "btn_incident"), callback_data="incident")],
+    ])
     await context.bot.send_message(chat_id, txt, reply_markup=kb)
 
 
 async def advance_step(context, chat_id, state) -> None:
     m = state["mission"]
     cl = _cl(m)
-    m["item_index"] += 1
-    if m["item_index"] >= len(cl[m["sec_index"]]["items"]):
-        m["sec_index"] += 1
-        m["item_index"] = 0
+    m["sec_index"] += 1
+    m["sec_photos"] = 0
     if m["sec_index"] >= len(cl):
         m["etape"] = ETAPE_VIDEO_FIN
         await context.bot.send_message(chat_id, _recap_text(state))
@@ -2697,29 +2703,28 @@ async def advance_step(context, chat_id, state) -> None:
         await send_step(context, chat_id, state)
 
 
-def _cur_type(m) -> str:
-    return _cl(m)[m["sec_index"]]["items"][m["item_index"]]["type"]
-
-
 async def on_ck(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    await query.answer()
     chat_id = query.from_user.id
     state = get_state(chat_id)
+    lang = state.get("lang") or "fr"
     m = state.get("mission")
     if not m or m["etape"] != ETAPE_CHECKLIST:
+        await query.answer()
         return
     action = query.data.split(":", 1)[1]
-    label = _cl(m)[m["sec_index"]]["items"][m["item_index"]]["label"]
-    fr = _fr_label(m)
-    if action == "ok":
-        m["confirmations"][fr] = True
-        await query.edit_message_text(f"✅ {label}")
-    elif action == "na":
-        m["confirmations"][fr] = "N/A"
-        await query.edit_message_text(f"➖ {label} — N/A")
-    elif action == "done":
-        await query.edit_message_text("✅ OK")
+    if action != "valider":
+        await query.answer()
+        return
+    sec = _cl(m)[m["sec_index"]]
+    pmin = sec.get("photos_min", 1)
+    got = m.get("sec_photos", 0)
+    if got < pmin:
+        await query.answer(t(lang, "sec_need_more", r=pmin - got, c=got, n=pmin), show_alert=True)
+        return
+    await query.answer()
+    m["confirmations"][_fr_titre(m)] = True   # valide tous les points de la section
+    await query.edit_message_text(t(lang, "sec_done", titre=sec["titre"]))
     await advance_step(context, chat_id, state)
 
 
@@ -2739,59 +2744,56 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(t(lang, "incident_photo_ok"))
         return
 
-    typ = None
-    if m and m["etape"] == ETAPE_CHECKLIST and m["sec_index"] < len(_cl(m)):
-        typ = _cur_type(m)
-    if typ not in ("photo", "photos"):
+    if not (m and m["etape"] == ETAPE_CHECKLIST and m["sec_index"] < len(_cl(m))):
         await update.message.reply_text(t(lang, "not_photo"))
         return
 
-    fr = _fr_label(m)
+    sec = _cl(m)[m["sec_index"]]
+    pmin = sec.get("photos_min", 1)
+    shots = sec.get("photos", [])
+    idx = m.get("sec_photos", 0)
+    attendu = shots[idx] if idx < len(shots) else sec["titre"]
+
     photo = update.message.photo[-1]
     tg_file = await photo.get_file()
     path = os.path.join(MEDIA_DIR, f"{chat_id}_{_stamp()}_{len(m['media']['photos']) + 1}.jpg")
     await tg_file.download_to_drive(path)
-    m["media"]["photos"].append({"point": fr, "path": path})
-    logger.info("Photo recue (%s) : %s", fr, path)
-    # Verification visuelle par l'IA (ne bloque jamais : l'agent peut garder quand meme)
-    label = _cl(m)[m["sec_index"]]["items"][m["item_index"]]["label"]
-    ok, raison = await claude_photo_check(path, label)
+    m["media"]["photos"].append({"point": f"{sec['titre']} — {attendu}", "path": path})
+    m["sec_photos"] = m.get("sec_photos", 0) + 1
+    got = m["sec_photos"]
+    logger.info("Photo section %s recue (%s) : %s", sec["titre"], attendu, path)
+
+    # Analyse IA : signale salete / manque / hors-sujet (ne bloque jamais)
+    ok, raison = await claude_photo_check(path, attendu)
     if not ok:
-        m["photo_check"] = {"path": path, "typ": typ}
+        m.setdefault("controles", []).append(
+            {"section": sec["titre"], "desc": raison or "-", "path": path})
+        m["photo_check"] = {"path": path}
         kb = InlineKeyboardMarkup([
             [InlineKeyboardButton(t(lang, "btn_keep_photo"), callback_data="pkeep")],
             [InlineKeyboardButton(t(lang, "btn_retake_photo"), callback_data="pretake")],
         ])
         await update.message.reply_text(
-            t(lang, "photo_doute", label=label, raison=raison or "—"), reply_markup=kb)
+            t(lang, "photo_doute", label=attendu, raison=raison or "—"), reply_markup=kb)
         return
-    await update.message.reply_text(t(lang, "photo_ok"))
-    if typ == "photo":  # une seule photo attendue -> on avance
-        await advance_step(context, chat_id, state)
-    # type "photos" (lot) : on reste, l'agent envoie d'autres photos ou « Photos terminees »
+    await update.message.reply_text(t(lang, "sec_photo_added", c=got, n=pmin))
 
 
 async def on_photo_keep(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """L'agent garde quand meme une photo signalee comme douteuse."""
+    """L'agent garde quand meme une photo signalee (le controle reste note dans le rapport)."""
     query = update.callback_query
     await query.answer()
     chat_id = query.from_user.id
     state = get_state(chat_id)
     lang = state.get("lang") or "fr"
     m = state.get("mission")
-    pc = m.get("photo_check") if m else None
-    if not m or not pc:
-        await query.edit_message_text(t(lang, "photo_ok"))
-        return
-    typ = pc.get("typ")
-    m["photo_check"] = None
+    if m:
+        m["photo_check"] = None
     await query.edit_message_text(t(lang, "photo_ok"))
-    if typ == "photo":
-        await advance_step(context, chat_id, state)
 
 
 async def on_photo_retake(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """L'agent veut reprendre la photo : on retire la photo douteuse, il en renvoie une."""
+    """L'agent reprend la photo : on retire la photo douteuse et son controle."""
     query = update.callback_query
     await query.answer()
     chat_id = query.from_user.id
@@ -2802,6 +2804,9 @@ async def on_photo_retake(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     if m and pc:
         path = pc.get("path")
         m["media"]["photos"] = [p for p in m["media"]["photos"] if p.get("path") != path]
+        m["controles"] = [c for c in m.get("controles", []) if c.get("path") != path]
+        if m.get("sec_photos", 0) > 0:
+            m["sec_photos"] -= 1
         try:
             if path and os.path.exists(path):
                 os.remove(path)
@@ -2896,6 +2901,13 @@ async def finir_mission(update, context, chat_id, state) -> None:
     lang = state.get("lang") or "fr"
     m = state["mission"]
     fin = datetime.datetime.now().isoformat(timespec="seconds")
+    # Controles photo IA conserves -> notes non urgentes dans le rapport
+    for c in m.get("controles", []):
+        m["incidents"].append({
+            "texte": "", "resume": f"Contrôle photo — {c.get('section')}: {c.get('desc')}",
+            "urgent": False, "langue": None, "photo": c.get("path"),
+            "heure": datetime.datetime.now().isoformat(timespec="seconds"),
+        })
     a_un_non = any(v is False for v in m["confirmations"].values())
     statut_code = "A verifier" if (a_un_non or m["incidents"]) else "Valide"
 
