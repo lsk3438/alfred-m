@@ -277,6 +277,15 @@ T = {
         "a_b_agents": "👥 Gérer les agents",
         "a_b_logements": "🏠 Assigner les logements",
         "a_b_admins": "🧑‍💼 Gérer les responsables",
+        "a_b_lodgify": "🏨 Gestion Lodgify",
+        "a_lodgify": ("🏨 Gestion Lodgify\n\nÉcris-moi directement ce que tu veux faire — je m'occupe de Lodgify. Exemples :\n\n"
+                      "📖 « Liste mes réservations à venir »\n"
+                      "📅 « Montre le calendrier du Studio Hydraulique »\n"
+                      "💬 « Lis la conversation de la résa 6142944261 »\n"
+                      "🔒 « Bloque le Studio Hydraulique du 10 au 12 »\n"
+                      "✉️ « Écris au voyageur de la résa X : bienvenue, code 1234 »\n"
+                      "💳 « Crée un lien de paiement de 150€ pour la résa Y »\n\n"
+                      "⚠️ Chaque action qui modifie Lodgify te demandera confirmation avant de partir. Tape /start pour quitter."),
         "a_reports": "📊 Mode rapport activé.\nPose ta question (logements nettoyés aujourd'hui, incidents urgents de la semaine, « génère un rapport »…). Tape /start pour quitter.",
         "a_agents_none": "👥 Aucun agent pour l'instant. Quand un agent s'inscrit pour ton entreprise, tu reçois un message avec un bouton Autoriser.",
         "a_agents_mine": "👥 Tes agents :",
@@ -1658,6 +1667,7 @@ def admin_panel_kb(chat_id) -> InlineKeyboardMarkup:
     lang = ui_lang(chat_id)
     rows = [[InlineKeyboardButton(t(lang, "a_b_agents"), callback_data="adm:agents")]]
     if is_super(chat_id):
+        rows.append([InlineKeyboardButton(t(lang, "a_b_lodgify"), callback_data="adm:lodgify")])
         rows.append([InlineKeyboardButton(t(lang, "a_b_logements"), callback_data="adm:logements")])
         rows.append([InlineKeyboardButton(t(lang, "a_b_admins"), callback_data="adm:admins")])
     return InlineKeyboardMarkup(rows)
@@ -1712,6 +1722,12 @@ async def on_admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if action == "reports":
         state["admin_mode"] = True
         await query.edit_message_text(t(lang, "a_reports"))
+    elif action == "lodgify":
+        if not is_super(chat_id):
+            await query.answer(t(lang, "a_super_only"), show_alert=True)
+            return
+        state["admin_mode"] = True
+        await query.edit_message_text(t(lang, "a_lodgify"))
     elif action == "agents":
         super_ = is_super(chat_id)
         macomp = admin_company(chat_id)
