@@ -1708,6 +1708,19 @@ async def on_admin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
+async def on_lodgify(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Commande /lodgify : ouvre la gestion Lodgify (super admin uniquement)."""
+    chat_id = update.effective_chat.id
+    state = get_state(chat_id)
+    lang = ui_lang(chat_id)
+    if not is_super(chat_id):
+        await update.message.reply_text(t(lang, "a_super_only"))
+        return
+    state["admin_mode"] = True
+    state["mission"] = None
+    await update.message.reply_text(t(lang, "a_lodgify"))
+
+
 async def on_admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Boutons du panneau admin (admins uniquement)."""
     query = update.callback_query
@@ -3125,12 +3138,14 @@ ADMIN_CMDS = [
     BotCommand("langue", "Changer de langue / Language"),
     BotCommand("admin", "Panneau admin (rapports, agents)"),
 ]
+SUPER_CMDS = ADMIN_CMDS + [BotCommand("lodgify", "🏨 Gestion Lodgify")]
 
 
 async def apply_admin_menu(bot, chat_id) -> None:
-    """Affiche le menu admin (enrichi) pour ce chat precis."""
+    """Affiche le menu admin (enrichi) pour ce chat precis. Super admin = menu + Lodgify."""
+    cmds = SUPER_CMDS if is_super(chat_id) else ADMIN_CMDS
     try:
-        await bot.set_my_commands(ADMIN_CMDS, scope=BotCommandScopeChat(chat_id=int(chat_id)))
+        await bot.set_my_commands(cmds, scope=BotCommandScopeChat(chat_id=int(chat_id)))
     except Exception:
         logger.exception("Echec menu admin pour %s", chat_id)
 
@@ -3158,6 +3173,7 @@ def main() -> None:
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("annuler", on_annuler))
     app.add_handler(CommandHandler("admin", on_admin))
+    app.add_handler(CommandHandler("lodgify", on_lodgify))
     app.add_handler(CommandHandler("langue", on_langue))
     app.add_handler(CommandHandler("monid", on_monid))
     app.add_handler(CommandHandler("ajouter_admin", on_ajouter_admin))
