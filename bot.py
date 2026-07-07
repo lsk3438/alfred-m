@@ -934,6 +934,25 @@ async def _lodgify_get(path: str, params: dict | None = None):
         return resp.json()
 
 
+LODGIFY_ROOT = "https://api.lodgify.com"
+
+
+async def lodgify_api(method: str, path: str, params: dict | None = None, body: dict | None = None):
+    """Appel generique a l'API Lodgify (tous verbes, v1 ou v2). Renvoie (status, data)."""
+    if not path.startswith("/"):
+        path = "/" + path
+    url = LODGIFY_ROOT + path
+    headers = {"accept": "application/json", "X-ApiKey": LODGIFY_API_KEY,
+               "content-type": "application/json"}
+    async with httpx.AsyncClient(timeout=40) as client:
+        resp = await client.request(method.upper(), url, headers=headers, params=params, json=body)
+        try:
+            data = resp.json()
+        except Exception:
+            data = resp.text
+        return resp.status_code, data
+
+
 def _items(data):
     if isinstance(data, dict):
         return data.get("items") or data.get("data") or []
@@ -2141,6 +2160,55 @@ ADMIN_TOOLS = [
 ]
 
 
+# --- Gestion Lodgify (super admin uniquement) : outils generiques ---
+LODGIFY_TOOLS = [
+    {"name": "lodgify_lire",
+     "description": "Lit des donnees dans Lodgify via l'API (lecture seule). Fournis le 'path' exact "
+                    "(ex: '/v2/reservations/bookings', '/v2/properties', '/v2/messaging/{threadGuid}'). "
+                    "Utilise 'params' pour les filtres de requete. Renvoie le JSON brut.",
+     "input_schema": {"type": "object", "properties": {
+         "path": {"type": "string", "description": "chemin API, commence par /v1 ou /v2"},
+         "params": {"type": "object", "description": "parametres de requete (optionnel)"}},
+         "required": ["path"]}},
+    {"name": "lodgify_agir",
+     "description": "Execute une action qui MODIFIE Lodgify (creer/modifier/annuler resa, bloquer dates, "
+                    "changer un tarif, envoyer un message voyageur, creer un lien de paiement, etc.). "
+                    "L'action ne part QU'APRES confirmation du responsable. Fournis methode, path, body "
+                    "et un 'resume' clair en francais de ce que ca va faire.",
+     "input_schema": {"type": "object", "properties": {
+         "methode": {"type": "string", "enum": ["POST", "PUT", "DELETE"]},
+         "path": {"type": "string", "description": "chemin API, ex '/v1/reservation/booking'"},
+         "body": {"type": "object", "description": "corps JSON de la requete (optionnel)"},
+         "resume": {"type": "string", "description": "resume clair en francais de l'action, montre au responsable"}},
+         "required": ["methode", "path", "resume"]}},
+]
+
+LODGIFY_GUIDE = (
+    "OUTILS LODGIFY (reserves a toi, super admin) : 'lodgify_lire' (GET) et 'lodgify_agir' (POST/PUT/DELETE, "
+    "avec confirmation). Voici les principaux points d'acces de l'API Lodgify :\n"
+    "LECTURE : GET /v2/properties (logements) · GET /v2/properties/{id}/rooms · GET /v2/reservations/bookings "
+    "(liste resas, params: page,size,stayFilter) · GET /v2/reservations/bookings/{id} · "
+    "GET /v2/availability/{propertyId} · GET /v2/quote/{propertyId} (devis, params dates) · "
+    "GET /v2/rates/settings?houseId={id} · GET /v2/messaging/{threadGuid} (fil de messages) · "
+    "GET /v1/reservation/booking/{id}/messages.\n"
+    "ACTIONS : POST /v1/reservation/booking (creer resa) · PUT /v1/reservation/booking/{id} (modifier) · "
+    "PUT /v1/reservation/booking/{id}/book | /decline | /tentative | /checkin | /checkout · "
+    "DELETE /v1/reservation/booking/{id} (corbeille) · POST /v1/reservation/booking/{id}/messages (ecrire au voyageur) · "
+    "POST /v1/availability/{propertyId}/{roomTypeId}/set (bloquer/ouvrir des dates) · "
+    "POST /v1/rates/savetiny (changer un tarif) · POST /v2/reservations/bookings/{id}/checkin|checkout · "
+    "createPaymentLink / request-payment (lien/demande de paiement) · PUT updatekeycodes (codes d'acces).\n"
+    "Le property_id se trouve via GET /v2/properties. Pour un fil de messages, recupere d'abord la resa puis son thread. "
+    "Interprete les dates au format AAAA-MM-JJ. Si tu n'es pas sur d'un id, LIS d'abord pour le trouver."
+)
+
+
+async def _lodgify_result_text(status, data) -> str:
+    txt = data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
+    if len(txt) > 6000:
+        txt = txt[:6000] + " …(tronque)"
+    return f"HTTP {status}\n{txt}"
+
+
 async def claude_tools_call(system: str, messages: list, tools: list, model: str, max_tokens: int = 2000) -> dict:
     headers = {"x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01",
                "content-type": "application/json"}
@@ -2250,6 +2318,31 @@ async def execute_admin_tool(name, inp, context, chat_id, state) -> str:
             chat_id, f"✉️ Message a envoyer a l'agent (code {cid}) :\n\n« {texte} »\n\nConfirmer l'envoi ?",
             reply_markup=kb)
         return "Message prepare, en attente de la confirmation du responsable."
+    if name == "lodgify_lire":
+        if not is_super(chat_id):
+            return "La gestion Lodgify est reservee a l'admin principal."
+        try:
+            status, data = await lodgify_api("GET", inp.get("path", ""), inp.get("params") or None)
+            return await _lodgify_result_text(status, data)
+        except Exception as e:
+            logger.exception("lodgify_lire")
+            return f"Erreur lecture Lodgify : {e}"
+    if name == "lodgify_agir":
+        if not is_super(chat_id):
+            return "La gestion Lodgify est reservee a l'admin principal."
+        methode = (inp.get("methode") or "").upper()
+        path = inp.get("path") or ""
+        if methode not in ("POST", "PUT", "DELETE") or not path:
+            return "Action invalide : methode et path requis."
+        state["pending_lodgify"] = {"methode": methode, "path": path, "body": inp.get("body") or None,
+                                    "resume": inp.get("resume") or f"{methode} {path}"}
+        kb = InlineKeyboardMarkup([[InlineKeyboardButton("✅ Confirmer", callback_data="lodgok"),
+                                    InlineKeyboardButton("✖️ Annuler", callback_data="lodgno")]])
+        apercu = json.dumps(inp.get("body"), ensure_ascii=False)[:600] if inp.get("body") else ""
+        msg = (f"⚠️ Action Lodgify a confirmer :\n\n{inp.get('resume')}\n\n"
+               f"↳ {methode} {path}" + (f"\n{apercu}" if apercu else ""))
+        await context.bot.send_message(chat_id, msg, reply_markup=kb)
+        return "Action Lodgify preparee, en attente de la confirmation du responsable."
     return "Outil inconnu."
 
 
@@ -2297,6 +2390,10 @@ async def answer_admin(update, context, state, question) -> None:
         "Pour une simple question d'analyse, reponds normalement en texte (precis, avec chiffres, en croisant "
         "MISSIONS et CHECKOUTS). N'invente jamais de donnees."
     )
+    tools = list(ADMIN_TOOLS)
+    if is_super(chat_id):
+        system = system + "\n\n" + LODGIFY_GUIDE
+        tools = tools + LODGIFY_TOOLS
     user_content = (f"MISSIONS:\n{json.dumps(missions, ensure_ascii=False)}\n\n"
                     f"CHECKOUTS:\n{json.dumps(checkouts, ensure_ascii=False)}\n\n"
                     f"DEMANDE DU RESPONSABLE : {question}")
@@ -2305,7 +2402,7 @@ async def answer_admin(update, context, state, question) -> None:
 
     for _ in range(6):
         try:
-            resp = await claude_tools_call(system, messages, ADMIN_TOOLS, model)
+            resp = await claude_tools_call(system, messages, tools, model)
         except Exception:
             logger.exception("Erreur tool-use (%s)", model)
             if model != ANTHROPIC_MODEL:
@@ -2389,6 +2486,40 @@ async def on_del_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await query.answer()
     get_state(query.from_user.id)["pending_delete"] = None
     await query.edit_message_text("Suppression annulee.")
+
+
+async def on_lodg_ok(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Execute l'action Lodgify apres confirmation (super admin uniquement)."""
+    query = update.callback_query
+    await query.answer()
+    chat_id = query.from_user.id
+    if not is_super(chat_id):
+        await query.edit_message_text("Reserve a l'admin principal.")
+        return
+    state = get_state(chat_id)
+    pend = state.get("pending_lodgify")
+    if not pend:
+        await query.edit_message_text("Rien a executer.")
+        return
+    state["pending_lodgify"] = None
+    await query.edit_message_text("⏳ Execution dans Lodgify...")
+    try:
+        status, data = await lodgify_api(pend["methode"], pend["path"], None, pend.get("body"))
+        ok = 200 <= int(status) < 300
+        apercu = data if isinstance(data, str) else json.dumps(data, ensure_ascii=False)
+        apercu = (apercu or "")[:800]
+        tag = "✅ Fait" if ok else "❌ Refuse par Lodgify"
+        await context.bot.send_message(chat_id, f"{tag} — {pend['resume']}\n(HTTP {status})\n{apercu}")
+    except Exception as e:
+        logger.exception("Execution Lodgify")
+        await context.bot.send_message(chat_id, f"❌ Erreur lors de l'action Lodgify : {e}")
+
+
+async def on_lodg_no(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    get_state(query.from_user.id)["pending_lodgify"] = None
+    await query.edit_message_text("Action Lodgify annulee.")
 
 
 # =====================================================================
@@ -3024,6 +3155,8 @@ def main() -> None:
     app.add_handler(CallbackQueryHandler(on_msg_no, pattern=r"^msgno$"))
     app.add_handler(CallbackQueryHandler(on_del_ok, pattern=r"^delmissok$"))
     app.add_handler(CallbackQueryHandler(on_del_no, pattern=r"^delmissno$"))
+    app.add_handler(CallbackQueryHandler(on_lodg_ok, pattern=r"^lodgok$"))
+    app.add_handler(CallbackQueryHandler(on_lodg_no, pattern=r"^lodgno$"))
     app.add_handler(CallbackQueryHandler(on_photo_keep, pattern=r"^pkeep$"))
     app.add_handler(CallbackQueryHandler(on_photo_retake, pattern=r"^pretake$"))
     app.add_handler(CallbackQueryHandler(on_auth, pattern=r"^auth:"))
