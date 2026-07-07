@@ -251,15 +251,17 @@ T = {
         "video_avant_ok": "Vidéo d'arrivée bien reçue ✓\n\nTu peux commencer le ménage 🧽 Prends ton temps et fais les choses bien. Quand tout est terminé, appuie sur le bouton ci-dessous. 👇",
         "btn_done": "✅ J'ai terminé le ménage",
         "btn_incident": "⚠️ Signaler un problème",
-        "sec_points_intro": "À contrôler dans cette pièce :",
-        "sec_photos_intro": "📸 Photos à envoyer (minimum {n}) :",
-        "sec_count": "Photos reçues : {c}/{n}",
-        "sec_instructions": "Envoie les photos une par une, puis appuie sur ✅ quand c'est bon.",
+        "sec_points_intro": "Un coup d'œil rapide 👇",
+        "sec_photos_intro": "📸 Photos à envoyer ({n}) :",
+        "sec_instructions": "Envoie les photos 📷 puis appuie sur ✅",
         "sec_validate": "✅ Section validée",
-        "sec_photo_added": "📷 Photo reçue ({c}/{n}). Continue ou valide la section.",
-        "sec_need_more": "⚠️ Il manque encore {r} photo(s) avant de valider ({c}/{n}).",
-        "sec_done": "✅ {titre} — validée !",
-        "ctrl_note": "🔎 Contrôle photo — {sec} : {desc}",
+        "sec_count_light": "📷 {c}/{n}",
+        "sec_need_more": "📸 Encore {r} — {c}/{n}",
+        "sec_review": "🔎 J'ai regardé tes photos. À revoir :\n{list}\n\nTu peux les refaire, ou valider quand même 👇",
+        "sec_btn_force": "✅ Valider quand même",
+        "sec_btn_redo": "📷 Refaire des photos",
+        "sec_redo": "Ok 👍 renvoie les photos concernées.",
+        "sec_done": "✅ {titre} — c'est bon !",
         "menage_done": "Bravo ! 👏 On passe au contrôle final, pièce par pièce. Pour chaque pièce : envoie les photos demandées, puis valide. Laisse-toi guider.",
         "point_photo": "📸 Étape {num}/{n} — {label}\nEnvoie une photo comme preuve.",
         "btn_yes": "✅ Oui", "btn_no": "⚠️ Non",
@@ -2665,30 +2667,36 @@ def _fr_titre(m) -> str:
     return CHECKLIST[m["sec_index"]]["titre"]
 
 
+def _section_kb(lang):
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(t(lang, "sec_validate"), callback_data="ck:valider")],
+        [InlineKeyboardButton(t(lang, "btn_incident"), callback_data="incident")],
+    ])
+
+
+_NUMS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"]
+
+
 async def send_step(context, chat_id, state) -> None:
-    """Affiche une SECTION entiere : points a controler + photos a envoyer."""
+    """Affiche une SECTION entiere, facon carte epuree : points + photos a envoyer."""
     lang = state.get("lang") or "fr"
     m = state["mission"]
     cl = _cl(m)
     sec = cl[m["sec_index"]]
     m["sec_photos"] = 0
+    m["sec_issues"] = []
     n = m["sec_index"] + 1
     total = len(cl)
     pmin = sec.get("photos_min", 1)
-    header = f"━━━━━━━━━━\n{sec['titre']}\n━━━━━━━━━━\n"
-    prog = f"{_bar(n, total)}   {n}/{total}\n\n"
-    points = "\n".join("• " + p for p in sec.get("points", []))
-    photos = "\n".join("• " + ph for ph in sec.get("photos", []))
-    txt = (f"{header}{prog}"
+    points = "\n".join("✓ " + p for p in sec.get("points", []))
+    photos = "\n".join(f"{_NUMS[i] if i < len(_NUMS) else '•'}  {ph}"
+                       for i, ph in enumerate(sec.get("photos", [])))
+    txt = (f"{sec['titre']}     ·  {n}/{total}\n"
+           f"{_bar(n, total)}\n\n"
            f"{t(lang, 'sec_points_intro')}\n{points}\n\n"
            f"{t(lang, 'sec_photos_intro', n=pmin)}\n{photos}\n\n"
-           f"{t(lang, 'sec_count', c=0, n=pmin)}\n"
            f"{t(lang, 'sec_instructions')}")
-    kb = InlineKeyboardMarkup([
-        [InlineKeyboardButton(t(lang, "sec_validate"), callback_data="ck:valider")],
-        [InlineKeyboardButton(t(lang, "btn_incident"), callback_data="incident")],
-    ])
-    await context.bot.send_message(chat_id, txt, reply_markup=kb)
+    await context.bot.send_message(chat_id, txt, reply_markup=_section_kb(lang))
 
 
 async def advance_step(context, chat_id, state) -> None:
@@ -2713,19 +2721,48 @@ async def on_ck(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await query.answer()
         return
     action = query.data.split(":", 1)[1]
+    sec = _cl(m)[m["sec_index"]]
+
+    async def _finish():
+        m["confirmations"][_fr_titre(m)] = True   # valide tous les points de la section
+        await query.edit_message_text(t(lang, "sec_done", titre=sec["titre"]))
+        await advance_step(context, chat_id, state)
+
+    if action == "redo":
+        await query.answer()
+        m["sec_issues"] = []
+        await query.edit_message_text(t(lang, "sec_redo"), reply_markup=_section_kb(lang))
+        return
+
+    if action == "force":
+        await query.answer()
+        for i in m.get("sec_issues", []):   # on garde les soucis pour le rapport
+            m.setdefault("controles", []).append(
+                {"section": sec["titre"], "desc": i.get("desc") or "-", "path": i.get("path")})
+        await _finish()
+        return
+
     if action != "valider":
         await query.answer()
         return
-    sec = _cl(m)[m["sec_index"]]
+
     pmin = sec.get("photos_min", 1)
     got = m.get("sec_photos", 0)
     if got < pmin:
         await query.answer(t(lang, "sec_need_more", r=pmin - got, c=got, n=pmin), show_alert=True)
         return
+    issues = m.get("sec_issues", [])
+    if issues:   # UN seul recap des photos a revoir
+        await query.answer()
+        lst = "\n".join("• " + (i.get("desc") or "-") for i in issues)
+        kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton(t(lang, "sec_btn_redo"), callback_data="ck:redo")],
+            [InlineKeyboardButton(t(lang, "sec_btn_force"), callback_data="ck:force")],
+        ])
+        await query.edit_message_text(t(lang, "sec_review", list=lst), reply_markup=kb)
+        return
     await query.answer()
-    m["confirmations"][_fr_titre(m)] = True   # valide tous les points de la section
-    await query.edit_message_text(t(lang, "sec_done", titre=sec["titre"]))
-    await advance_step(context, chat_id, state)
+    await _finish()
 
 
 async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -2763,20 +2800,12 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     got = m["sec_photos"]
     logger.info("Photo section %s recue (%s) : %s", sec["titre"], attendu, path)
 
-    # Analyse IA : signale salete / manque / hors-sujet (ne bloque jamais)
+    # Analyse IA discrete : on note les soucis (recap unique a la validation), sans interrompre
     ok, raison = await claude_photo_check(path, attendu)
     if not ok:
-        m.setdefault("controles", []).append(
-            {"section": sec["titre"], "desc": raison or "-", "path": path})
-        m["photo_check"] = {"path": path}
-        kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton(t(lang, "btn_keep_photo"), callback_data="pkeep")],
-            [InlineKeyboardButton(t(lang, "btn_retake_photo"), callback_data="pretake")],
-        ])
-        await update.message.reply_text(
-            t(lang, "photo_doute", label=attendu, raison=raison or "—"), reply_markup=kb)
-        return
-    await update.message.reply_text(t(lang, "sec_photo_added", c=got, n=pmin))
+        m.setdefault("sec_issues", []).append(
+            {"attendu": attendu, "desc": raison or "-", "path": path})
+    await update.message.reply_text(t(lang, "sec_count_light", c=got, n=pmin))
 
 
 async def on_photo_keep(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
