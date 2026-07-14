@@ -338,6 +338,8 @@ T = {
         "btn_role_agent": "🧹 Agent de ménage",
         "reg_ask_nom": "Parfait ! Quel est ton nom et ton prénom ?",
         "reg_admin_entreprise": "Quel est le nom de ton entreprise ?",
+        "reg_admin_choose_co": "Rejoins une entreprise existante, ou crée la tienne :",
+        "btn_new_company": "➕ Créer une nouvelle entreprise",
         "reg_admin_role": "Quel est ton rôle (ex : gérant, responsable ménage) ?",
         "reg_agent_choose_co": "Pour quelle entreprise travailles-tu ? Choisis dans la liste 👇",
         "reg_no_company": "Aucune entreprise n'est encore enregistrée. Demande à ton responsable de créer d'abord son compte (en tant que responsable).",
@@ -1296,9 +1298,11 @@ def role_keyboard(lang: str) -> InlineKeyboardMarkup:
     ])
 
 
-def company_keyboard(lang: str) -> InlineKeyboardMarkup:
+def company_keyboard(lang: str, with_new: bool = False) -> InlineKeyboardMarkup:
     rows = [[InlineKeyboardButton(f"🏢 {disp}", callback_data=f"regco:{key}")]
             for key, disp in all_companies().items()]
+    if with_new:
+        rows.append([InlineKeyboardButton(t(lang, "btn_new_company"), callback_data="regnewco")])
     return InlineKeyboardMarkup(rows)
 
 
@@ -1341,8 +1345,13 @@ async def handle_reg_step(update, context, state, reg) -> None:
             return
         reg["nom"] = txt
         if step == "admin_nom":
-            reg["step"] = "admin_entreprise"
-            await update.message.reply_text(t(ll, "reg_admin_entreprise"))
+            if all_companies():
+                reg["step"] = "admin_co"
+                await update.message.reply_text(t(ll, "reg_admin_choose_co"),
+                                                reply_markup=company_keyboard(ll, with_new=True))
+            else:
+                reg["step"] = "admin_entreprise"
+                await update.message.reply_text(t(ll, "reg_admin_entreprise"))
         else:
             if not all_companies():
                 state["reg"] = None
@@ -1351,6 +1360,11 @@ async def handle_reg_step(update, context, state, reg) -> None:
             reg["step"] = "agent_entreprise"
             await update.message.reply_text(t(ll, "reg_agent_choose_co"),
                                             reply_markup=company_keyboard(ll))
+        return
+    if step == "admin_co":
+        # L'utilisateur doit choisir via les boutons ; on re-affiche le choix
+        await update.message.reply_text(t(ll, "reg_admin_choose_co"),
+                                        reply_markup=company_keyboard(ll, with_new=True))
         return
     if step == "admin_entreprise":
         reg["entreprise"] = txt
@@ -1383,6 +1397,13 @@ async def on_reg_company(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if not disp:
         await query.answer("Entreprise introuvable.", show_alert=True)
         return
+    # Un responsable rejoint une entreprise existante -> on continue vers son role
+    if reg.get("type") == "admin":
+        reg["entreprise"] = disp
+        reg["step"] = "admin_role"
+        state["reg"] = reg
+        await query.edit_message_text(t(ll, "reg_admin_role"))
+        return
     nom = reg.get("nom", "Agent")
     PENDING[str(chat_id)] = {"type": "agent", "nom": nom, "entreprise": disp, "lang": ll,
                              "date": datetime.datetime.now().isoformat(timespec="seconds")}
@@ -1390,6 +1411,19 @@ async def on_reg_company(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     state["reg"] = None
     await query.edit_message_text(t(ll, "reg_pending", name=nom, soc=disp))
     await notify_validators(context, str(chat_id))
+
+
+async def on_reg_new_company(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Le responsable choisit de creer une nouvelle entreprise -> saisie du nom."""
+    query = update.callback_query
+    await query.answer()
+    chat_id = query.from_user.id
+    state = get_state(chat_id)
+    ll = state.get("lang") or AGENT_LANG.get(str(chat_id)) or "fr"
+    reg = state.get("reg") or {}
+    reg["step"] = "admin_entreprise"
+    state["reg"] = reg
+    await query.edit_message_text(t(ll, "reg_admin_entreprise"))
 
 
 async def handle_super_profile_step(update, context, state, reg) -> None:
@@ -2639,7 +2673,7 @@ async def on_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await handle_super_profile_step(update, context, state, reg)
         return
     # Etapes d'inscription (responsable ou agent)
-    if reg and reg.get("step") in ("admin_nom", "admin_entreprise", "admin_role", "agent_nom"):
+    if reg and reg.get("step") in ("admin_nom", "admin_co", "admin_entreprise", "admin_role", "agent_nom"):
         await handle_reg_step(update, context, state, reg)
         return
     # Mode admin : questions en langage naturel sur les rapports (responsable uniquement)
@@ -3200,6 +3234,7 @@ def main() -> None:
     app.add_handler(CallbackQueryHandler(on_logtog, pattern=r"^logtog:"))
     app.add_handler(CallbackQueryHandler(on_reg_role, pattern=r"^reg:role:"))
     app.add_handler(CallbackQueryHandler(on_reg_company, pattern=r"^regco:"))
+    app.add_handler(CallbackQueryHandler(on_reg_new_company, pattern=r"^regnewco$"))
     app.add_handler(CallbackQueryHandler(on_lang, pattern=r"^lang:"))
     app.add_handler(CallbackQueryHandler(on_changelang, pattern=r"^changelang$"))
     app.add_handler(CallbackQueryHandler(on_begin, pattern=r"^begin$"))
