@@ -29,6 +29,7 @@ from telegram.ext import (
     CommandHandler,
     ContextTypes,
     MessageHandler,
+    TypeHandler,
     filters,
 )
 
@@ -880,6 +881,50 @@ def get_state(chat_id: int) -> dict:
                            "apparts_today": {}, "mission": None, "admin_mode": False,
                            "reg": None}
     return AGENTS[chat_id]
+
+
+# --- Persistance des etats (survie aux redemarrages) ---
+STATE_FILE = os.path.join(BASE_DIR, "state.json")
+
+
+def save_state() -> None:
+    """Sauvegarde les etats (missions en cours, etc.) sur disque, best-effort."""
+    try:
+        data = {}
+        for cid, st in AGENTS.items():
+            try:
+                json.dumps(st)  # ne garde que ce qui est serialisable
+            except Exception:
+                continue
+            data[str(cid)] = st
+        tmp = STATE_FILE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False)
+        os.replace(tmp, STATE_FILE)
+    except Exception:
+        logger.exception("Echec sauvegarde etat")
+
+
+def load_state() -> None:
+    """Recharge les etats au demarrage : une mission en cours n'est plus perdue."""
+    try:
+        if not os.path.exists(STATE_FILE):
+            return
+        with open(STATE_FILE, encoding="utf-8") as f:
+            data = json.load(f)
+        for cid, st in data.items():
+            try:
+                AGENTS[int(cid)] = st
+            except Exception:
+                continue
+        logger.info("Etat recharge : %d conversation(s)", len(AGENTS))
+    except Exception:
+        logger.exception("Echec chargement etat")
+
+
+async def _persist_state(update, context) -> None:
+    """Sauvegarde l'etat apres chaque update (handler en dernier groupe)."""
+    save_state()
 
 
 def ui_lang(chat_id) -> str:
@@ -3203,6 +3248,7 @@ async def _post_init(app: Application) -> None:
 def main() -> None:
     if not TELEGRAM_TOKEN or TELEGRAM_TOKEN == "COLLE_TON_TOKEN_ICI":
         raise SystemExit("\n>>> ERREUR : TELEGRAM_TOKEN absent du fichier .env.\n")
+    load_state()  # recharge les missions en cours (survie aux redemarrages)
     app = Application.builder().token(TELEGRAM_TOKEN).post_init(_post_init).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("annuler", on_annuler))
@@ -3245,6 +3291,8 @@ def main() -> None:
     app.add_handler(MessageHandler(filters.VIDEO | filters.VIDEO_NOTE, on_video))
     app.add_handler(MessageHandler(filters.PHOTO, on_photo))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_text))
+    # Sauvegarde de l'etat apres chaque update (groupe tardif) -> survit aux redemarrages
+    app.add_handler(TypeHandler(Update, _persist_state), group=90)
 
     logger.info("ALFRED-M (multilingue) demarre. En attente... (Ctrl+C pour arreter)")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
