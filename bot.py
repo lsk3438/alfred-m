@@ -336,6 +336,7 @@ T = {
         "send_avant": "Quand tu es prêt(e), envoie la vidéo d'arrivée. 📹",
         "not_video": "Je n'attends pas de vidéo pour le moment 🙂",
         "not_photo": "Je n'attends pas de photo à cette étape 🙂",
+        "tech_error": "⚠️ Un petit souci technique est survenu. Réessaie dans un instant. Si ça continue, tape /start pour repartir proprement.",
         "follow": "Suis simplement les étapes en cours 🙂 Utilise les boutons et envoie les photos/vidéos demandées.",
         "mission_cancel": "🚫 Mission en cours annulée. Tu peux repartir à zéro avec /start.",
         "mission_none": "Aucune mission en cours à annuler. 🙂",
@@ -428,6 +429,7 @@ T = {
         "send_avant": "When you're ready, send the arrival video. 📹",
         "not_video": "I'm not expecting a video right now 🙂",
         "not_photo": "I'm not expecting a photo at this step 🙂",
+        "tech_error": "⚠️ A small technical issue occurred. Please try again in a moment. If it keeps happening, type /start to restart cleanly.",
         "sec_points_intro": "Quick check 👇",
         "sec_photos_list": "📸 Photos to send:",
         "sec_instructions": "Send the photos 📷 then tap ✅",
@@ -533,6 +535,7 @@ T = {
         "send_avant": "Cuando estés list@, envía el vídeo de llegada. 📹",
         "not_video": "No espero un vídeo ahora mismo 🙂",
         "not_photo": "No espero una foto en este paso 🙂",
+        "tech_error": "⚠️ Ha ocurrido un pequeño problema técnico. Inténtalo de nuevo en un momento. Si continúa, escribe /start para empezar de nuevo.",
         "sec_points_intro": "Un vistazo rápido 👇",
         "sec_photos_list": "📸 Fotos a enviar:",
         "sec_instructions": "Envía las fotos 📷 y pulsa ✅",
@@ -638,6 +641,7 @@ T = {
         "send_avant": "عندما تكون جاهزاً، أرسل فيديو الوصول. 📹",
         "not_video": "لا أنتظر فيديو الآن 🙂",
         "not_photo": "لا أنتظر صورة في هذه الخطوة 🙂",
+        "tech_error": "⚠️ حدث خلل تقني بسيط. حاول مرة أخرى بعد لحظات. إذا استمر الأمر، اكتب /start للبدء من جديد.",
         "sec_points_intro": "نظرة سريعة 👇",
         "sec_photos_list": "📸 الصور المطلوبة:",
         "sec_instructions": "أرسل الصور 📷 ثم اضغط ✅",
@@ -743,6 +747,7 @@ T = {
         "send_avant": "Când ești gata, trimite videoul de sosire. 📹",
         "not_video": "Nu aștept un video acum 🙂",
         "not_photo": "Nu aștept o poză la acest pas 🙂",
+        "tech_error": "⚠️ A apărut o mică problemă tehnică. Încearcă din nou într-o clipă. Dacă persistă, scrie /start pentru a reîncepe.",
         "sec_points_intro": "O privire rapidă 👇",
         "sec_photos_list": "📸 Poze de trimis:",
         "sec_instructions": "Trimite pozele 📷 apoi apasă ✅",
@@ -985,6 +990,33 @@ def save_state() -> None:
         logger.exception("Echec sauvegarde etat")
 
 
+def _sanitize_mission(st: dict) -> None:
+    """Repare une mission rechargee du disque pour eviter tout plantage
+    (champs manquants apres une mise a jour). Mission trop incomplete -> abandonnee."""
+    if not isinstance(st, dict):
+        return
+    m = st.get("mission")
+    if not isinstance(m, dict):
+        return
+    if not all(k in m for k in ("etape", "name", "property_id")):
+        st["mission"] = None
+        return
+    media = m.get("media")
+    if not isinstance(media, dict):
+        media = {}
+    media.setdefault("photos", [])
+    media.setdefault("video_avant", None)
+    media.setdefault("video_fin", None)
+    m["media"] = media
+    m.setdefault("sec_index", 0)
+    m.setdefault("sec_photos", 0)
+    m.setdefault("sec_seen", [])
+    m.setdefault("sec_issues", [])
+    m.setdefault("confirmations", {})
+    m.setdefault("incidents", [])
+    m.setdefault("controles", [])
+
+
 def load_state() -> None:
     """Recharge les etats au demarrage : une mission en cours n'est plus perdue."""
     try:
@@ -994,8 +1026,10 @@ def load_state() -> None:
             data = json.load(f)
         for cid, st in data.items():
             try:
+                _sanitize_mission(st)
                 AGENTS[int(cid)] = st
             except Exception:
+                logger.exception("Etat ignore pour %s", cid)
                 continue
         logger.info("Etat recharge : %d conversation(s)", len(AGENTS))
     except Exception:
@@ -1005,6 +1039,27 @@ def load_state() -> None:
 async def _persist_state(update, context) -> None:
     """Sauvegarde l'etat apres chaque update (handler en dernier groupe)."""
     save_state()
+
+
+async def on_error(update, context) -> None:
+    """Filet de securite global : loggue toute erreur non geree et previent
+    l'utilisateur au lieu de le laisser bloque sans message."""
+    logger.exception("Erreur non geree : %s", getattr(context, "error", None))
+    try:
+        chat_id = None
+        if isinstance(update, Update) and update.effective_chat:
+            chat_id = update.effective_chat.id
+        if not chat_id:
+            return
+        lang = "fr"
+        try:
+            st = AGENTS.get(chat_id) or {}
+            lang = st.get("lang") or AGENT_LANG.get(str(chat_id)) or "fr"
+        except Exception:
+            pass
+        await context.bot.send_message(chat_id, t(lang, "tech_error"))
+    except Exception:
+        logger.exception("Echec envoi du message d'erreur a l'utilisateur")
 
 
 def ui_lang(chat_id) -> str:
@@ -3461,6 +3516,8 @@ def main() -> None:
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, on_text))
     # Sauvegarde de l'etat apres chaque update (groupe tardif) -> survit aux redemarrages
     app.add_handler(TypeHandler(Update, _persist_state), group=90)
+    # Filet de securite : tout bug non gere previent l'utilisateur au lieu de le bloquer
+    app.add_error_handler(on_error)
 
     logger.info("ALFRED-M (multilingue) demarre. En attente... (Ctrl+C pour arreter)")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
