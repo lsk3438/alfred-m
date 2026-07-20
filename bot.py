@@ -10,6 +10,7 @@ Paliers 1 a 6 + MULTILINGUE (fr, en, es, ar, ro).
 """
 
 import base64
+import contextvars
 import datetime
 import glob
 import json
@@ -1827,8 +1828,10 @@ async def on_auth(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         t(al, "a_done_admin" if typ == "admin" else "a_done_agent", nom=nom, ent=ent))
 
 
-# Entreprise active pour le cloisonnement des rapports (None = super admin, voit tout)
-_SCOPE_COMPANY = None
+# Entreprise active pour le cloisonnement des rapports.
+# ContextVar = valeur PROPRE a chaque conversation/tache asyncio : deux responsables
+# de deux entreprises differentes ne peuvent plus se marcher dessus (pas de fuite de donnees).
+_SCOPE_COMPANY = contextvars.ContextVar("scope_company", default=None)
 
 
 def _company_agent_ids(company: str) -> set:
@@ -1837,8 +1840,9 @@ def _company_agent_ids(company: str) -> set:
 
 
 def load_full_reports() -> list[dict]:
-    """Rapports complets (avec chemins des photos). Filtre par entreprise si _SCOPE_COMPANY est defini."""
-    scope_ids = _company_agent_ids(_SCOPE_COMPANY) if _SCOPE_COMPANY else None
+    """Rapports complets (avec chemins des photos). Filtre par entreprise si un scope est defini."""
+    scope = _SCOPE_COMPANY.get()
+    scope_ids = _company_agent_ids(scope) if scope else None
     out = []
     for fp in glob.glob(os.path.join(ARCHIVES_DIR, "**", "*.json"), recursive=True):
         try:
@@ -1869,12 +1873,11 @@ def _extraire_date(text: str):
 
 
 async def on_photos(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    global _SCOPE_COMPANY
     chat_id = update.effective_chat.id
     if not is_admin(chat_id):
         await update.message.reply_text("Cette commande est reservee aux admins.")
         return
-    _SCOPE_COMPANY = None if is_super(chat_id) else admin_company(chat_id)
+    _SCOPE_COMPANY.set(None if is_super(chat_id) else admin_company(chat_id))
     query = " ".join(context.args).strip()
     if not query:
         await update.message.reply_text(
@@ -2635,20 +2638,21 @@ async def execute_admin_tool(name, inp, context, chat_id, state) -> str:
 
 
 async def answer_admin(update, context, state, question) -> None:
-    global _SCOPE_COMPANY
     chat_id = update.effective_chat.id
-    # Cloisonnement : un responsable ne voit que son entreprise ; le super admin voit tout
-    _SCOPE_COMPANY = None if is_super(chat_id) else admin_company(chat_id)
+    # Cloisonnement : un responsable ne voit que son entreprise ; le super admin voit tout.
+    # Valeur propre a cette conversation (ContextVar) -> aucune fuite entre responsables simultanes.
+    scope = None if is_super(chat_id) else admin_company(chat_id)
+    _SCOPE_COMPANY.set(scope)
     logger.info("Question admin de %s (chat_id=%s) : %s", state.get("prenom"), chat_id, question)
-    await update.message.reply_text("🔎 L'agent analyse...")
+    await update.message.reply_text("🔎 J'analyse...")
     try:
         checkouts = await load_checkouts()
     except Exception:
         logger.exception("Erreur Lodgify (admin)")
         checkouts = []
     # Cloisonnement du planning : un responsable ne voit que les logements de son entreprise
-    if _SCOPE_COMPANY:
-        ck = co_key(_SCOPE_COMPANY)
+    if scope:
+        ck = co_key(scope)
         checkouts = [c for c in checkouts if co_key(property_company(c.get("property_id"))) == ck]
     missions = build_missions_data()
     if not missions and not checkouts:
