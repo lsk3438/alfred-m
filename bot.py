@@ -9,6 +9,7 @@ Paliers 1 a 6 + MULTILINGUE (fr, en, es, ar, ro).
 - Les archives gardent les libelles en FRANCAIS (rapports uniformes).
 """
 
+import asyncio
 import base64
 import contextvars
 import datetime
@@ -338,6 +339,7 @@ T = {
         "not_video": "Je n'attends pas de vidéo pour le moment 🙂",
         "not_photo": "Je n'attends pas de photo à cette étape 🙂",
         "tech_error": "⚠️ Un petit souci technique est survenu. Réessaie dans un instant. Si ça continue, tape /start pour repartir proprement.",
+        "lodgify_offline": "⚠️ Lodgify est momentanément indisponible. J'utilise la dernière liste connue des logements.",
         "follow": "Suis simplement les étapes en cours 🙂 Utilise les boutons et envoie les photos/vidéos demandées.",
         "mission_cancel": "🚫 Mission en cours annulée. Tu peux repartir à zéro avec /start.",
         "mission_none": "Aucune mission en cours à annuler. 🙂",
@@ -431,6 +433,7 @@ T = {
         "not_video": "I'm not expecting a video right now 🙂",
         "not_photo": "I'm not expecting a photo at this step 🙂",
         "tech_error": "⚠️ A small technical issue occurred. Please try again in a moment. If it keeps happening, type /start to restart cleanly.",
+        "lodgify_offline": "⚠️ Lodgify is temporarily unavailable. I'm using the last known list of properties.",
         "sec_points_intro": "Quick check 👇",
         "sec_photos_list": "📸 Photos to send:",
         "sec_instructions": "Send the photos 📷 then tap ✅",
@@ -537,6 +540,7 @@ T = {
         "not_video": "No espero un vídeo ahora mismo 🙂",
         "not_photo": "No espero una foto en este paso 🙂",
         "tech_error": "⚠️ Ha ocurrido un pequeño problema técnico. Inténtalo de nuevo en un momento. Si continúa, escribe /start para empezar de nuevo.",
+        "lodgify_offline": "⚠️ Lodgify no está disponible por el momento. Uso la última lista conocida de alojamientos.",
         "sec_points_intro": "Un vistazo rápido 👇",
         "sec_photos_list": "📸 Fotos a enviar:",
         "sec_instructions": "Envía las fotos 📷 y pulsa ✅",
@@ -643,6 +647,7 @@ T = {
         "not_video": "لا أنتظر فيديو الآن 🙂",
         "not_photo": "لا أنتظر صورة في هذه الخطوة 🙂",
         "tech_error": "⚠️ حدث خلل تقني بسيط. حاول مرة أخرى بعد لحظات. إذا استمر الأمر، اكتب /start للبدء من جديد.",
+        "lodgify_offline": "⚠️ Lodgify غير متاح مؤقتاً. أستخدم آخر قائمة معروفة للعقارات.",
         "sec_points_intro": "نظرة سريعة 👇",
         "sec_photos_list": "📸 الصور المطلوبة:",
         "sec_instructions": "أرسل الصور 📷 ثم اضغط ✅",
@@ -749,6 +754,7 @@ T = {
         "not_video": "Nu aștept un video acum 🙂",
         "not_photo": "Nu aștept o poză la acest pas 🙂",
         "tech_error": "⚠️ A apărut o mică problemă tehnică. Încearcă din nou într-o clipă. Dacă persistă, scrie /start pentru a reîncepe.",
+        "lodgify_offline": "⚠️ Lodgify este temporar indisponibil. Folosesc ultima listă cunoscută de locuințe.",
         "sec_points_intro": "O privire rapidă 👇",
         "sec_photos_list": "📸 Poze de trimis:",
         "sec_instructions": "Trimite pozele 📷 apoi apasă ✅",
@@ -1118,12 +1124,46 @@ def menage_keyboard(lang: str) -> InlineKeyboardMarkup:
 # =====================================================================
 # LODGIFY
 # =====================================================================
+RETRY_STATUSES = {429, 500, 502, 503, 529}
+
+
+async def _http_retry(method: str, url: str, *, headers=None, params=None,
+                      json_body=None, timeout: float = 60, tries: int = 3):
+    """Requete HTTP avec 2-3 tentatives + pause croissante (1s, 2s...) sur erreurs
+    passageres : 429/500/502/503/529, coupures reseau, timeouts. Leve au dernier echec.
+    Les autres codes (400/404/409...) sont renvoyes tels quels, sans reessai."""
+    delay = 1.0
+    last_exc = None
+    for attempt in range(tries):
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                resp = await client.request(method.upper(), url, headers=headers,
+                                            params=params, json=json_body)
+            if resp.status_code in RETRY_STATUSES and attempt < tries - 1:
+                logger.warning("HTTP %s sur %s -> nouvelle tentative dans %.0fs",
+                               resp.status_code, url, delay)
+                await asyncio.sleep(delay)
+                delay *= 2
+                continue
+            return resp
+        except (httpx.TransportError, httpx.TimeoutException) as e:
+            last_exc = e
+            if attempt < tries - 1:
+                logger.warning("Erreur reseau (%s) sur %s -> nouvelle tentative dans %.0fs",
+                               type(e).__name__, url, delay)
+                await asyncio.sleep(delay)
+                delay *= 2
+                continue
+            raise
+    if last_exc:
+        raise last_exc
+
+
 async def _lodgify_get(path: str, params: dict | None = None):
     headers = {"accept": "application/json", "X-ApiKey": LODGIFY_API_KEY}
-    async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.get(LODGIFY_BASE + path, headers=headers, params=params)
-        resp.raise_for_status()
-        return resp.json()
+    resp = await _http_retry("GET", LODGIFY_BASE + path, headers=headers, params=params, timeout=30)
+    resp.raise_for_status()
+    return resp.json()
 
 
 LODGIFY_ROOT = "https://api.lodgify.com"
@@ -1136,13 +1176,12 @@ async def lodgify_api(method: str, path: str, params: dict | None = None, body: 
     url = LODGIFY_ROOT + path
     headers = {"accept": "application/json", "X-ApiKey": LODGIFY_API_KEY,
                "content-type": "application/json"}
-    async with httpx.AsyncClient(timeout=40) as client:
-        resp = await client.request(method.upper(), url, headers=headers, params=params, json=body)
-        try:
-            data = resp.json()
-        except Exception:
-            data = resp.text
-        return resp.status_code, data
+    resp = await _http_retry(method, url, headers=headers, params=params, json_body=body, timeout=40)
+    try:
+        data = resp.json()
+    except Exception:
+        data = resp.text
+    return resp.status_code, data
 
 
 def _items(data):
@@ -1158,40 +1197,6 @@ def _first(d: dict, *keys, default=None):
         if k in d and d[k] not in (None, ""):
             return d[k]
     return default
-
-
-async def get_today_apparts() -> list[dict]:
-    props = _items(await _lodgify_get("/properties", params={"size": 200}))
-    name_by_id: dict = {}
-    for p in props:
-        pid = _first(p, "id", "property_id")
-        internal = str(_first(p, "internal_name", default="")).strip()
-        if not internal or internal.lower() == "empty":
-            internal = str(_first(p, "name", default="")).strip() or f"Appart {pid}"
-        if pid is not None:
-            name_by_id[str(pid)] = internal
-    books = _items(await _lodgify_get("/reservations/bookings", params={"size": 200}))
-    today = datetime.date.today()
-    apparts: dict = {}
-    for b in books:
-        pid = _first(b, "property_id", "propertyId")
-        dep = _first(b, "departure", "checkOut", "check_out", default="")
-        if pid is None or not dep:
-            continue
-        try:
-            dep_date = datetime.date.fromisoformat(str(dep)[:10])
-        except ValueError:
-            continue
-        if dep_date < today:
-            continue
-        key = str(pid)
-        if key not in apparts or dep_date < apparts[key]["date"]:
-            apparts[key] = {"property_id": key,
-                            "name": name_by_id.get(key, f"Appart {key}"),
-                            "date": dep_date}
-    result = list(apparts.values())
-    result.sort(key=lambda x: x["date"])
-    return result
 
 
 # =====================================================================
@@ -1213,10 +1218,10 @@ async def analyser_incident(texte: str, lang: str) -> dict | None:
     )
     body = {"model": ANTHROPIC_MODEL, "max_tokens": 400, "system": system,
             "messages": [{"role": "user", "content": texte}]}
-    async with httpx.AsyncClient(timeout=40) as client:
-        r = await client.post("https://api.anthropic.com/v1/messages", headers=headers, json=body)
-        r.raise_for_status()
-        data = r.json()
+    r = await _http_retry("POST", "https://api.anthropic.com/v1/messages",
+                          headers=headers, json_body=body, timeout=40)
+    r.raise_for_status()
+    data = r.json()
     txt = data["content"][0]["text"]
     return json.loads(txt[txt.find("{"): txt.rfind("}") + 1])
 
@@ -1329,6 +1334,25 @@ async def load_checkouts() -> list[dict]:
     return out
 
 
+def _photo_b64(path: str, max_side: int = 1280) -> str:
+    """Encode une photo en base64, reduite si possible (moins de cout et plus rapide cote IA).
+    Si Pillow n'est pas installe, envoie l'image telle quelle (aucun blocage)."""
+    try:
+        import io as _io
+        from PIL import Image
+        img = Image.open(path).convert("RGB")
+        w, h = img.size
+        if max(w, h) > max_side:
+            ratio = max_side / float(max(w, h))
+            img = img.resize((max(1, int(w * ratio)), max(1, int(h * ratio))))
+        buf = _io.BytesIO()
+        img.save(buf, format="JPEG", quality=80)
+        return base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        with open(path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
+
+
 async def claude_text(system: str, user: str, max_tokens: int = 900, model: str | None = None) -> str | None:
     if not ANTHROPIC_API_KEY:
         return None
@@ -1336,43 +1360,10 @@ async def claude_text(system: str, user: str, max_tokens: int = 900, model: str 
                "content-type": "application/json"}
     body = {"model": model or ANTHROPIC_MODEL, "max_tokens": max_tokens, "system": system,
             "messages": [{"role": "user", "content": user}]}
-    async with httpx.AsyncClient(timeout=60) as client:
-        r = await client.post("https://api.anthropic.com/v1/messages", headers=headers, json=body)
-        r.raise_for_status()
-        return r.json()["content"][0]["text"]
-
-
-async def claude_photo_check(path: str, label: str) -> tuple:
-    """Verifie via l'IA si la photo correspond a l'element demande. Retourne (ok, raison).
-    En cas de doute technique, retourne (True, '') pour ne jamais bloquer l'agent."""
-    if not ANTHROPIC_API_KEY:
-        return True, ""
-    try:
-        with open(path, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode()
-    except Exception:
-        return True, ""
-    system = (
-        "Tu controles des photos de menage prises par un agent. "
-        "Reponds UNIQUEMENT en JSON compact : {\"ok\": true|false, \"raison\": \"<8 mots max>\"}. "
-        "Sois tolerant sur l'angle, la luminosite, le flou et le cadrage. "
-        "Mets ok=false dans DEUX cas seulement : (1) la photo n'a clairement aucun rapport avec "
-        "l'element demande ; (2) on voit clairement un probleme de proprete ou un manque "
-        "(salete, cheveux, poussiere, taches, desordre, poubelle pleine, element manquant). "
-        "Dans ce cas, 'raison' decrit brievement le probleme. Sinon ok=true."
-    )
-    content = [
-        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b64}},
-        {"type": "text", "text": f"Element attendu : {label}. La photo est-elle correcte et propre ?"},
-    ]
-    try:
-        raw = await claude_text(system, content, max_tokens=120, model=ANTHROPIC_MODEL)
-        mt = re.search(r"\{.*\}", raw or "", re.S)
-        data = json.loads(mt.group(0)) if mt else {}
-        return bool(data.get("ok", True)), str(data.get("raison", ""))
-    except Exception:
-        logger.exception("Echec verification photo")
-        return True, ""
+    r = await _http_retry("POST", "https://api.anthropic.com/v1/messages",
+                          headers=headers, json_body=body, timeout=60)
+    r.raise_for_status()
+    return r.json()["content"][0]["text"]
 
 
 async def claude_photo_recognize(path: str, shots: list, titre: str) -> tuple:
@@ -1384,8 +1375,7 @@ async def claude_photo_recognize(path: str, shots: list, titre: str) -> tuple:
     if not ANTHROPIC_API_KEY or not shots:
         return "", ""
     try:
-        with open(path, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode()
+        b64 = _photo_b64(path)
     except Exception:
         return "", ""
     liste = "\n".join(f"- {s}" for s in shots)
@@ -2504,10 +2494,10 @@ async def claude_tools_call(system: str, messages: list, tools: list, model: str
     headers = {"x-api-key": ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01",
                "content-type": "application/json"}
     body = {"model": model, "max_tokens": max_tokens, "system": system, "tools": tools, "messages": messages}
-    async with httpx.AsyncClient(timeout=90) as client:
-        r = await client.post("https://api.anthropic.com/v1/messages", headers=headers, json=body)
-        r.raise_for_status()
-        return r.json()
+    r = await _http_retry("POST", "https://api.anthropic.com/v1/messages",
+                          headers=headers, json_body=body, timeout=90)
+    r.raise_for_status()
+    return r.json()
 
 
 def _mission_files_matching(mission_id="", appartement="", date="") -> list:
@@ -2938,8 +2928,28 @@ def _appart_kb(items, lang) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(rows)
 
 
+PROPERTIES_CACHE_FILE = os.path.join(BASE_DIR, "properties_cache.json")
+
+
+def _save_properties_cache(items: list[dict]) -> None:
+    try:
+        with open(PROPERTIES_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(items, f, ensure_ascii=False)
+    except Exception:
+        logger.exception("Echec sauvegarde cache logements")
+
+
+def _load_properties_cache() -> list[dict]:
+    try:
+        with open(PROPERTIES_CACHE_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
 async def get_all_properties() -> list[dict]:
-    """Tous les appartements (on peut en choisir n'importe lequel, meme pour un menage imprevu)."""
+    """Tous les appartements (on peut en choisir n'importe lequel, meme pour un menage imprevu).
+    La liste reussie est mise en cache sur disque -> secours si Lodgify est indisponible."""
     props = _items(await _lodgify_get("/properties", params={"size": 200}))
     out = []
     for p in props:
@@ -2951,6 +2961,8 @@ async def get_all_properties() -> list[dict]:
             internal = str(_first(p, "name", default="")).strip() or f"Appart {pid}"
         out.append({"property_id": str(pid), "name": internal})
     out.sort(key=lambda x: x["name"].lower())
+    if out:
+        _save_properties_cache(out)
     return out
 
 
@@ -2970,10 +2982,11 @@ async def on_begin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         items = await get_all_properties()
     except Exception:
         logger.exception("Erreur Lodgify")
-        await query.edit_message_text(t(lang, "lodgify_err"))
-        return
+        items = _load_properties_cache()   # secours : derniere liste connue
+        if items:
+            await context.bot.send_message(chat_id, t(lang, "lodgify_offline"))
     if not items:
-        await query.edit_message_text(t(lang, "no_appart"))
+        await query.edit_message_text(t(lang, "lodgify_err"))
         return
     # On limite aux logements de l'entreprise de la personne (repli sur tout si rien d'assigne)
     soc = person_company(chat_id)

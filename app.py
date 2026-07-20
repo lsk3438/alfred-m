@@ -116,16 +116,50 @@ def dashboard_page():
     return _page("dashboard.html")
 
 
+# Limitation des tentatives de connexion (anti force-brute), par adresse IP
+_LOGIN_FAILS: dict = {}
+_LOGIN_MAX = 5           # essais autorises
+_LOGIN_WINDOW = 300      # avant blocage temporaire (secondes)
+
+
+def _login_blocked(ip: str) -> int:
+    """Retourne le nombre de secondes de blocage restantes (0 si non bloque)."""
+    rec = _LOGIN_FAILS.get(ip)
+    if not rec:
+        return 0
+    count, first = rec
+    import time as _t
+    if count >= _LOGIN_MAX and (_t.time() - first) < _LOGIN_WINDOW:
+        return int(_LOGIN_WINDOW - (_t.time() - first))
+    if (_t.time() - first) >= _LOGIN_WINDOW:
+        _LOGIN_FAILS.pop(ip, None)
+    return 0
+
+
+def _login_fail(ip: str) -> None:
+    import time as _t
+    count, first = _LOGIN_FAILS.get(ip, (0, _t.time()))
+    if (_t.time() - first) >= _LOGIN_WINDOW:
+        count, first = 0, _t.time()
+    _LOGIN_FAILS[ip] = (count + 1, first)
+
+
 @app.post("/api/login")
 def api_login():
     data = request.get_json(silent=True) or request.form
     user = (data.get("user") or "").strip()
     pwd = (data.get("pass") or "").strip()
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr or "?").split(",")[0].strip()
     if not WEB_PASS:
         return jsonify({"error": "Le mot de passe du site n'est pas configuré (WEB_PASS)."}), 403
+    reste = _login_blocked(ip)
+    if reste:
+        return jsonify({"error": f"Trop de tentatives. Réessaie dans {reste // 60 + 1} min."}), 429
     if user == WEB_USER and pwd == WEB_PASS:
+        _LOGIN_FAILS.pop(ip, None)
         session["ok"] = True
         return jsonify({"ok": True})
+    _login_fail(ip)
     return jsonify({"error": "Identifiant ou mot de passe incorrect."}), 401
 
 
@@ -203,7 +237,12 @@ def api_agents():
     if not logged():
         return need_login()
     out = []
-    for cid, info in (bot.AGENTS_AUTH or {}).items():
+    # Relecture a chaud du fichier : un agent ajoute par le bot apparait sans redemarrer le site
+    try:
+        agents = bot._load_agents_auth()
+    except Exception:
+        agents = bot.AGENTS_AUTH or {}
+    for cid, info in (agents or {}).items():
         out.append({
             "n": info.get("prenom", "Agent"),
             "in": "".join([w[0] for w in str(info.get("prenom", "A")).split()[:2]]).upper() or "A",
