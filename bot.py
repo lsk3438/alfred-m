@@ -1064,7 +1064,16 @@ async def on_error(update, context) -> None:
             lang = st.get("lang") or AGENT_LANG.get(str(chat_id)) or "fr"
         except Exception:
             pass
-        await context.bot.send_message(chat_id, t(lang, "tech_error"))
+        msg = t(lang, "tech_error")
+        # Diagnostic reserve au super-admin : il voit la cause technique exacte
+        if is_super(chat_id):
+            import traceback
+            err = getattr(context, "error", None)
+            tb = "".join(traceback.format_exception(type(err), err, err.__traceback__))
+            msg = (msg + "\n\n———\n🔧 Debug (super-admin) :\n"
+                   + f"{type(err).__name__}: {err}\n\n" + tb)
+            msg = msg[-3500:]
+        await context.bot.send_message(chat_id, msg)
     except Exception:
         logger.exception("Echec envoi du message d'erreur a l'utilisateur")
 
