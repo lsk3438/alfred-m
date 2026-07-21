@@ -341,6 +341,7 @@ T = {
         "not_photo": "Je n'attends pas de photo à cette étape 🙂",
         "tech_error": "⚠️ Un petit souci technique est survenu. Réessaie dans un instant. Si ça continue, tape /start pour repartir proprement.",
         "lodgify_offline": "⚠️ Lodgify est momentanément indisponible. J'utilise la dernière liste connue des logements.",
+        "loading_apparts": "⏳ Je charge la liste des logements...",
         "follow": "Suis simplement les étapes en cours 🙂 Utilise les boutons et envoie les photos/vidéos demandées.",
         "mission_cancel": "🚫 Mission en cours annulée. Tu peux repartir à zéro avec /start.",
         "mission_none": "Aucune mission en cours à annuler. 🙂",
@@ -435,6 +436,7 @@ T = {
         "not_photo": "I'm not expecting a photo at this step 🙂",
         "tech_error": "⚠️ A small technical issue occurred. Please try again in a moment. If it keeps happening, type /start to restart cleanly.",
         "lodgify_offline": "⚠️ Lodgify is temporarily unavailable. I'm using the last known list of properties.",
+        "loading_apparts": "⏳ Loading the list of properties...",
         "sec_points_intro": "Quick check 👇",
         "sec_photos_list": "📸 Photos to send:",
         "sec_instructions": "Send the photos 📷 then tap ✅",
@@ -542,6 +544,7 @@ T = {
         "not_photo": "No espero una foto en este paso 🙂",
         "tech_error": "⚠️ Ha ocurrido un pequeño problema técnico. Inténtalo de nuevo en un momento. Si continúa, escribe /start para empezar de nuevo.",
         "lodgify_offline": "⚠️ Lodgify no está disponible por el momento. Uso la última lista conocida de alojamientos.",
+        "loading_apparts": "⏳ Cargando la lista de alojamientos...",
         "sec_points_intro": "Un vistazo rápido 👇",
         "sec_photos_list": "📸 Fotos a enviar:",
         "sec_instructions": "Envía las fotos 📷 y pulsa ✅",
@@ -649,6 +652,7 @@ T = {
         "not_photo": "لا أنتظر صورة في هذه الخطوة 🙂",
         "tech_error": "⚠️ حدث خلل تقني بسيط. حاول مرة أخرى بعد لحظات. إذا استمر الأمر، اكتب /start للبدء من جديد.",
         "lodgify_offline": "⚠️ Lodgify غير متاح مؤقتاً. أستخدم آخر قائمة معروفة للعقارات.",
+        "loading_apparts": "⏳ جارٍ تحميل قائمة العقارات...",
         "sec_points_intro": "نظرة سريعة 👇",
         "sec_photos_list": "📸 الصور المطلوبة:",
         "sec_instructions": "أرسل الصور 📷 ثم اضغط ✅",
@@ -756,6 +760,7 @@ T = {
         "not_photo": "Nu aștept o poză la acest pas 🙂",
         "tech_error": "⚠️ A apărut o mică problemă tehnică. Încearcă din nou într-o clipă. Dacă persistă, scrie /start pentru a reîncepe.",
         "lodgify_offline": "⚠️ Lodgify este temporar indisponibil. Folosesc ultima listă cunoscută de locuințe.",
+        "loading_apparts": "⏳ Se încarcă lista de locuințe...",
         "sec_points_intro": "O privire rapidă 👇",
         "sec_photos_list": "📸 Poze de trimis:",
         "sec_instructions": "Trimite pozele 📷 apoi apasă ✅",
@@ -2993,6 +2998,12 @@ async def on_begin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not LODGIFY_API_KEY:
         await query.edit_message_text("Lodgify non configure.")
         return
+    # Retour instantane des le 1er appui : evite l'impression que "rien ne se passe"
+    # pendant l'appel a Lodgify (et supprime le besoin d'appuyer 2 fois).
+    try:
+        await query.edit_message_text(t(lang, "loading_apparts"))
+    except BadRequest:
+        pass
     try:
         items = await get_all_properties()
     except Exception:
