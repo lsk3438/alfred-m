@@ -3205,17 +3205,9 @@ async def on_ck(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 m.setdefault("controles", []).append(
                     {"section": titre, "desc": f"Photo non fournie : {s}", "path": None})
         m["confirmations"][_fr_titre(m)] = True
-        if _is_repeat(m):
-            kb = InlineKeyboardMarkup([
-                [InlineKeyboardButton(t(lang, "sec_again"), callback_data="ck:again")],
-                [InlineKeyboardButton(t(lang, "sec_cont"), callback_data="ck:cont")],
-            ])
-            await query.edit_message_text(
-                t(lang, "sec_done", titre=titre) + "\n\n" + t(lang, "sec_again_q"),
-                reply_markup=kb)
-        else:
-            await query.edit_message_text(t(lang, "sec_done", titre=titre))
-            await advance_step(context, chat_id, state)
+        # On passe directement a la piece suivante (plus de demande "autre piece identique")
+        await query.edit_message_text(t(lang, "sec_done", titre=titre))
+        await advance_step(context, chat_id, state)
 
     # Refaire une piece identique (chambre 2, SDB 2...) : on repart a zero sur la meme section
     if action == "again":
