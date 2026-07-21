@@ -265,6 +265,13 @@ T = {
         "sec_btn_force": "✅ Valider quand même",
         "sec_btn_redo": "📷 Refaire des photos",
         "sec_redo": "Ok 👍 renvoie les photos concernées.",
+        "sec_actions_intro": "🧹 À FAIRE dans cette pièce :",
+        "sec_actions_hint": "Quand c'est fait, appuie sur « ✅ C'est fait ».",
+        "sec_btn_done_actions": "✅ C'est fait",
+        "sec_actions_ok": "✅ Nettoyage certifié 👍",
+        "sec_photos_now": "📸 Envoie maintenant ces photos (toutes d'un coup) :",
+        "sec_photos_hint": "Je coche chaque photo reçue, puis appuie sur « Suivant ».",
+        "sec_photo_wait_actions": "🧹 Termine d'abord le nettoyage : appuie sur « C'est fait », puis envoie les photos.",
         "sec_done": "✅ {titre} — c'est bon !",
         "sec_next": "✅ Suivant",
         "sec_photos_list": "📸 Photos à envoyer :",
@@ -454,6 +461,13 @@ T = {
         "sec_again": "➕ Another (same room)",
         "sec_cont": "➡️ Next room",
         "sec_redo": "Ok 👍 resend the relevant photos.",
+        "sec_actions_intro": "🧹 TO DO in this room:",
+        "sec_actions_hint": "When done, tap “✅ Done”.",
+        "sec_btn_done_actions": "✅ Done",
+        "sec_actions_ok": "✅ Cleaning certified 👍",
+        "sec_photos_now": "📸 Now send these photos (all at once):",
+        "sec_photos_hint": "I tick each photo received, then tap “Next”.",
+        "sec_photo_wait_actions": "🧹 Finish the cleaning first: tap “Done”, then send the photos.",
         "follow": "Just follow the current steps 🙂 Use the buttons and send the requested photos/videos.",
         "mission_cancel": "🚫 Current mission cancelled. You can start over with /start.",
         "mission_none": "No mission in progress to cancel. 🙂",
@@ -563,6 +577,13 @@ T = {
         "sec_again": "➕ Otra (misma estancia)",
         "sec_cont": "➡️ Siguiente estancia",
         "sec_redo": "Ok 👍 reenvía las fotos correspondientes.",
+        "sec_actions_intro": "🧹 POR HACER en esta estancia:",
+        "sec_actions_hint": "Cuando esté hecho, pulsa «✅ Hecho».",
+        "sec_btn_done_actions": "✅ Hecho",
+        "sec_actions_ok": "✅ Limpieza certificada 👍",
+        "sec_photos_now": "📸 Ahora envía estas fotos (todas juntas):",
+        "sec_photos_hint": "Marco cada foto recibida, luego pulsa «Siguiente».",
+        "sec_photo_wait_actions": "🧹 Primero termina la limpieza: pulsa «Hecho», luego envía las fotos.",
         "follow": "Solo sigue los pasos actuales 🙂 Usa los botones y envía las fotos/vídeos pedidos.",
         "mission_cancel": "🚫 Misión en curso cancelada. Puedes empezar de nuevo con /start.",
         "mission_none": "No hay ninguna misión en curso que cancelar. 🙂",
@@ -672,6 +693,13 @@ T = {
         "sec_again": "➕ أخرى (نفس الغرفة)",
         "sec_cont": "➡️ الغرفة التالية",
         "sec_redo": "حسناً 👍 أعد إرسال الصور المعنية.",
+        "sec_actions_intro": "🧹 المطلوب في هذه الغرفة:",
+        "sec_actions_hint": "عند الانتهاء، اضغط «✅ تم».",
+        "sec_btn_done_actions": "✅ تم",
+        "sec_actions_ok": "✅ تم توثيق التنظيف 👍",
+        "sec_photos_now": "📸 الآن أرسل هذه الصور (كلها دفعة واحدة):",
+        "sec_photos_hint": "أؤشر كل صورة مستلمة، ثم اضغط «التالي».",
+        "sec_photo_wait_actions": "🧹 أنهِ التنظيف أولاً: اضغط «تم»، ثم أرسل الصور.",
         "follow": "فقط اتبع الخطوات الحالية 🙂 استخدم الأزرار وأرسل الصور/الفيديوهات المطلوبة.",
         "mission_cancel": "🚫 تم إلغاء المهمة الجارية. يمكنك البدء من جديد عبر /start.",
         "mission_none": "لا توجد مهمة جارية لإلغائها. 🙂",
@@ -781,6 +809,13 @@ T = {
         "sec_again": "➕ Alta (aceeași cameră)",
         "sec_cont": "➡️ Camera următoare",
         "sec_redo": "Ok 👍 retrimite pozele vizate.",
+        "sec_actions_intro": "🧹 DE FĂCUT în această cameră:",
+        "sec_actions_hint": "Când e gata, apasă «✅ Gata».",
+        "sec_btn_done_actions": "✅ Gata",
+        "sec_actions_ok": "✅ Curățenie confirmată 👍",
+        "sec_photos_now": "📸 Acum trimite aceste poze (toate deodată):",
+        "sec_photos_hint": "Bifez fiecare poză primită, apoi apasă «Următorul».",
+        "sec_photo_wait_actions": "🧹 Termină întâi curățenia: apasă «Gata», apoi trimite pozele.",
         "follow": "Urmează pur și simplu pașii curenți 🙂 Folosește butoanele și trimite pozele/videourile cerute.",
         "mission_cancel": "🚫 Misiune în curs anulată. Poți reîncepe cu /start.",
         "mission_none": "Nicio misiune în curs de anulat. 🙂",
@@ -1027,6 +1062,7 @@ def _sanitize_mission(st: dict) -> None:
     media.setdefault("video_fin", None)
     m["media"] = media
     m.setdefault("sec_index", 0)
+    m.setdefault("sec_phase", "photos")
     m.setdefault("sec_photos", 0)
     m.setdefault("sec_seen", [])
     m.setdefault("sec_issues", [])
@@ -3130,10 +3166,24 @@ def _fr_titre(m) -> str:
 
 
 def _section_kb(lang):
+    """Clavier de l'etape PHOTOS."""
     return InlineKeyboardMarkup([
         [InlineKeyboardButton(t(lang, "sec_next"), callback_data="ck:next")],
         [InlineKeyboardButton(t(lang, "btn_incident"), callback_data="incident")],
     ])
+
+
+def _actions_kb(lang):
+    """Clavier de l'etape NETTOYAGE (certifier les actions)."""
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(t(lang, "sec_btn_done_actions"), callback_data="ck:actions_ok")],
+        [InlineKeyboardButton(t(lang, "btn_incident"), callback_data="incident")],
+    ])
+
+
+def _rooms_bar(idx: int, total: int) -> str:
+    """Barre de progression des pieces : 🟩 faite · 🟦 en cours · ⬜ a venir."""
+    return "".join("🟩" if i < idx else ("🟦" if i == idx else "⬜") for i in range(total))
 
 
 def _is_repeat(m) -> bool:
@@ -3143,29 +3193,43 @@ def _is_repeat(m) -> bool:
 
 
 async def send_step(context, chat_id, state) -> None:
-    """Affiche une SECTION entiere : points a verifier + photos a envoyer (envoi libre)."""
+    """ETAPE 1 d'une piece : certifier le nettoyage (actions a faire)."""
     lang = state.get("lang") or "fr"
     m = state["mission"]
     cl = _cl(m)
     sec = cl[m["sec_index"]]
+    m["sec_phase"] = "actions"
     m["sec_photos"] = 0
     m["sec_issues"] = []
     m["sec_seen"] = []
-    n = m["sec_index"] + 1
-    total = len(cl)
     i_sec = m["sec_index"]
-    # Points/photos critiques reperes par position (valable meme apres traduction).
-    # Signal = simple point rouge 🔴 (pas besoin du mot "obligatoire" : tout est deja demande).
+    n = i_sec + 1
+    total = len(cl)
+    # Pas d'actions a cocher pour cette piece -> on va directement aux photos
+    if not sec.get("points"):
+        await send_photos_step(context, chat_id, state)
+        return
     pcrit = set(CHECKLIST[i_sec].get("points_critiques", [])) if 0 <= i_sec < len(CHECKLIST) else set()
+    points = "\n".join((("🔴 " if i in pcrit else "•  ") + p) for i, p in enumerate(sec.get("points", [])))
+    txt = (f"{sec['titre']}   ·  {n}/{total}\n"
+           f"{_rooms_bar(i_sec, total)}\n\n"
+           f"{t(lang, 'sec_actions_intro')}\n{points}\n\n"
+           f"{t(lang, 'sec_actions_hint')}")
+    await context.bot.send_message(chat_id, txt, reply_markup=_actions_kb(lang))
+
+
+async def send_photos_step(context, chat_id, state) -> None:
+    """ETAPE 2 d'une piece : envoyer les photos (toutes d'un coup)."""
+    lang = state.get("lang") or "fr"
+    m = state["mission"]
+    cl = _cl(m)
+    sec = cl[m["sec_index"]]
+    m["sec_phase"] = "photos"
+    i_sec = m["sec_index"]
     crit = set(CHECKLIST[i_sec].get("critiques", [])) if 0 <= i_sec < len(CHECKLIST) else set()
-    points = "\n".join((("🔴 " if i in pcrit else "✓ ") + p) for i, p in enumerate(sec.get("points", [])))
     photos = "\n".join((("🔴 " if i in crit else "•  ") + ph) for i, ph in enumerate(sec.get("photos", [])))
-    bloc_points = (f"{t(lang, 'sec_points_intro')}\n{points}\n\n" if points else "")
-    txt = (f"{sec['titre']}     ·  {n}/{total}\n"
-           f"{_bar(n, total)}\n\n"
-           f"{bloc_points}"
-           f"{t(lang, 'sec_photos_list')}\n{photos}\n\n"
-           f"{t(lang, 'sec_instructions')}")
+    txt = (f"{t(lang, 'sec_photos_now')}\n{photos}\n\n"
+           f"{t(lang, 'sec_photos_hint')}")
     await context.bot.send_message(chat_id, txt, reply_markup=_section_kb(lang))
 
 
@@ -3210,17 +3274,12 @@ async def on_ck(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await query.edit_message_text(t(lang, "sec_done", titre=titre))
         await advance_step(context, chat_id, state)
 
-    # Refaire une piece identique (chambre 2, SDB 2...) : on repart a zero sur la meme section
-    if action == "again":
+    # ETAPE 1 validee (nettoyage certifie) -> on passe a l'etape PHOTOS
+    if action == "actions_ok":
         await query.answer()
-        await query.edit_message_text(t(lang, "sec_done", titre=titre))
-        await send_step(context, chat_id, state)
-        return
-
-    # Passer a la piece suivante
-    if action == "cont":
-        await query.answer()
-        await advance_step(context, chat_id, state)
+        m["confirmations"][_fr_titre(m)] = True   # nettoyage certifie par l'agent
+        await query.edit_message_text(t(lang, "sec_actions_ok"))
+        await send_photos_step(context, chat_id, state)
         return
 
     # Completer / reprendre : on garde les photos deja reconnues, on reevalue les soucis
@@ -3279,6 +3338,11 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if not (m and m["etape"] == ETAPE_CHECKLIST and m["sec_index"] < len(_cl(m))):
         await update.message.reply_text(t(lang, "not_photo"))
+        return
+
+    # Phase NETTOYAGE : on n'attend pas encore de photo (l'agent doit d'abord certifier)
+    if m.get("sec_phase") != "photos":
+        await update.message.reply_text(t(lang, "sec_photo_wait_actions"))
         return
 
     sec = _cl(m)[m["sec_index"]]
