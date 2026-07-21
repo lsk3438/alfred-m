@@ -342,6 +342,7 @@ T = {
         "tech_error": "⚠️ Un petit souci technique est survenu. Réessaie dans un instant. Si ça continue, tape /start pour repartir proprement.",
         "lodgify_offline": "⚠️ Lodgify est momentanément indisponible. J'utilise la dernière liste connue des logements.",
         "loading_apparts": "⏳ Je charge la liste des logements...",
+        "obligatoire": "OBLIGATOIRE",
         "follow": "Suis simplement les étapes en cours 🙂 Utilise les boutons et envoie les photos/vidéos demandées.",
         "mission_cancel": "🚫 Mission en cours annulée. Tu peux repartir à zéro avec /start.",
         "mission_none": "Aucune mission en cours à annuler. 🙂",
@@ -437,6 +438,7 @@ T = {
         "tech_error": "⚠️ A small technical issue occurred. Please try again in a moment. If it keeps happening, type /start to restart cleanly.",
         "lodgify_offline": "⚠️ Lodgify is temporarily unavailable. I'm using the last known list of properties.",
         "loading_apparts": "⏳ Loading the list of properties...",
+        "obligatoire": "MANDATORY",
         "sec_points_intro": "Quick check 👇",
         "sec_photos_list": "📸 Photos to send:",
         "sec_instructions": "Send the photos 📷 then tap ✅",
@@ -545,6 +547,7 @@ T = {
         "tech_error": "⚠️ Ha ocurrido un pequeño problema técnico. Inténtalo de nuevo en un momento. Si continúa, escribe /start para empezar de nuevo.",
         "lodgify_offline": "⚠️ Lodgify no está disponible por el momento. Uso la última lista conocida de alojamientos.",
         "loading_apparts": "⏳ Cargando la lista de alojamientos...",
+        "obligatoire": "OBLIGATORIO",
         "sec_points_intro": "Un vistazo rápido 👇",
         "sec_photos_list": "📸 Fotos a enviar:",
         "sec_instructions": "Envía las fotos 📷 y pulsa ✅",
@@ -653,6 +656,7 @@ T = {
         "tech_error": "⚠️ حدث خلل تقني بسيط. حاول مرة أخرى بعد لحظات. إذا استمر الأمر، اكتب /start للبدء من جديد.",
         "lodgify_offline": "⚠️ Lodgify غير متاح مؤقتاً. أستخدم آخر قائمة معروفة للعقارات.",
         "loading_apparts": "⏳ جارٍ تحميل قائمة العقارات...",
+        "obligatoire": "إلزامي",
         "sec_points_intro": "نظرة سريعة 👇",
         "sec_photos_list": "📸 الصور المطلوبة:",
         "sec_instructions": "أرسل الصور 📷 ثم اضغط ✅",
@@ -761,6 +765,7 @@ T = {
         "tech_error": "⚠️ A apărut o mică problemă tehnică. Încearcă din nou într-o clipă. Dacă persistă, scrie /start pentru a reîncepe.",
         "lodgify_offline": "⚠️ Lodgify este temporar indisponibil. Folosesc ultima listă cunoscută de locuințe.",
         "loading_apparts": "⏳ Se încarcă lista de locuințe...",
+        "obligatoire": "OBLIGATORIU",
         "sec_points_intro": "O privire rapidă 👇",
         "sec_photos_list": "📸 Poze de trimis:",
         "sec_instructions": "Trimite pozele 📷 apoi apasă ✅",
@@ -856,7 +861,7 @@ CHECKLIST = [
         "Evier",
         "Tiroir / armoires vaisselle et casseroles",
     ]},
-    {"titre": "3. 🚿 Salle de bain", "repeat": True, "photos_min": 3, "points": [
+    {"titre": "3. 🚿 Salle de bain", "repeat": True, "photos_min": 3, "critiques": [3, 4], "points": [
         "Lavabo lave (vasque + robinetterie)",
         "Miroir, carrelage et joints propres (sans traces ni moisissure)",
     ], "photos": [
@@ -867,7 +872,7 @@ CHECKLIST = [
         "Siphon",
         "Sol",
     ]},
-    {"titre": "4. 🚽 Toilettes", "repeat": True, "photos_min": 2, "points": [
+    {"titre": "4. 🚽 Toilettes", "repeat": True, "photos_min": 2, "critiques": [1], "points": [
         "Papier toilette present (au moins 2 rouleaux)",
     ], "photos": [
         "Vue d'ensemble",
@@ -885,7 +890,7 @@ CHECKLIST = [
         "Table / chaises",
         "Canapes",
     ]},
-    {"titre": "6. ✅ General (fin de menage)", "photos_min": 1, "points": [
+    {"titre": "6. ✅ General (fin de menage)", "photos_min": 1, "critiques": [0], "points": [
         "Tous les sols aspires (toutes les pieces)",
         "Tous les sols laves (toutes les pieces)",
         "Toutes les vitres et fenetres sans traces",
@@ -3149,7 +3154,16 @@ async def send_step(context, chat_id, state) -> None:
     n = m["sec_index"] + 1
     total = len(cl)
     points = "\n".join("✓ " + p for p in sec.get("points", []))
-    photos = "\n".join("•  " + ph for ph in sec.get("photos", []))
+    # Photos critiques (par position, valable meme apres traduction) -> marqueur fort
+    i_sec = m["sec_index"]
+    crit = set(CHECKLIST[i_sec].get("critiques", [])) if 0 <= i_sec < len(CHECKLIST) else set()
+    lignes = []
+    for i, ph in enumerate(sec.get("photos", [])):
+        if i in crit:
+            lignes.append(f"🔴 {ph} — {t(lang, 'obligatoire')}")
+        else:
+            lignes.append(f"•  {ph}")
+    photos = "\n".join(lignes)
     bloc_points = (f"{t(lang, 'sec_points_intro')}\n{points}\n\n" if points else "")
     txt = (f"{sec['titre']}     ·  {n}/{total}\n"
            f"{_bar(n, total)}\n\n"
