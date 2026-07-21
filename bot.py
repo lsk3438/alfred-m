@@ -25,6 +25,7 @@ from telegram import (
     BotCommand, BotCommandScopeChat, BotCommandScopeDefault,
     InlineKeyboardButton, InlineKeyboardMarkup, Update,
 )
+from telegram.error import BadRequest
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -1051,7 +1052,13 @@ async def _persist_state(update, context) -> None:
 async def on_error(update, context) -> None:
     """Filet de securite global : loggue toute erreur non geree et previent
     l'utilisateur au lieu de le laisser bloque sans message."""
-    logger.exception("Erreur non geree : %s", getattr(context, "error", None))
+    err = getattr(context, "error", None)
+    # Erreur benigne de Telegram : on a voulu re-afficher un message deja identique
+    # (double-appui sur un bouton). Aucun impact -> on ignore sans alerter l'utilisateur.
+    if err is not None and "Message is not modified" in str(err):
+        logger.info("Edition ignoree (message identique)")
+        return
+    logger.exception("Erreur non geree : %s", err)
     try:
         chat_id = None
         if isinstance(update, Update) and update.effective_chat:
@@ -1068,7 +1075,6 @@ async def on_error(update, context) -> None:
         # Diagnostic reserve au super-admin : il voit la cause technique exacte
         if is_super(chat_id):
             import traceback
-            err = getattr(context, "error", None)
             tb = "".join(traceback.format_exception(type(err), err, err.__traceback__))
             msg = (msg + "\n\n———\n🔧 Debug (super-admin) :\n"
                    + f"{type(err).__name__}: {err}\n\n" + tb)
@@ -3004,7 +3010,11 @@ async def on_begin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if scoped:
             items = scoped
     state["apparts_today"] = {it["property_id"]: it["name"] for it in items}
-    await query.edit_message_text(t(lang, "which_appart"), reply_markup=_appart_kb(items, lang))
+    try:
+        await query.edit_message_text(t(lang, "which_appart"), reply_markup=_appart_kb(items, lang))
+    except BadRequest as e:
+        if "not modified" not in str(e):   # liste deja affichee (double-appui) -> sans gravite
+            raise
 
 
 async def on_appart_click(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
