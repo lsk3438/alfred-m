@@ -282,7 +282,7 @@ T = {
         "btn_yes": "✅ Oui", "btn_no": "⚠️ Non",
         "point_confirm": "Étape {num}/{n} — {label}",
         "point_done": "Étape {num}/{n} — {label} → {mark}",
-        "checklist_done": "Checklist terminée, beau travail ! 🎉 Dernière étape : filme une courte vidéo du logement propre et prêt à accueillir les voyageurs. 📹",
+        "checklist_done": "Checklist terminée, beau travail ! 🎉 J'enregistre le rapport de la mission.",
         "photo_ok": "Photo reçue ✓ Merci !",
         "photo_doute": "🤔 Hmm, cette photo ne semble pas montrer « {label} » ({raison}). Tu peux la garder quand même, ou en reprendre une.",
         "btn_keep_photo": "✅ Garder quand même",
@@ -386,7 +386,7 @@ T = {
         "btn_yes": "✅ Yes", "btn_no": "⚠️ No",
         "point_confirm": "Step {num}/{n} — {label}",
         "point_done": "Step {num}/{n} — {label} → {mark}",
-        "checklist_done": "Checklist done, great work! 🎉 Last step: film a short video of the clean apartment, ready to welcome guests. 📹",
+        "checklist_done": "Checklist done, great work! 🎉 I'm saving the mission report.",
         "photo_ok": "Photo received ✓ Thanks!",
         "photo_doute": "🤔 Hmm, this photo doesn't seem to show « {label} » ({raison}). You can keep it anyway, or take a new one.",
         "btn_keep_photo": "✅ Keep it anyway",
@@ -494,7 +494,7 @@ T = {
         "btn_yes": "✅ Sí", "btn_no": "⚠️ No",
         "point_confirm": "Paso {num}/{n} — {label}",
         "point_done": "Paso {num}/{n} — {label} → {mark}",
-        "checklist_done": "¡Checklist completada, buen trabajo! 🎉 Último paso: graba un vídeo corto del apartamento limpio y listo para recibir huéspedes. 📹",
+        "checklist_done": "¡Checklist completada, buen trabajo! 🎉 Guardo el informe de la misión.",
         "photo_ok": "Foto recibida ✓ ¡Gracias!",
         "photo_doute": "🤔 Mmm, esta foto no parece mostrar « {label} » ({raison}). Puedes conservarla igualmente o hacer otra.",
         "btn_keep_photo": "✅ Conservar igualmente",
@@ -602,7 +602,7 @@ T = {
         "btn_yes": "✅ نعم", "btn_no": "⚠️ لا",
         "point_confirm": "الخطوة {num}/{n} — {label}",
         "point_done": "الخطوة {num}/{n} — {label} ← {mark}",
-        "checklist_done": "اكتملت القائمة، عمل رائع! 🎉 الخطوة الأخيرة: صوّر فيديو قصيراً للشقة نظيفة وجاهزة لاستقبال الضيوف. 📹",
+        "checklist_done": "اكتملت القائمة، عمل رائع! 🎉 أحفظ تقرير المهمة.",
         "photo_ok": "تم استلام الصورة ✓ شكراً!",
         "photo_doute": "🤔 يبدو أن هذه الصورة لا تُظهر « {label} » ({raison}). يمكنك الاحتفاظ بها على أي حال، أو التقاط صورة أخرى.",
         "btn_keep_photo": "✅ الاحتفاظ بها",
@@ -710,7 +710,7 @@ T = {
         "btn_yes": "✅ Da", "btn_no": "⚠️ Nu",
         "point_confirm": "Pasul {num}/{n} — {label}",
         "point_done": "Pasul {num}/{n} — {label} → {mark}",
-        "checklist_done": "Listă completă, treabă bună! 🎉 Ultimul pas: filmează un video scurt cu apartamentul curat și pregătit să primească oaspeții. 📹",
+        "checklist_done": "Listă completă, treabă bună! 🎉 Salvez raportul misiunii.",
         "photo_ok": "Poză primită ✓ Mulțumesc!",
         "photo_doute": "🤔 Hmm, această poză nu pare să arate « {label} » ({raison}). O poți păstra oricum sau poți face alta.",
         "btn_keep_photo": "✅ Păstrează oricum",
@@ -3058,15 +3058,6 @@ async def on_video(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(t(lang, "video_avant_ok"), reply_markup=menage_keyboard(lang))
         return
 
-    if m and m["etape"] == ETAPE_VIDEO_FIN:
-        tg_file = await video.get_file()
-        path = os.path.join(MEDIA_DIR, f"{chat_id}_{_stamp()}_fin.mp4")
-        await tg_file.download_to_drive(path)
-        m["media"]["video_fin"] = path
-        logger.info("Video FIN recue : %s", path)
-        await finir_mission(update, context, chat_id, state)
-        return
-
     await update.message.reply_text(t(lang, "not_video"), reply_markup=welcome_keyboard(lang))
 
 
@@ -3174,8 +3165,8 @@ async def advance_step(context, chat_id, state) -> None:
     m["sec_index"] += 1
     m["sec_photos"] = 0
     if m["sec_index"] >= len(cl):
-        m["etape"] = ETAPE_VIDEO_FIN
         await context.bot.send_message(chat_id, _recap_text(state))
+        await finir_mission(context, chat_id, state)   # plus de video de fin : on cloture direct
     else:
         await send_step(context, chat_id, state)
 
@@ -3427,7 +3418,7 @@ async def finaliser_incident(update, context, chat_id, state, texte) -> None:
 # =====================================================================
 # CLOTURE + ARCHIVAGE
 # =====================================================================
-async def finir_mission(update, context, chat_id, state) -> None:
+async def finir_mission(context, chat_id, state) -> None:
     lang = state.get("lang") or "fr"
     m = state["mission"]
     fin = datetime.datetime.now().isoformat(timespec="seconds")
@@ -3461,8 +3452,8 @@ async def finir_mission(update, context, chat_id, state) -> None:
 
     statut_aff = t(lang, "st_ok") if statut_code == "Valide" else t(lang, "st_check")
     state["mission"] = None
-    await update.message.reply_text(t(lang, "mission_archived", statut=statut_aff),
-                                    reply_markup=welcome_keyboard(lang))
+    await context.bot.send_message(chat_id, t(lang, "mission_archived", statut=statut_aff),
+                                   reply_markup=welcome_keyboard(lang))
 
 
 # =====================================================================
