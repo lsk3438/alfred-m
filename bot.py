@@ -890,7 +890,7 @@ CHECKLIST = [
         "Table / chaises",
         "Canapes",
     ]},
-    {"titre": "6. ✅ General (fin de menage)", "photos_min": 1, "critiques": [0], "points": [
+    {"titre": "6. ✅ General (fin de menage)", "photos_min": 1, "critiques": [0], "points_critiques": [10, 12], "points": [
         "Tous les sols aspires (toutes les pieces)",
         "Tous les sols laves (toutes les pieces)",
         "Toutes les vitres et fenetres sans traces",
@@ -3153,17 +3153,13 @@ async def send_step(context, chat_id, state) -> None:
     m["sec_seen"] = []
     n = m["sec_index"] + 1
     total = len(cl)
-    points = "\n".join("✓ " + p for p in sec.get("points", []))
-    # Photos critiques (par position, valable meme apres traduction) -> marqueur fort
     i_sec = m["sec_index"]
+    # Points/photos critiques reperes par position (valable meme apres traduction).
+    # Signal = simple point rouge 🔴 (pas besoin du mot "obligatoire" : tout est deja demande).
+    pcrit = set(CHECKLIST[i_sec].get("points_critiques", [])) if 0 <= i_sec < len(CHECKLIST) else set()
     crit = set(CHECKLIST[i_sec].get("critiques", [])) if 0 <= i_sec < len(CHECKLIST) else set()
-    lignes = []
-    for i, ph in enumerate(sec.get("photos", [])):
-        if i in crit:
-            lignes.append(f"🔴 {ph} — {t(lang, 'obligatoire')}")
-        else:
-            lignes.append(f"•  {ph}")
-    photos = "\n".join(lignes)
+    points = "\n".join((("🔴 " if i in pcrit else "✓ ") + p) for i, p in enumerate(sec.get("points", [])))
+    photos = "\n".join((("🔴 " if i in crit else "•  ") + ph) for i, ph in enumerate(sec.get("photos", [])))
     bloc_points = (f"{t(lang, 'sec_points_intro')}\n{points}\n\n" if points else "")
     txt = (f"{sec['titre']}     ·  {n}/{total}\n"
            f"{_bar(n, total)}\n\n"
