@@ -438,9 +438,18 @@
   });
 
   /* ---------- Missions ---------- */
+  // Référence lisible : 3 lettres du logement + JJMMAA (+ -2 si plusieurs le même jour)
+  function refOf(m){
+    var base=(m.n||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,3)||'MIS';
+    var p=(m.date||'').split('-');
+    var dd=(p.length===3)?(p[2]+p[1]+p[0].slice(2)):'';
+    var same=MISSIONS.filter(function(x){return x.n===m.n&&x.date===m.date;});
+    var i=same.indexOf(m);
+    return base+'-'+dd+((same.length>1&&i>0)?('-'+(i+1)):'');
+  }
   function rowHTML(m){
-    var meta=esc(m.date)+' · '+esc(m.nph||0)+' photos';
-    if(m.st==='warn'&&m.why)meta='<span style="color:#ffd98a">'+esc(m.why)+'</span>';
+    var meta='<b style="color:#bcd6ff">'+esc(refOf(m))+'</b> · '+esc(m.date)+' · '+esc(m.nph||0)+' photos';
+    if(m.st==='warn'&&m.why)meta+='<br><span style="color:#ffd98a">'+esc(m.why)+'</span>';
     var tag=(m.st==='warn')?('<div class="st '+(m.done?'ok':'warn')+'" style="margin-top:5px;display:inline-block">'+(m.done?'✓ Traité':'● Non traité')+'</div>'):'';
     return '<div class="row" data-mid="'+esc(m.id)+'"><div class="ico">🏠</div>'+
       '<div><div class="nm">'+esc(m.n)+'</div><div class="meta">'+meta+'</div>'+tag+'</div>'+
@@ -543,8 +552,9 @@
   $('r-go').onclick=renderReps;
   $('r-reset').onclick=function(){['r-per','r-d1','r-d2','r-ag','r-lg','r-st','r-pb','r-ph'].forEach(function(i){$(i).value='';});renderReps();};
   $('r-csv').onclick=function(){
-    var l=repFiltered(),rows=[['Mission','Logement','Agent','Date','Horaires','Durée','Statut','Problèmes','Photos']];
-    l.forEach(function(m){rows.push([m.id,m.n,m.ag,m.date,m.hr,m.dur,m.lab,m.pb,m.nph]);});
+    var l=repFiltered(),rows=[['Référence','Logement','Agent','Date','Horaires','Durée','Statut','Traitement','Motif','Problèmes','Photos']];
+    l.forEach(function(m){rows.push([refOf(m),m.n,m.ag,m.date,m.hr,m.dur,m.lab,
+      (m.st==='warn'?(m.done?'Traité':'Non traité'):''),(m.why||''),m.pb,m.nph]);});
     var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(';');}).join('\n');
     var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
     a.download='alfred-rapports.csv';a.click();};
@@ -587,7 +597,7 @@
     return head('🏠 '+esc(m.n),esc(m.ag)+' · '+esc(m.date))+
       '<div style="margin-top:10px"><span class="st '+esc(m.st)+'">'+esc(m.lab)+'</span></div>'+
       '<div class="lbl">Mission</div>'+
-      '<div class="kv"><span>Référence</span><span>'+esc(m.id)+'</span></div>'+
+      '<div class="kv"><span>Référence</span><span><b>'+esc(refOf(m))+'</b></span></div>'+
       '<div class="kv"><span>Horaires</span><span>'+esc(m.hr)+'</span></div>'+
       '<div class="kv"><span>Durée</span><span>'+esc(m.dur)+'</span></div>'+
       '<div class="kv"><span>Photos</span><span>'+esc(m.nph)+'</span></div>'+
