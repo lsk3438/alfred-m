@@ -203,6 +203,8 @@
           <div class="fld"><label>Statut</label><select id="m-st">
             <option value="">Tous</option><option value="ok">Validée</option>
             <option value="warn">À vérifier</option><option value="run">En cours</option></select></div>
+          <div class="fld"><label>Traitement</label><select id="m-tr">
+            <option value="">Tous</option><option value="0">Non traité</option><option value="1">Traité</option></select></div>
         </div>
         <div class="fbar"><button class="btn sm" id="m-go">Filtrer</button>
           <button class="btn ghost sm" id="m-reset">Réinitialiser</button>
@@ -326,13 +328,16 @@
 
   /* ---------- Données de démonstration (remplacées par le serveur si dispo) ---------- */
   var MISSIONS=[
-    {id:"m1",n:"Churchill 79",ag:"Marie Dupont",date:TODAY,hr:"09:15 → 10:40",dur:"1h25",st:"ok",lab:"✓ Validé",pb:0,nph:14},
-    {id:"m2",n:"Louise 12",ag:"Ahmed B.",date:TODAY,hr:"11:00 → 12:20",dur:"1h20",st:"warn",lab:"⚠ À vérifier",pb:1,nph:11},
-    {id:"m3",n:"Flagey 23",ag:"Sofia R.",date:TODAY,hr:"13:30 → en cours",dur:"—",st:"run",lab:"● En cours",pb:0,nph:4},
-    {id:"m4",n:"Sablon 8",ag:"Karim L.",date:"2026-07-20",hr:"14:00 → 15:10",dur:"1h10",st:"ok",lab:"✓ Validé",pb:0,nph:12},
-    {id:"m5",n:"Dansaert 5",ag:"Marie Dupont",date:"2026-07-19",hr:"11:00 → 12:30",dur:"1h30",st:"warn",lab:"⚠ Incident",pb:2,nph:9},
-    {id:"m6",n:"Churchill 79",ag:"Ahmed B.",date:"2026-07-18",hr:"09:00 → 10:15",dur:"1h15",st:"ok",lab:"✓ Validé",pb:0,nph:13},
-    {id:"m7",n:"Flagey 23",ag:"Sofia R.",date:"2026-07-15",hr:"09:10 → 10:25",dur:"1h15",st:"ok",lab:"✓ Validé",pb:0,nph:10}
+    {id:"m1",n:"Churchill 79",ag:"Marie Dupont",date:TODAY,hr:"09:15 → 10:40",dur:"1h25",st:"ok",lab:"✓ Validé",pb:0,nph:14,why:"",done:0,note:""},
+    {id:"m2",n:"Louise 12",ag:"Ahmed B.",date:TODAY,hr:"11:00 → 12:20",dur:"1h20",st:"warn",lab:"⚠ À vérifier",pb:1,nph:11,
+     why:"Photo non fournie : Siphon",done:0,note:""},
+    {id:"m3",n:"Flagey 23",ag:"Sofia R.",date:TODAY,hr:"13:30 → en cours",dur:"—",st:"run",lab:"● En cours",pb:0,nph:4,why:"",done:0,note:""},
+    {id:"m4",n:"Sablon 8",ag:"Karim L.",date:"2026-07-20",hr:"14:00 → 15:10",dur:"1h10",st:"ok",lab:"✓ Validé",pb:0,nph:12,why:"",done:0,note:""},
+    {id:"m5",n:"Dansaert 5",ag:"Marie Dupont",date:"2026-07-19",hr:"11:00 → 12:30",dur:"1h30",st:"warn",lab:"⚠ À vérifier",pb:2,nph:9,
+     why:"Incident signalé : fuite sous l'évier · Contrôle photo — Salle de bain : cheveux dans le siphon",done:1,
+     note:"Plombier passé le 20/07, fuite réparée. Photo du siphon revue, c'est propre."},
+    {id:"m6",n:"Churchill 79",ag:"Ahmed B.",date:"2026-07-18",hr:"09:00 → 10:15",dur:"1h15",st:"ok",lab:"✓ Validé",pb:0,nph:13,why:"",done:0,note:""},
+    {id:"m7",n:"Flagey 23",ag:"Sofia R.",date:"2026-07-15",hr:"09:10 → 10:25",dur:"1h15",st:"ok",lab:"✓ Validé",pb:0,nph:10,why:"",done:0,note:""}
   ];
   var AGENTS=[
     {n:"Marie Dupont",in:"MD",tg:"612345678",role:"agent",st:"up",tot:64,sem:8,mois:26,last:TODAY,pb:1},
@@ -393,7 +398,7 @@
     return {tot:done.length,
       day:MISSIONS.filter(function(m){return m.date===TODAY;}).length,
       run:MISSIONS.filter(function(m){return m.st==='run';}).length,
-      warn:MISSIONS.filter(function(m){return m.st==='warn';}).length,
+      warn:MISSIONS.filter(function(m){return m.st==='warn'&&!m.done;}).length,
       ag:AGENTS.filter(function(a){return a.st==='up';}).length,
       lg:LOGS.length};
   }
@@ -423,6 +428,7 @@
     if(sec==='miss'){
       $('m-per').value=(f==='today')?'today':'';
       $('m-st').value=(f==='run'||f==='warn'||f==='ok')?f:'';
+      $('m-tr').value=(f==='warn')?'0':'';   // "À vérifier" = les non traités
       $('m-ag').value='';$('m-lg').value='';renderMissions();
     }
     if(sec==='agents'){
@@ -433,8 +439,11 @@
 
   /* ---------- Missions ---------- */
   function rowHTML(m){
+    var meta=esc(m.date)+' · '+esc(m.nph||0)+' photos';
+    if(m.st==='warn'&&m.why)meta='<span style="color:#ffd98a">'+esc(m.why)+'</span>';
+    var tag=(m.st==='warn')?('<div class="st '+(m.done?'ok':'warn')+'" style="margin-top:5px;display:inline-block">'+(m.done?'✓ Traité':'● Non traité')+'</div>'):'';
     return '<div class="row" data-mid="'+esc(m.id)+'"><div class="ico">🏠</div>'+
-      '<div><div class="nm">'+esc(m.n)+'</div><div class="meta">'+esc(m.date)+' · '+esc(m.nph||0)+' photos'+(m.pb?' · ⚠ '+m.pb+' problème(s)':'')+'</div></div>'+
+      '<div><div class="nm">'+esc(m.n)+'</div><div class="meta">'+meta+'</div>'+tag+'</div>'+
       '<div class="ag">'+esc(m.ag)+'</div><div class="hr">'+esc(m.hr)+'</div>'+
       '<div class="st '+esc(m.st)+'">'+esc(m.lab)+'</div></div>';
   }
@@ -445,8 +454,9 @@
     bindRows($('rows'));
   }
   function missFiltered(){
-    var per=$('m-per').value,ag=$('m-ag').value,lg=$('m-lg').value,st=$('m-st').value;
+    var per=$('m-per').value,ag=$('m-ag').value,lg=$('m-lg').value,st=$('m-st').value,tr=$('m-tr').value;
     return MISSIONS.filter(function(m){
+      if(tr==='0'&&m.done)return false; if(tr==='1'&&!m.done)return false;
       return inPeriod(m.date,per)&&(!ag||m.ag===ag)&&(!lg||m.n===lg)&&(!st||m.st===st);});
   }
   function renderMissions(){
@@ -456,7 +466,7 @@
     bindRows($('rows2'));
   }
   $('m-go').onclick=renderMissions;
-  $('m-reset').onclick=function(){$('m-per').value='';$('m-ag').value='';$('m-lg').value='';$('m-st').value='';renderMissions();};
+  $('m-reset').onclick=function(){['m-per','m-ag','m-lg','m-st','m-tr'].forEach(function(i){$(i).value='';});renderMissions();};
 
   /* ---------- Agents ---------- */
   function agentFilter(){var t=document.querySelector('#a-tabs .tab.on');return t?t.dataset.af:'';}
@@ -581,17 +591,37 @@
       '<div class="kv"><span>Horaires</span><span>'+esc(m.hr)+'</span></div>'+
       '<div class="kv"><span>Durée</span><span>'+esc(m.dur)+'</span></div>'+
       '<div class="kv"><span>Photos</span><span>'+esc(m.nph)+'</span></div>'+
+      (m.st==='warn'&&m.why?('<div class="lbl">Pourquoi cette mission est à vérifier</div><div class="inc">⚠️ '+esc(m.why)+'</div>'):'')+
       (inc?('<div class="lbl">Problèmes signalés</div>'+inc):'')+
       (ck?('<div class="lbl">Vérifications</div>'+ck):'')+
       (ph?('<div class="lbl">Photos preuve</div><div class="gallery">'+ph+'</div>'):'')+
-      '<div class="ro">🔒 Le rapport est en lecture seule — c\'est ta preuve. Tu peux ajouter un commentaire daté ci-dessous.</div>'+
-      '<div class="lbl">Commentaire administrateur</div>'+
-      '<textarea class="cmt" placeholder="Ajouter une remarque (visible dans le rapport)…"></textarea>'+
+      (m.st==='warn'?(
+        '<div class="lbl">Traitement</div>'+
+        '<div class="kv"><span>État</span><span class="pill '+(m.done?'up':'off')+'" id="tr-pill">'+(m.done?'✓ Traité':'● Non traité')+'</span></div>'+
+        '<textarea class="cmt" id="tr-note" style="margin-top:12px" placeholder="Note : ce que tu as constaté ou fait…">'+esc(m.note||'')+'</textarea>'+
+        '<div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">'+
+        '<button class="btn sm" onclick="alfredToggle(\''+esc(m.id)+'\')">'+(m.done?'Rouvrir (non traité)':'Marquer comme traité')+'</button>'+
+        '<button class="btn ghost sm" onclick="alfredNote(\''+esc(m.id)+'\')">Enregistrer la note</button></div>'
+      ):'')+
+      '<div class="ro">🔒 Le rapport reste en lecture seule — c\'est ta preuve. Le motif ci-dessus est conservé même une fois la mission traitée ; on n\'enregistre que ta décision et ta note.</div>'+
       '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'+
-      '<button class="btn sm" onclick="alert(\'Commentaire enregistré (démo).\')">Enregistrer le commentaire</button>'+
       '<button class="btn ghost sm" onclick="alert(\'Le PDF sera généré par le serveur.\')">📄 PDF</button>'+
       '<button class="btn ghost sm" onclick="alfredClose()">Fermer</button></div>';
   }
+
+  // Marquer traité / rouvrir + note (démo : en mémoire ; côté serveur ce sera enregistré)
+  window.alfredToggle=function(id){
+    var m=MISSIONS.filter(function(x){return x.id===id;})[0]; if(!m)return;
+    var n=$('tr-note'); if(n)m.note=n.value;
+    m.done=m.done?0:1;
+    renderKpis();renderDash();renderMissions();renderReps();
+    openMission(id);
+  };
+  window.alfredNote=function(id){
+    var m=MISSIONS.filter(function(x){return x.id===id;})[0]; if(!m)return;
+    var n=$('tr-note'); if(n)m.note=n.value;
+    alert('Note enregistrée (démo).');
+  };
 
   function openAgent(nom){
     var a=AGENTS.filter(function(x){return x.n===nom;})[0]; if(!a)return;
