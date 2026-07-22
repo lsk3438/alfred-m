@@ -330,6 +330,27 @@ def api_mission():
     return jsonify({"confs": [], "incidents": [], "photos": []})
 
 
+@app.post("/api/mission/stop")
+def api_mission_stop():
+    """Demande au BOT d'arreter une mission en cours.
+    mode = "archive" (cloture en gardant les photos) ou "suppr" (efface).
+    C'est le bot qui execute : lui seul possede l'etat vivant de la mission."""
+    if not logged():
+        return need_login()
+    data = request.get_json(silent=True) or {}
+    agid = str(data.get("agid") or "").strip()
+    mode = "suppr" if data.get("mode") == "suppr" else "archive"
+    if not agid:
+        return jsonify({"error": "agent manquant"}), 400
+    dem = _read_json(os.path.join(BASE, "arrets_missions.json"), {})
+    dem[agid] = {"mode": mode, "par": WEB_USER,
+                 "le": datetime.datetime.now().isoformat(timespec="seconds")}
+    if not _write_json(os.path.join(BASE, "arrets_missions.json"), dem):
+        return jsonify({"error": "enregistrement impossible"}), 500
+    invalidate_cache()
+    return jsonify({"ok": True, "mode": mode})
+
+
 @app.post("/api/traitement")
 def api_traitement():
     """Marque une mission traitee / non traitee + note. N'ecrit JAMAIS dans l'archive."""

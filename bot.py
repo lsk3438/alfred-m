@@ -272,6 +272,10 @@ T = {
         "sec_photos_now": "📸 Envoie maintenant ces photos (toutes d'un coup) :",
         "sec_photos_hint": "Je coche chaque photo reçue, puis appuie sur « Suivant ».",
         "sec_photo_wait_actions": "🧹 Termine d'abord le nettoyage : appuie sur « C'est fait », puis envoie les photos.",
+        "btn_wrong_appart": "⬅️ Ce n'est pas le bon logement",
+        "back_too_late": "La mission a déjà commencé. Utilise /annuler si tu dois vraiment l'arrêter.",
+        "mission_closed_admin": "⚠️ Ta mission sur {name} a été clôturée par le responsable. Si tu es encore sur place, relance-la avec /start.",
+        "mission_deleted_admin": "⚠️ Ta mission sur {name} a été annulée par le responsable.",
         "sec_done": "✅ {titre} — c'est bon !",
         "sec_next": "✅ Suivant",
         "sec_photos_list": "📸 Photos à envoyer :",
@@ -468,6 +472,10 @@ T = {
         "sec_photos_now": "📸 Now send these photos (all at once):",
         "sec_photos_hint": "I tick each photo received, then tap “Next”.",
         "sec_photo_wait_actions": "🧹 Finish the cleaning first: tap “Done”, then send the photos.",
+        "btn_wrong_appart": "⬅️ Wrong property",
+        "back_too_late": "The mission has already started. Use /annuler if you really need to stop it.",
+        "mission_closed_admin": "⚠️ Your mission at {name} was closed by the manager. If you're still on site, restart it with /start.",
+        "mission_deleted_admin": "⚠️ Your mission at {name} was cancelled by the manager.",
         "follow": "Just follow the current steps 🙂 Use the buttons and send the requested photos/videos.",
         "mission_cancel": "🚫 Current mission cancelled. You can start over with /start.",
         "mission_none": "No mission in progress to cancel. 🙂",
@@ -584,6 +592,10 @@ T = {
         "sec_photos_now": "📸 Ahora envía estas fotos (todas juntas):",
         "sec_photos_hint": "Marco cada foto recibida, luego pulsa «Siguiente».",
         "sec_photo_wait_actions": "🧹 Primero termina la limpieza: pulsa «Hecho», luego envía las fotos.",
+        "btn_wrong_appart": "⬅️ No es el alojamiento correcto",
+        "back_too_late": "La misión ya ha comenzado. Usa /annuler si realmente debes pararla.",
+        "mission_closed_admin": "⚠️ Tu misión en {name} ha sido cerrada por el responsable. Si sigues allí, reiníciala con /start.",
+        "mission_deleted_admin": "⚠️ Tu misión en {name} ha sido cancelada por el responsable.",
         "follow": "Solo sigue los pasos actuales 🙂 Usa los botones y envía las fotos/vídeos pedidos.",
         "mission_cancel": "🚫 Misión en curso cancelada. Puedes empezar de nuevo con /start.",
         "mission_none": "No hay ninguna misión en curso que cancelar. 🙂",
@@ -700,6 +712,10 @@ T = {
         "sec_photos_now": "📸 الآن أرسل هذه الصور (كلها دفعة واحدة):",
         "sec_photos_hint": "أؤشر كل صورة مستلمة، ثم اضغط «التالي».",
         "sec_photo_wait_actions": "🧹 أنهِ التنظيف أولاً: اضغط «تم»، ثم أرسل الصور.",
+        "btn_wrong_appart": "⬅️ ليس هذا السكن الصحيح",
+        "back_too_late": "المهمة بدأت بالفعل. استخدم /annuler إذا كنت مضطراً لإيقافها.",
+        "mission_closed_admin": "⚠️ تم إغلاق مهمتك في {name} من قبل المسؤول. إذا كنت لا تزال هناك، أعد البدء عبر /start.",
+        "mission_deleted_admin": "⚠️ تم إلغاء مهمتك في {name} من قبل المسؤول.",
         "follow": "فقط اتبع الخطوات الحالية 🙂 استخدم الأزرار وأرسل الصور/الفيديوهات المطلوبة.",
         "mission_cancel": "🚫 تم إلغاء المهمة الجارية. يمكنك البدء من جديد عبر /start.",
         "mission_none": "لا توجد مهمة جارية لإلغائها. 🙂",
@@ -816,6 +832,10 @@ T = {
         "sec_photos_now": "📸 Acum trimite aceste poze (toate deodată):",
         "sec_photos_hint": "Bifez fiecare poză primită, apoi apasă «Următorul».",
         "sec_photo_wait_actions": "🧹 Termină întâi curățenia: apasă «Gata», apoi trimite pozele.",
+        "btn_wrong_appart": "⬅️ Nu este locuința potrivită",
+        "back_too_late": "Misiunea a început deja. Folosește /annuler dacă chiar trebuie oprită.",
+        "mission_closed_admin": "⚠️ Misiunea ta la {name} a fost închisă de responsabil. Dacă ești încă acolo, reia cu /start.",
+        "mission_deleted_admin": "⚠️ Misiunea ta la {name} a fost anulată de responsabil.",
         "follow": "Urmează pur și simplu pașii curenți 🙂 Folosește butoanele și trimite pozele/videourile cerute.",
         "mission_cancel": "🚫 Misiune în curs anulată. Poți reîncepe cu /start.",
         "mission_none": "Nicio misiune în curs de anulat. 🙂",
@@ -3100,7 +3120,27 @@ async def on_appart_click(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     name = state.get("apparts_today", {}).get(property_id, f"Appart {property_id}")
     state["mission"] = new_mission(property_id, name)
     logger.info("Mission demarree : chat_id=%s appart=%s", chat_id, name)
-    await query.edit_message_text(t(lang, "appart_chosen", name=name))
+    # Filet anti-erreur : tant que la video d'arrivee n'est pas envoyee, l'agent
+    # peut revenir en arriere s'il s'est trompe de logement.
+    kb = InlineKeyboardMarkup([[InlineKeyboardButton(t(lang, "btn_wrong_appart"),
+                                                    callback_data="reappart")]])
+    await query.edit_message_text(t(lang, "appart_chosen", name=name), reply_markup=kb)
+
+
+async def on_reappart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """L'agent s'est trompe de logement : on annule et on reaffiche la liste.
+    Possible uniquement AVANT la video d'arrivee (apres, il y a du travail a perdre)."""
+    query = update.callback_query
+    chat_id = query.from_user.id
+    state = get_state(chat_id)
+    lang = state.get("lang") or "fr"
+    m = state.get("mission")
+    if m and m.get("etape") != ETAPE_VIDEO_AVANT:
+        await query.answer(t(lang, "back_too_late"), show_alert=True)
+        return
+    state["mission"] = None
+    logger.info("Retour choix logement : chat_id=%s", chat_id)
+    await on_begin(update, context)
 
 
 async def on_video(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -3513,7 +3553,7 @@ async def finaliser_incident(update, context, chat_id, state, texte) -> None:
 # =====================================================================
 # CLOTURE + ARCHIVAGE
 # =====================================================================
-async def finir_mission(context, chat_id, state) -> None:
+async def finir_mission(context, chat_id, state, statut_force=None) -> None:
     lang = state.get("lang") or "fr"
     m = state["mission"]
     fin = datetime.datetime.now().isoformat(timespec="seconds")
@@ -3525,7 +3565,7 @@ async def finir_mission(context, chat_id, state) -> None:
             "heure": datetime.datetime.now().isoformat(timespec="seconds"),
         })
     a_un_non = any(v is False for v in m["confirmations"].values())
-    statut_code = "A verifier" if (a_un_non or m["incidents"]) else "Valide"
+    statut_code = statut_force or ("A verifier" if (a_un_non or m["incidents"]) else "Valide")
 
     mission_id = f"{chat_id}_{m['debut'].replace(':', '-')}"
     data = {
@@ -3547,8 +3587,78 @@ async def finir_mission(context, chat_id, state) -> None:
 
     statut_aff = t(lang, "st_ok") if statut_code == "Valide" else t(lang, "st_check")
     state["mission"] = None
+    if statut_force:
+        return   # cloture forcee par l'admin : c'est l'appelant qui previent l'agent
     await context.bot.send_message(chat_id, t(lang, "mission_archived", statut=statut_aff),
                                    reply_markup=welcome_keyboard(lang))
+
+
+# =====================================================================
+# ARRET D'UNE MISSION DEPUIS LE PANNEAU WEB
+# Le site depose une demande ici ; c'est le BOT qui l'execute (sinon il
+# reecrirait la mission en memoire et le "fantome" reviendrait).
+# =====================================================================
+ARRETS_FILE = os.path.join(BASE_DIR, "arrets_missions.json")
+
+
+class _BotCtx:
+    """Petit adaptateur : finir_mission n'a besoin que de context.bot."""
+    def __init__(self, bot):
+        self.bot = bot
+
+
+async def process_stop_requests(bot) -> None:
+    """Applique les demandes d'arret deposees par le panneau web."""
+    try:
+        if not os.path.exists(ARRETS_FILE):
+            return
+        with open(ARRETS_FILE, encoding="utf-8") as f:
+            demandes = json.load(f) or {}
+    except Exception:
+        return
+    if not demandes:
+        return
+    try:
+        os.remove(ARRETS_FILE)   # on consomme la file d'attente
+    except Exception:
+        logger.exception("Echec suppression du fichier d'arrets")
+
+    for cid, dem in demandes.items():
+        try:
+            chat_id = int(cid)
+        except Exception:
+            continue
+        state = AGENTS.get(chat_id)
+        m = (state or {}).get("mission")
+        if not state or not isinstance(m, dict):
+            continue
+        lang = state.get("lang") or AGENT_LANG.get(str(chat_id)) or "fr"
+        nom = m.get("name") or "?"
+        mode = (dem or {}).get("mode") or "archive"
+        try:
+            if mode == "suppr":
+                state["mission"] = None
+                await bot.send_message(chat_id, t(lang, "mission_deleted_admin", name=nom))
+            else:
+                # On archive ce qui a deja ete fait, avec le statut "Incomplete"
+                await finir_mission(_BotCtx(bot), chat_id, state, statut_force="Incomplete")
+                await bot.send_message(chat_id, t(lang, "mission_closed_admin", name=nom))
+            logger.info("Mission arretee par l'admin (%s) : chat_id=%s appart=%s", mode, chat_id, nom)
+        except Exception:
+            logger.exception("Echec arret mission chat_id=%s", chat_id)
+    save_state()
+
+
+async def _watch_stop_requests(bot) -> None:
+    """Verifie regulierement les demandes d'arret (effet en moins de 15 s)."""
+    while True:
+        try:
+            await asyncio.sleep(15)
+            await process_stop_requests(bot)
+        except asyncio.CancelledError:
+            return
+        except Exception:
+            logger.exception("Boucle d'arret des missions")
 
 
 # =====================================================================
@@ -3591,6 +3701,9 @@ async def _post_init(app: Application) -> None:
     # Menu enrichi pour chaque admin (par conversation)
     for aid in all_admin_ids():
         await apply_admin_menu(app.bot, aid)
+    # Demandes d'arret venant du panneau web (traitees en continu)
+    await process_stop_requests(app.bot)
+    asyncio.create_task(_watch_stop_requests(app.bot))
 
 
 def main() -> None:
@@ -3633,6 +3746,7 @@ def main() -> None:
     app.add_handler(CallbackQueryHandler(on_changelang, pattern=r"^changelang$"))
     app.add_handler(CallbackQueryHandler(on_begin, pattern=r"^begin$"))
     app.add_handler(CallbackQueryHandler(on_appart_click, pattern=r"^appart:"))
+    app.add_handler(CallbackQueryHandler(on_reappart, pattern=r"^reappart$"))
     app.add_handler(CallbackQueryHandler(on_fin_menage, pattern=r"^finmenage$"))
     app.add_handler(CallbackQueryHandler(on_ck, pattern=r"^ck:"))
     app.add_handler(CallbackQueryHandler(on_incident, pattern=r"^incident$"))

@@ -616,6 +616,13 @@
         '<button class="btn sm" onclick="alfredToggle(\''+esc(m.id)+'\')">'+(m.done?'Rouvrir (non traité)':'Marquer comme traité')+'</button>'+
         '<button class="btn ghost sm" onclick="alfredNote(\''+esc(m.id)+'\')">Enregistrer la note</button></div>'
       ):'')+
+      (m.st==='run'?(
+        '<div class="lbl">Mission en cours</div>'+
+        '<div class="ro" style="margin-top:0">⏱️ Démarrée le '+esc(m.date)+' et jamais terminée. Si l\'agent a abandonné, tu peux la clôturer ici.</div>'+
+        '<div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">'+
+        '<button class="btn sm" onclick="alfredStop(\''+esc(m.agid||'')+'\',\'archive\',\''+esc(m.n)+'\')">📁 Archiver comme incomplète</button>'+
+        '<button class="btn ghost sm" onclick="alfredStop(\''+esc(m.agid||'')+'\',\'suppr\',\''+esc(m.n)+'\')">🗑️ Supprimer</button></div>'
+      ):'')+
       '<div class="ro">🔒 Le rapport reste en lecture seule — c\'est ta preuve. Le motif ci-dessus est conservé même une fois la mission traitée ; on n\'enregistre que ta décision et ta note.</div>'+
       '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'+
       '<button class="btn ghost sm" onclick="alert(\'Le PDF sera généré par le serveur.\')">📄 PDF</button>'+
@@ -623,6 +630,24 @@
   }
 
   // Marquer traité / rouvrir + note (démo : en mémoire ; côté serveur ce sera enregistré)
+  // Arrêter une mission en cours (le bot exécute la demande sous ~15 s)
+  window.alfredStop=function(agid,mode,nom){
+    if(!agid){alert("Agent inconnu pour cette mission.");return;}
+    var txt=(mode==='suppr')
+      ? 'Supprimer définitivement la mission sur '+nom+' ?\n\nLes photos déjà envoyées seront perdues. À réserver aux missions de test.'
+      : 'Clôturer la mission sur '+nom+' comme incomplète ?\n\nLes photos déjà envoyées seront conservées dans le rapport.';
+    if(!confirm(txt))return;
+    fetch('/api/mission/stop',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({agid:agid,mode:mode})})
+      .then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(){
+        alert("Demande envoyée. Le bot clôture la mission dans quelques secondes, et prévient l'agent.");
+        alfredClose();
+        setTimeout(hydrate,16000);
+      })
+      .catch(function(){alert("Impossible pour le moment (site non connecté au serveur ?).");});
+  };
+
   function saveTraitement(m,cb){
     fetch('/api/traitement',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({id:m.id,done:m.done,note:m.note||''})})
