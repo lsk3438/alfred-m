@@ -430,6 +430,7 @@
   /* ---------- Missions ---------- */
   // Référence lisible : 3 lettres du logement + JJMMAA (+ -2 si plusieurs le même jour)
   function refOf(m){
+    if(m.ref)return m.ref;                    // référence calculée par le serveur
     var base=(m.n||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z]/g,'').toUpperCase().slice(0,3)||'MIS';
     var p=(m.date||'').split('-');
     var dd=(p.length===3)?(p[2]+p[1]+p[0].slice(2)):'';
@@ -526,18 +527,27 @@
   $('l-sync').onclick=function(){alert("Les logements sont tirés de Lodgify — c'est ta source de vérité. Seuls l'accès, le code et les consignes sont ajoutés ici.");};
 
   /* ---------- Médias (chargement à la demande) ---------- */
-  function renderMedia(){
-    var lg=$('p-lg').value,ag=$('p-ag').value,rm=$('p-rm').value,d1=$('p-d1').value,d2=$('p-d2').value;
-    var l=PHOTOS.filter(function(p){
-      return (!lg||p.lg===lg)&&(!ag||p.ag===ag)&&(!rm||p.rm===rm)&&(!d1||p.date>=d1)&&(!d2||p.date<=d2);});
+  function showMedia(l){
     $('p-cnt').textContent=l.length+' photo'+(l.length>1?'s':'');
     $('p-empty').style.display=l.length?'none':'block';
     if(!l.length){$('p-empty').innerHTML='Aucune photo pour ces critères.';$('gal').innerHTML='';return;}
     $('gal').innerHTML=l.map(function(p){
       var img=p.url?'<img src="'+esc(p.url)+'" loading="lazy" style="width:100%;height:120px;object-fit:cover">'
-                   :'<div class="img" style="background:linear-gradient(135deg,rgba(56,160,255,.18),rgba(99,102,241,.12))">'+p.e+'</div>';
+                   :'<div class="img" style="background:linear-gradient(135deg,rgba(56,160,255,.18),rgba(99,102,241,.12))">'+(p.e||'📷')+'</div>';
       return '<div class="ph">'+img+'<div class="cap">'+esc(p.cap)+'<br><span style="opacity:.65">'+esc(p.lg)+' · '+esc(p.date)+'</span></div></div>';
     }).join('');
+  }
+  function renderMedia(){
+    var lg=$('p-lg').value,ag=$('p-ag').value,rm=$('p-rm').value,d1=$('p-d1').value,d2=$('p-d2').value;
+    $('p-empty').style.display='block';$('p-empty').innerHTML='Recherche en cours…';
+    var qs='?lg='+encodeURIComponent(lg)+'&ag='+encodeURIComponent(ag)+
+           '&rm='+encodeURIComponent(rm)+'&d1='+encodeURIComponent(d1)+'&d2='+encodeURIComponent(d2);
+    fetch('/api/media'+qs).then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(a){showMedia(a||[]);})
+      .catch(function(){   // mode démo
+        showMedia(PHOTOS.filter(function(p){
+          return (!lg||p.lg===lg)&&(!ag||p.ag===ag)&&(!rm||p.rm===rm)&&(!d1||p.date>=d1)&&(!d2||p.date<=d2);}));
+      });
   }
   $('p-go').onclick=renderMedia;
   $('p-reset').onclick=function(){['p-lg','p-ag','p-rm','p-d1','p-d2'].forEach(function(i){$(i).value='';});
@@ -546,10 +556,17 @@
     $('p-empty').innerHTML="Choisis un filtre puis lance la recherche.<br>Les photos ne se chargent qu'à la demande, pour garder l'application rapide.";};
 
   /* ---------- Rapports ---------- */
-  $('r-gen').onclick=function(){var b=$('r-gen');b.textContent='Génération…';
-    fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:''})})
-      .then(function(r){return r.json();}).then(function(){b.textContent='＋ Générer un rapport';hydrate();})
-      .catch(function(){b.textContent='＋ Générer un rapport';alert("Disponible une fois le site en ligne sur ton serveur.");});};
+  $('r-gen').onclick=function(){
+    var b=$('r-gen'),sel=missFiltered().filter(function(m){return m.st!=='run';});
+    if(!sel.length){alert("Aucune mission dans la sélection. Choisis-les dans l'onglet Missions.");return;}
+    if(!confirm('Générer un rapport pour '+sel.length+' mission'+(sel.length>1?'s':'')+' ?'))return;
+    b.textContent='Génération…';
+    fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ids:sel.map(function(m){return m.id;})})})
+      .then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(){b.textContent='＋ Générer un rapport';
+        fetch('/api/reports').then(function(r){return r.json();}).then(renderReportFiles).catch(function(){});})
+      .catch(function(){b.textContent='＋ Générer un rapport';alert("Disponible une fois le site démarré sur ton serveur.");});};
   function renderReportFiles(arr){
     var el=$('replist');
     if(!arr||!arr.length){el.innerHTML='<div class="empty">Aucun rapport généré pour l\'instant.</div>';return;}
@@ -606,17 +623,24 @@
   }
 
   // Marquer traité / rouvrir + note (démo : en mémoire ; côté serveur ce sera enregistré)
+  function saveTraitement(m,cb){
+    fetch('/api/traitement',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:m.id,done:m.done,note:m.note||''})})
+      .then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(){if(cb)cb(true);}).catch(function(){if(cb)cb(false);});
+  }
   window.alfredToggle=function(id){
     var m=MISSIONS.filter(function(x){return x.id===id;})[0]; if(!m)return;
     var n=$('tr-note'); if(n)m.note=n.value;
     m.done=m.done?0:1;
+    saveTraitement(m);
     renderKpis();renderDash();renderMissions();
     openMission(id);
   };
   window.alfredNote=function(id){
     var m=MISSIONS.filter(function(x){return x.id===id;})[0]; if(!m)return;
     var n=$('tr-note'); if(n)m.note=n.value;
-    alert('Note enregistrée (démo).');
+    saveTraitement(m,function(ok){alert(ok?'Note enregistrée.':'Note gardée en mémoire (mode démo).');});
   };
 
   function openAgent(nom){
@@ -698,22 +722,14 @@
 
   /* ---------- Vraies données si le serveur répond ---------- */
   function hydrate(){
-    fetch('/api/missions').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(t){
-      var all=[].concat(t.today||[],t.done||[]).map(function(m){
-        return {id:m.id||'',n:m.n,ag:m.ag,date:m.date||'',hr:m.hr||'',dur:m.dur||'—',
-                st:m.st,lab:m.lab,pb:m.pb||0,nph:m.photos||0};});
-      if(all.length){MISSIONS=all;fillSelects();renderAll();}
+    fetch('/api/missions').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(a){
+      if(a&&a.length){MISSIONS=a;fillSelects();renderAll();}
     }).catch(function(){API=false;});
-    fetch('/api/agents').then(function(r){return r.json();}).then(function(a){
-      if(a&&a.length){AGENTS=a.map(function(x){
-        return {n:x.n,in:x.in||'A',tg:x.tg||'—',role:x.role||'agent',st:x.st||'up',
-                tot:x.tot||0,sem:x.sem||0,mois:x.mois||0,last:x.last||'—',pb:x.pb||0};});
-        fillSelects();renderKpis();renderAgents();}}).catch(function(){});
-    fetch('/api/logements').then(function(r){return r.json();}).then(function(a){
-      if(a&&a.length){LOGS=a.map(function(x){
-        return {n:x.n,ad:x.ad||'',last:x.last||'—',st:x.st||'up',acces:x.acces||'—',code:x.code||'—',note:x.note||''};});
-        fillSelects();renderKpis();renderLogs();}}).catch(function(){});
-    fetch('/api/reports').then(function(r){return r.json();}).then(function(a){if(a)renderReportFiles(a);}).catch(function(){});
+    fetch('/api/agents').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(a){
+      if(a&&a.length){AGENTS=a;fillSelects();renderKpis();renderAgents();}}).catch(function(){});
+    fetch('/api/logements').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(a){
+      if(a&&a.length){LOGS=a;fillSelects();renderKpis();renderLogs();}}).catch(function(){});
+    fetch('/api/reports').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(a){if(a)renderReportFiles(a);}).catch(function(){});
   }
   hydrate();
 

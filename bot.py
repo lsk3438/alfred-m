@@ -1564,8 +1564,29 @@ async def on_admins_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 # =====================================================================
 # AGENTS DE MENAGE AUTORISES (liste blanche ; gerée par les admins)
 # =====================================================================
+_AUTH_MTIME = 0.0
+
+
+def _refresh_agents_auth() -> None:
+    """Relit la liste des agents si le fichier a change sur le disque.
+    Indispensable : le panneau web (autre processus) peut activer/desactiver un agent."""
+    global AGENTS_AUTH, _AUTH_MTIME
+    try:
+        mt = os.path.getmtime(AGENTS_AUTH_FILE)
+    except Exception:
+        return
+    if mt != _AUTH_MTIME:
+        AGENTS_AUTH = _load_agents_auth()
+        _AUTH_MTIME = mt
+
+
 def is_agent_authorized(chat_id) -> bool:
-    return is_admin(chat_id) or str(chat_id) in AGENTS_AUTH
+    """Autorise si admin, ou si l'agent est present ET non desactive."""
+    if is_admin(chat_id):
+        return True
+    _refresh_agents_auth()
+    info = AGENTS_AUTH.get(str(chat_id))
+    return bool(info) and bool(info.get("actif", True))
 
 
 def role_keyboard(lang: str) -> InlineKeyboardMarkup:
