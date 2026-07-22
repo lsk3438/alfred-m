@@ -17,7 +17,6 @@
   #net{position:fixed;inset:0;z-index:0}
   .app{position:relative;z-index:1;display:flex;height:100vh}
 
-  /* Sidebar */
   .side{width:240px;flex:none;padding:24px 18px;display:flex;flex-direction:column;gap:6px;
     background:linear-gradient(180deg,rgba(8,16,38,.8),rgba(6,13,32,.55));border-right:1px solid var(--bd);backdrop-filter:blur(14px)}
   .logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:26px;letter-spacing:3px;margin:4px 6px 4px;
@@ -30,7 +29,6 @@
   .nav a.on{background:linear-gradient(90deg,rgba(56,189,248,.18),rgba(99,102,241,.10));color:#fff;border-color:rgba(120,190,255,.3)}
   .side .foot{margin-top:auto;font-size:11px;color:var(--mut);letter-spacing:1px;padding:8px 6px}
 
-  /* Main */
   .main{flex:1;overflow-y:auto;padding:26px 30px 40px}
   .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
   .top h1{font-family:'Orbitron';font-size:22px;font-weight:700;letter-spacing:1px}
@@ -45,20 +43,21 @@
   .sec.on{display:block}
   @keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-  /* KPI */
-  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px}
-  .kpi{position:relative;overflow:hidden;background:var(--pan);border:1px solid var(--bd);border-radius:18px;padding:18px 20px;backdrop-filter:blur(12px)}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:26px}
+  .kpi{position:relative;overflow:hidden;background:var(--pan);border:1px solid var(--bd);border-radius:18px;padding:18px 20px;backdrop-filter:blur(12px);cursor:pointer;transition:.16s}
+  .kpi:hover{transform:translateY(-3px);border-color:rgba(120,190,255,.45);box-shadow:0 14px 30px rgba(3,12,40,.5)}
   .kpi::after{content:"";position:absolute;right:-30px;top:-30px;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(56,160,255,.25),transparent 70%)}
   .kpi .lab{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-weight:600}
-  .kpi .num{font-family:'Orbitron';font-size:34px;font-weight:800;margin-top:8px;line-height:1}
+  .kpi .num{font-family:'Orbitron';font-size:32px;font-weight:800;margin-top:8px;line-height:1}
+  .kpi .go{font-size:11.5px;color:var(--mut);margin-top:8px;letter-spacing:.4px}
   .kpi .ic{position:absolute;right:16px;bottom:14px;font-size:20px;opacity:.5}
-  .kpi.b1 .num{color:#bfe0ff}.kpi.b2 .num{color:#86f0c0}.kpi.b3 .num{color:#ffd98a}.kpi.b4 .num{color:#cdb8ff}
+  .kpi.b1 .num{color:#bfe0ff}.kpi.b2 .num{color:#9fdcff}.kpi.b3 .num{color:#86f0c0}
+  .kpi.b4 .num{color:#ffd98a}.kpi.b5 .num{color:#cdb8ff}.kpi.b6 .num{color:#ffc6e0}
 
-  /* Panel */
   .panel{background:var(--pan);border:1px solid var(--bd);border-radius:20px;padding:20px 22px;backdrop-filter:blur(12px);margin-bottom:20px}
   .panel-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
   .panel-h h2{font-family:'Orbitron';font-size:16px;font-weight:700;letter-spacing:.5px}
-  .tabs{display:flex;gap:6px;background:rgba(4,10,26,.6);padding:5px;border-radius:12px;border:1px solid var(--bd)}
+  .tabs{display:flex;gap:6px;background:rgba(4,10,26,.6);padding:5px;border-radius:12px;border:1px solid var(--bd);flex-wrap:wrap}
   .tab{padding:8px 16px;border-radius:9px;font-weight:600;font-size:13.5px;color:var(--mut);cursor:pointer;transition:.15s;white-space:nowrap}
   .tab.on{background:linear-gradient(90deg,var(--blue),var(--ind));color:#02122e;box-shadow:0 6px 16px rgba(59,130,246,.4)}
   .tab .c{display:inline-block;margin-left:6px;font-size:11px;background:rgba(255,255,255,.18);padding:1px 7px;border-radius:20px}
@@ -67,10 +66,21 @@
     background:linear-gradient(90deg,var(--blue),var(--ind));box-shadow:0 8px 20px rgba(59,130,246,.4);transition:transform .15s}
   .btn:hover{transform:translateY(-2px)}
   .btn.ghost{background:transparent;color:#bcd6ff;border:1px solid var(--bd);box-shadow:none}
+  .btn.sm{padding:7px 13px;font-size:13px}
 
-  /* Mission rows */
+  /* Barre de filtres */
+  .filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:16px}
+  .fld{display:flex;flex-direction:column;gap:5px}
+  .fld label{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+  .fld select,.fld input{padding:10px 12px;border-radius:11px;font-family:'Rajdhani';font-size:14.5px;font-weight:600;color:#eaf2ff;
+    background:rgba(255,255,255,.06);border:1px solid var(--bd);outline:none}
+  .fld select:focus,.fld input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.2)}
+  .fld select option{background:#0a1730;color:#eaf2ff}
+  .fbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  .cnt{font-size:13px;color:var(--mut);margin-left:auto}
+
   .rows{display:flex;flex-direction:column;gap:10px}
-  .row{display:grid;grid-template-columns:46px 1.6fr 1.3fr 1fr auto;align-items:center;gap:14px;
+  .row{display:grid;grid-template-columns:46px 1.6fr 1.2fr 1.1fr auto;align-items:center;gap:14px;
     padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--bd);transition:.15s;cursor:pointer}
   .row:hover{background:rgba(80,150,255,.10);border-color:rgba(120,190,255,.35);transform:translateX(2px)}
   .row .ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;
@@ -84,11 +94,11 @@
   .st.warn{background:rgba(245,158,11,.15);color:#ffd98a;border:1px solid rgba(245,158,11,.3)}
   .st.run{background:rgba(56,189,248,.16);color:#9fdcff;border:1px solid rgba(56,189,248,.35)}
   .st.plan{background:rgba(148,163,184,.14);color:#c4d2e6;border:1px solid rgba(148,163,184,.3)}
-  .empty{text-align:center;color:var(--mut);padding:40px;font-size:14px}
+  .empty{text-align:center;color:var(--mut);padding:38px;font-size:14px;line-height:1.6}
 
-  /* Cards grid (agents / logements) */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-  .card{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:16px;padding:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+  .card{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:16px;padding:18px;cursor:pointer;transition:.15s}
+  .card:hover{background:rgba(80,150,255,.09);border-color:rgba(120,190,255,.35);transform:translateY(-2px)}
   .card .hd{display:flex;align-items:center;gap:12px;margin-bottom:12px}
   .card .pic{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;color:#02122e;background:linear-gradient(135deg,var(--blue),var(--ind))}
   .card .nm2{font-weight:700;font-size:16px}.card .rl{font-size:12.5px;color:var(--mut)}
@@ -96,19 +106,17 @@
   .card .line span:first-child{color:var(--mut)}
   .pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
   .pill.up{background:rgba(34,197,94,.16);color:#7ef0b0}.pill.off{background:rgba(148,163,184,.14);color:#c4d2e6}
+  .pill.adm{background:rgba(99,102,241,.2);color:#c7c9ff}
 
-  /* Photos */
   .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
   .ph{border-radius:13px;overflow:hidden;border:1px solid var(--bd);background:rgba(255,255,255,.03)}
   .ph .img{height:120px;display:flex;align-items:center;justify-content:center;font-size:30px;color:rgba(255,255,255,.5)}
   .ph .cap{padding:8px 10px;font-size:12px;color:var(--mut);text-align:center}
 
-  /* Rapports list */
   .rep{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border-radius:13px;background:rgba(255,255,255,.035);border:1px solid var(--bd);margin-bottom:10px}
   .rep .ti{font-weight:700}.rep .mt{font-size:12.5px;color:var(--mut);margin-top:2px}
 
-  /* Assistant */
-  .chat{display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:420px}
+  .chat{display:flex;flex-direction:column;height:calc(100vh - 260px);min-height:380px}
   .msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:6px 4px 14px}
   .m{max-width:78%;padding:12px 15px;border-radius:15px;font-size:14.5px;line-height:1.5}
   .m.bot{align-self:flex-start;background:rgba(56,140,255,.12);border:1px solid var(--bd);border-bottom-left-radius:5px}
@@ -120,11 +128,10 @@
   .inbar input{flex:1;padding:14px 16px;border-radius:13px;font-family:'Rajdhani';font-size:15px;color:#fff;background:rgba(255,255,255,.06);border:1px solid var(--bd);outline:none}
   .inbar input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(56,189,248,.22)}
 
-  /* Modal détail mission */
   .modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
     background:rgba(2,6,18,.7);backdrop-filter:blur(4px)}
   .modal.on{display:flex;animation:fadein .25s ease}
-  .sheet{width:560px;max-width:94vw;max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,rgba(12,22,48,.97),rgba(8,15,36,.97));
+  .sheet{width:600px;max-width:94vw;max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,rgba(12,22,48,.97),rgba(8,15,36,.97));
     border:1px solid var(--bd);border-radius:20px;padding:24px 26px;box-shadow:0 40px 90px rgba(0,8,40,.7)}
   .sheet h3{font-family:'Orbitron';font-size:19px;margin-bottom:4px}
   .sheet .x{float:right;cursor:pointer;color:var(--mut);font-size:22px;line-height:1}
@@ -134,11 +141,19 @@
   .ck .y{background:#34d399}.ck .nn{background:#f87171}.ck .nu{background:#94a3b8}
   .inc{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:11px;padding:10px 13px;margin-top:8px;font-size:14px}
   .inc.u{background:rgba(248,113,113,.14);border-color:rgba(248,113,113,.4)}
+  .kv{display:flex;justify-content:space-between;gap:14px;font-size:14px;padding:7px 0;border-bottom:1px solid rgba(140,185,255,.08)}
+  .kv span:first-child{color:var(--mut)}
+  .ro{background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.25);border-radius:11px;padding:9px 13px;font-size:12.5px;color:#bcd6ff;margin-top:14px}
+  .cmt{width:100%;min-height:70px;padding:11px 13px;border-radius:12px;font-family:'Rajdhani';font-size:14.5px;color:#eaf2ff;
+    background:rgba(255,255,255,.06);border:1px solid var(--bd);outline:none;resize:vertical}
+  .secret{letter-spacing:3px}
 
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
   .main::-webkit-scrollbar,.msgs::-webkit-scrollbar,.sheet::-webkit-scrollbar{width:9px}
   .main::-webkit-scrollbar-thumb,.msgs::-webkit-scrollbar-thumb{background:rgba(120,170,255,.25);border-radius:6px}
-  @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}.side{width:74px}.logo small,.nav a span{display:none}.nav a{justify-content:center}}
+  @media(max-width:980px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:860px){.side{width:74px}.logo small,.nav a span{display:none}.nav a{justify-content:center}
+    .row{grid-template-columns:40px 1fr auto}.row .ag,.row .hr{display:none}}
 </style>
 </head>
 <body>
@@ -152,11 +167,11 @@
       <a data-sec="miss"><span class="ic">🧹</span><span>Missions</span></a>
       <a data-sec="agents"><span class="ic">👥</span><span>Agents</span></a>
       <a data-sec="logs"><span class="ic">🏠</span><span>Logements</span></a>
-      <a data-sec="photos"><span class="ic">🖼️</span><span>Photos</span></a>
+      <a data-sec="media"><span class="ic">🖼️</span><span>Médias</span></a>
       <a data-sec="reps"><span class="ic">📊</span><span>Rapports</span></a>
       <a data-sec="ask"><span class="ic">💬</span><span>Assistant ALFRED</span></a>
     </nav>
-    <div class="foot">v1 · Cosmopolitan Colours</div>
+    <div class="foot">v2 · Cosmopolitan Colours</div>
   </aside>
 
   <main class="main">
@@ -165,80 +180,126 @@
       <div class="who"><div class="badge-live"><span class="d"></span>EN DIRECT</div><div class="ava">CL</div></div>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- ================= DASHBOARD ================= -->
     <section class="sec on" id="dash">
-      <div class="kpis">
-        <div class="kpi b1"><div class="lab">Missions du jour</div><div class="num">5</div><div class="ic">🧹</div></div>
-        <div class="kpi b2"><div class="lab">Validées</div><div class="num">3</div><div class="ic">✓</div></div>
-        <div class="kpi b3"><div class="lab">À vérifier</div><div class="num">1</div><div class="ic">⚠</div></div>
-        <div class="kpi b4"><div class="lab">Agents actifs</div><div class="num">4</div><div class="ic">👥</div></div>
-      </div>
+      <div class="kpis" id="kpis"></div>
       <div class="panel">
-        <div class="panel-h"><h2>Missions</h2>
-          <div class="tabs">
-            <div class="tab on" data-t="today">Aujourd'hui <span class="c">5</span></div>
-            <div class="tab" data-t="soon">À venir <span class="c">3</span></div>
-            <div class="tab" data-t="done">Terminées <span class="c">4</span></div>
-          </div>
-        </div>
+        <div class="panel-h"><h2>Activité du jour</h2>
+          <button class="btn ghost sm" data-goto="miss|">Voir toutes les missions</button></div>
         <div class="rows" id="rows"></div>
       </div>
     </section>
 
-    <!-- MISSIONS (même contenu, vue dédiée) -->
+    <!-- ================= MISSIONS ================= -->
     <section class="sec" id="miss">
       <div class="panel">
-        <div class="panel-h"><h2>Toutes les missions</h2>
-          <div class="tabs">
-            <div class="tab on" data-t2="today">Aujourd'hui <span class="c">5</span></div>
-            <div class="tab" data-t2="soon">À venir <span class="c">3</span></div>
-            <div class="tab" data-t2="done">Terminées <span class="c">4</span></div>
-          </div>
+        <div class="panel-h"><h2>Missions</h2></div>
+        <div class="filters">
+          <div class="fld"><label>Période</label><select id="m-per">
+            <option value="">Toutes</option><option value="today">Aujourd'hui</option>
+            <option value="week">Cette semaine</option><option value="month">Ce mois-ci</option></select></div>
+          <div class="fld"><label>Agent</label><select id="m-ag"><option value="">Tous</option></select></div>
+          <div class="fld"><label>Logement</label><select id="m-lg"><option value="">Tous</option></select></div>
+          <div class="fld"><label>Statut</label><select id="m-st">
+            <option value="">Tous</option><option value="ok">Validée</option>
+            <option value="warn">À vérifier</option><option value="run">En cours</option></select></div>
         </div>
+        <div class="fbar"><button class="btn sm" id="m-go">Filtrer</button>
+          <button class="btn ghost sm" id="m-reset">Réinitialiser</button>
+          <span class="cnt" id="m-cnt"></span></div>
         <div class="rows" id="rows2"></div>
       </div>
     </section>
 
-    <!-- AGENTS -->
+    <!-- ================= AGENTS ================= -->
     <section class="sec" id="agents">
       <div class="panel">
-        <div class="panel-h"><h2>Mes agents</h2><button class="btn">+ Ajouter un agent</button></div>
+        <div class="panel-h"><h2>Agents</h2><button class="btn" id="a-add">+ Ajouter un agent</button></div>
+        <div class="fbar">
+          <div class="tabs" id="a-tabs">
+            <div class="tab on" data-af="">Tous</div>
+            <div class="tab" data-af="up">Actifs</div>
+            <div class="tab" data-af="off">Désactivés</div>
+          </div>
+          <span class="cnt" id="a-cnt"></span>
+        </div>
         <div class="grid" id="agrid"></div>
       </div>
     </section>
 
-    <!-- LOGEMENTS -->
+    <!-- ================= LOGEMENTS ================= -->
     <section class="sec" id="logs">
       <div class="panel">
-        <div class="panel-h"><h2>Logements</h2><button class="btn ghost">Synchroniser Lodgify</button></div>
+        <div class="panel-h"><h2>Logements</h2><button class="btn ghost" id="l-sync">Synchroniser Lodgify</button></div>
+        <div class="fbar"><span class="cnt" id="l-cnt"></span></div>
         <div class="grid" id="lgrid"></div>
       </div>
     </section>
 
-    <!-- PHOTOS -->
-    <section class="sec" id="photos">
+    <!-- ================= MÉDIAS ================= -->
+    <section class="sec" id="media">
       <div class="panel">
-        <div class="panel-h"><h2>Photos · Churchill 79 — 22 juin</h2><button class="btn ghost">Filtrer</button></div>
+        <div class="panel-h"><h2>Médias</h2></div>
+        <div class="filters">
+          <div class="fld"><label>Logement</label><select id="p-lg"><option value="">Tous</option></select></div>
+          <div class="fld"><label>Agent</label><select id="p-ag"><option value="">Tous</option></select></div>
+          <div class="fld"><label>Pièce</label><select id="p-rm">
+            <option value="">Toutes</option><option>Chambres</option><option>Cuisine</option>
+            <option>Salle de bain</option><option>Toilettes</option><option>Salon</option><option>Général</option></select></div>
+          <div class="fld"><label>Depuis le</label><input type="date" id="p-d1"></div>
+          <div class="fld"><label>Jusqu'au</label><input type="date" id="p-d2"></div>
+        </div>
+        <div class="fbar"><button class="btn sm" id="p-go">Rechercher</button>
+          <button class="btn ghost sm" id="p-reset">Réinitialiser</button>
+          <span class="cnt" id="p-cnt"></span></div>
         <div class="gallery" id="gal"></div>
+        <div class="empty" id="p-empty">Choisis un filtre puis lance la recherche.<br>Les photos ne se chargent qu'à la demande, pour garder l'application rapide.</div>
       </div>
     </section>
 
-    <!-- RAPPORTS -->
+    <!-- ================= RAPPORTS ================= -->
     <section class="sec" id="reps">
       <div class="panel">
-        <div class="panel-h"><h2>Rapports</h2><button class="btn">＋ Générer un rapport</button></div>
+        <div class="panel-h"><h2>Rapports</h2></div>
+        <div class="filters">
+          <div class="fld"><label>Période</label><select id="r-per">
+            <option value="">Toutes</option><option value="today">Aujourd'hui</option>
+            <option value="week">Cette semaine</option><option value="month">Ce mois-ci</option>
+            <option value="custom">Personnalisée</option></select></div>
+          <div class="fld"><label>Du</label><input type="date" id="r-d1"></div>
+          <div class="fld"><label>Au</label><input type="date" id="r-d2"></div>
+          <div class="fld"><label>Agent</label><select id="r-ag"><option value="">Tous</option></select></div>
+          <div class="fld"><label>Logement</label><select id="r-lg"><option value="">Tous</option></select></div>
+          <div class="fld"><label>Statut</label><select id="r-st">
+            <option value="">Tous</option><option value="ok">Validée</option><option value="warn">À vérifier</option></select></div>
+          <div class="fld"><label>Problème</label><select id="r-pb">
+            <option value="">Peu importe</option><option value="y">Avec problème</option><option value="n">Sans problème</option></select></div>
+          <div class="fld"><label>Photos</label><select id="r-ph">
+            <option value="">Peu importe</option><option value="y">Avec photos</option><option value="n">Sans photo</option></select></div>
+        </div>
+        <div class="fbar">
+          <button class="btn sm" id="r-go">Filtrer</button>
+          <button class="btn ghost sm" id="r-reset">Réinitialiser</button>
+          <button class="btn ghost sm" id="r-pdf">📄 PDF</button>
+          <button class="btn ghost sm" id="r-csv">📊 CSV</button>
+          <button class="btn ghost sm" id="r-print">🖨️ Imprimer</button>
+          <span class="cnt" id="r-cnt"></span>
+        </div>
+        <div class="rows" id="rrows"></div>
+        <div class="panel-h" style="margin:22px 0 12px"><h2>Rapports générés</h2>
+          <button class="btn sm" id="r-gen">＋ Générer un rapport</button></div>
         <div id="replist"></div>
       </div>
     </section>
 
-    <!-- ASSISTANT -->
+    <!-- ================= ASSISTANT ================= -->
     <section class="sec" id="ask">
       <div class="panel">
         <div class="panel-h"><h2>💬 Assistant ALFRED</h2></div>
         <div class="sugg" id="sugg">
           <div class="chip">Quels logements nettoyés aujourd'hui ?</div>
           <div class="chip">Incidents urgents de la semaine</div>
-          <div class="chip">Photos de Churchill 79 hier</div>
+          <div class="chip">Missions à vérifier ce mois-ci</div>
           <div class="chip">Génère un rapport des missions à vérifier</div>
         </div>
         <div class="chat">
@@ -258,182 +319,380 @@
 <div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
 
 <script>
+(function(){
   var d=new Date();
   document.getElementById('today').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var TODAY=d.toISOString().slice(0,10);
 
-  var DATA={
-    today:[
-      {n:"Churchill 79",ad:"Av. Churchill 79, Bxl",ag:"Marie Dupont",hr:"09:15 → 10:40",st:"ok",lab:"✓ Validé"},
-      {n:"Louise 12",ad:"Av. Louise 12, Bxl",ag:"Ahmed B.",hr:"11:00 → 12:20",st:"warn",lab:"⚠ À vérifier"},
-      {n:"Flagey 23",ad:"Place Flagey 23",ag:"Sofia R.",hr:"13:30 → en cours",st:"run",lab:"● En cours"},
-      {n:"Dansaert 5",ad:"Rue Dansaert 5",ag:"Marie Dupont",hr:"15:00",st:"plan",lab:"Planifiée"},
-      {n:"Sablon 8",ad:"Place du Sablon 8",ag:"Karim L.",hr:"16:30",st:"plan",lab:"Planifiée"}
-    ],
-    soon:[
-      {n:"Churchill 79",ad:"Av. Churchill 79, Bxl",ag:"Marie Dupont",hr:"Demain · 09:00",st:"plan",lab:"Planifiée"},
-      {n:"Midi 200",ad:"Bd du Midi 200",ag:"Non assigné",hr:"Demain · 11:30",st:"plan",lab:"À assigner"},
-      {n:"Louise 12",ad:"Av. Louise 12, Bxl",ag:"Ahmed B.",hr:"Jeu. 25 · 10:00",st:"plan",lab:"Planifiée"}
-    ],
-    done:[
-      {n:"Flagey 23",ad:"Place Flagey 23",ag:"Sofia R.",hr:"Hier · 09:10 → 10:25",st:"ok",lab:"✓ Validé"},
-      {n:"Sablon 8",ad:"Place du Sablon 8",ag:"Karim L.",hr:"Hier · 14:00 → 15:10",st:"ok",lab:"✓ Validé"},
-      {n:"Dansaert 5",ad:"Rue Dansaert 5",ag:"Marie Dupont",hr:"21 juin · 11:00 → 12:30",st:"warn",lab:"⚠ Incident"},
-      {n:"Churchill 79",ad:"Av. Churchill 79, Bxl",ag:"Ahmed B.",hr:"20 juin · 09:00 → 10:15",st:"ok",lab:"✓ Validé"}
-    ]
-  };
+  /* ---------- Données de démonstration (remplacées par le serveur si dispo) ---------- */
+  var MISSIONS=[
+    {id:"m1",n:"Churchill 79",ag:"Marie Dupont",date:TODAY,hr:"09:15 → 10:40",dur:"1h25",st:"ok",lab:"✓ Validé",pb:0,nph:14},
+    {id:"m2",n:"Louise 12",ag:"Ahmed B.",date:TODAY,hr:"11:00 → 12:20",dur:"1h20",st:"warn",lab:"⚠ À vérifier",pb:1,nph:11},
+    {id:"m3",n:"Flagey 23",ag:"Sofia R.",date:TODAY,hr:"13:30 → en cours",dur:"—",st:"run",lab:"● En cours",pb:0,nph:4},
+    {id:"m4",n:"Sablon 8",ag:"Karim L.",date:"2026-07-20",hr:"14:00 → 15:10",dur:"1h10",st:"ok",lab:"✓ Validé",pb:0,nph:12},
+    {id:"m5",n:"Dansaert 5",ag:"Marie Dupont",date:"2026-07-19",hr:"11:00 → 12:30",dur:"1h30",st:"warn",lab:"⚠ Incident",pb:2,nph:9},
+    {id:"m6",n:"Churchill 79",ag:"Ahmed B.",date:"2026-07-18",hr:"09:00 → 10:15",dur:"1h15",st:"ok",lab:"✓ Validé",pb:0,nph:13},
+    {id:"m7",n:"Flagey 23",ag:"Sofia R.",date:"2026-07-15",hr:"09:10 → 10:25",dur:"1h15",st:"ok",lab:"✓ Validé",pb:0,nph:10}
+  ];
   var AGENTS=[
-    {n:"Marie Dupont",in:"MD",rl:"Agent · Genius",sem:8,st:"up"},
-    {n:"Ahmed B.",in:"AB",rl:"Agent · Genius",sem:6,st:"up"},
-    {n:"Sofia R.",in:"SR",rl:"Agent · Genius",sem:5,st:"up"},
-    {n:"Karim L.",in:"KL",rl:"Agent · Genius",sem:4,st:"up"},
-    {n:"Nadia T.",in:"NT",rl:"Agent · Genius",sem:0,st:"off"}
+    {n:"Marie Dupont",in:"MD",tg:"612345678",role:"agent",st:"up",tot:64,sem:8,mois:26,last:TODAY,pb:1},
+    {n:"Ahmed B.",in:"AB",tg:"698765432",role:"agent",st:"up",tot:51,sem:6,mois:21,last:TODAY,pb:0},
+    {n:"Sofia R.",in:"SR",tg:"634567890",role:"agent",st:"up",tot:38,sem:5,mois:17,last:TODAY,pb:0},
+    {n:"Karim L.",in:"KL",tg:"645678901",role:"agent",st:"up",tot:29,sem:4,mois:12,last:"2026-07-20",pb:0},
+    {n:"Chris L.",in:"CL",tg:"600112233",role:"admin",st:"up",tot:0,sem:0,mois:0,last:"—",pb:0},
+    {n:"Nadia T.",in:"NT",tg:"656789012",role:"agent",st:"off",tot:12,sem:0,mois:0,last:"2026-06-02",pb:0}
   ];
   var LOGS=[
-    {n:"Churchill 79",ad:"Av. Churchill 79",last:"22 juin",st:"up"},
-    {n:"Louise 12",ad:"Av. Louise 12",last:"22 juin",st:"up"},
-    {n:"Flagey 23",ad:"Place Flagey 23",last:"hier",st:"up"},
-    {n:"Dansaert 5",ad:"Rue Dansaert 5",last:"21 juin",st:"up"},
-    {n:"Sablon 8",ad:"Place du Sablon 8",last:"hier",st:"up"},
-    {n:"Midi 200",ad:"Bd du Midi 200",last:"—",st:"off"}
+    {n:"Churchill 79",ad:"Av. Churchill 79, Bruxelles",last:TODAY,st:"up",acces:"Boîte à clés à gauche de la porte",code:"4821",note:"Poubelles le mardi soir"},
+    {n:"Louise 12",ad:"Av. Louise 12, Bruxelles",last:TODAY,st:"up",acces:"Digicode entrée puis 2e étage",code:"7734",note:""},
+    {n:"Flagey 23",ad:"Place Flagey 23",last:TODAY,st:"up",acces:"Clés chez le concierge",code:"—",note:"Ascenseur en panne"},
+    {n:"Sablon 8",ad:"Place du Sablon 8",last:"2026-07-20",st:"up",acces:"Boîte à clés portail",code:"1290",note:""},
+    {n:"Dansaert 5",ad:"Rue Dansaert 5",last:"2026-07-19",st:"up",acces:"Boîte à clés sous la boîte aux lettres",code:"5567",note:"Fuite évier signalée"},
+    {n:"Midi 200",ad:"Bd du Midi 200",last:"—",st:"off",acces:"—",code:"—",note:"Logement en maintenance"}
   ];
-  var PHOTOS=[["🛏️","Sous le lit"],["🚿","Douche / siphon"],["🚽","WC"],["🍽️","Vaisselle rangée"],["🪟","Fenêtres"],["🗑️","Poubelles vidées"]];
+  var PHOTOS=[
+    {lg:"Churchill 79",ag:"Marie Dupont",rm:"Chambres",date:TODAY,cap:"Sous le lit",e:"🛏️"},
+    {lg:"Churchill 79",ag:"Marie Dupont",rm:"Salle de bain",date:TODAY,cap:"Siphon",e:"🚿"},
+    {lg:"Churchill 79",ag:"Marie Dupont",rm:"Toilettes",date:TODAY,cap:"WC lunette ouverte",e:"🚽"},
+    {lg:"Louise 12",ag:"Ahmed B.",rm:"Cuisine",date:TODAY,cap:"Intérieur four",e:"🍽️"},
+    {lg:"Louise 12",ag:"Ahmed B.",rm:"Salon",date:TODAY,cap:"Vue d'ensemble",e:"🛋️"},
+    {lg:"Sablon 8",ag:"Karim L.",rm:"Général",date:"2026-07-20",cap:"Clés dans la box",e:"🔑"},
+    {lg:"Dansaert 5",ag:"Marie Dupont",rm:"Salle de bain",date:"2026-07-19",cap:"Douche",e:"🚿"},
+    {lg:"Flagey 23",ag:"Sofia R.",rm:"Chambres",date:"2026-07-15",cap:"Lit fait",e:"🛏️"}
+  ];
   var REPORTS=[
-    {ti:"Rapport de ménage — semaine 25",mt:"16–22 juin · 12 missions · 2 à vérifier"},
-    {ti:"Rapport de ménage — semaine 24",mt:"9–15 juin · 14 missions · 0 incident"},
-    {ti:"Rapport Churchill 79 — juin",mt:"5 interventions · 1 incident résolu"}
+    {ti:"Rapport de ménage — semaine 29",mt:"13–19 juillet · 12 missions · 2 à vérifier"},
+    {ti:"Rapport Churchill 79 — juillet",mt:"5 interventions · 1 incident résolu"}
   ];
 
-  function rowHTML(m){return '<div class="row" data-id="'+(m.id||'')+'"><div class="ico">🏠</div>'+
-    '<div><div class="nm">'+m.n+'</div><div class="meta">'+(m.ad||'')+'</div></div>'+
-    '<div class="ag">'+m.ag+'</div><div class="hr">'+m.hr+'</div>'+
-    '<div class="st '+m.st+'">'+m.lab+'</div></div>';}
-  function fill(id,t){var el=document.getElementById(id);var l=DATA[t]||[];
-    el.innerHTML=l.length?l.map(rowHTML).join(''):'<div class="empty">Aucune mission.</div>';
-    el.querySelectorAll('.row').forEach(function(r){r.onclick=function(){openMission(r.getAttribute('data-id'),r);};});}
-  fill('rows','today');fill('rows2','today');
+  var API=true, $=function(i){return document.getElementById(i);};
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function uniq(a){return a.filter(function(v,i){return v&&a.indexOf(v)===i;});}
 
-  // ---- Détail mission (modal) ----
-  var modal=document.getElementById('modal'),sheet=document.getElementById('sheet');
-  function closeM(){modal.classList.remove('on');}
-  modal.addEventListener('click',function(e){if(e.target===modal)closeM();});
-  function detailHTML(d){
-    var ck=(d.confs||[]).map(function(c){
-      var cls=c.no?'nn':(c.ok?'y':'nu'),sym=c.no?'✗':(c.ok?'✓':'–');
-      var val=c.val?(' <b style="margin-left:auto">'+c.val+'</b>'):'';
-      return '<div class="ck"><span class="b '+cls+'">'+sym+'</span><span>'+c.label+'</span>'+val+'</div>';}).join('');
-    var inc=(d.incidents||[]).map(function(i){return '<div class="inc'+(i.urgent?' u':'')+'">'+(i.urgent?'🚨 ':'⚠️ ')+i.resume+'</div>';}).join('');
-    var ph=(d.photos||[]).map(function(p){return '<div class="ph"><div class="img" style="padding:0"><img src="'+p.url+'" style="width:100%;height:110px;object-fit:cover"></div><div class="cap">'+(p.cap||'Photo')+'</div></div>';}).join('');
-    return '<span class="x" onclick="document.getElementById(\'modal\').classList.remove(\'on\')">✕</span>'+
-      '<h3>🏠 '+d.n+'</h3><div class="sub" style="color:var(--mut)">'+(d.ag||'')+' · '+(d.deb||'').replace('T',' ')+'</div>'+
-      '<div style="margin-top:10px"><span class="st '+d.st+'">'+d.lab+'</span></div>'+
-      (inc?('<div class="lbl">Incident</div>'+inc):'')+
-      (ck?('<div class="lbl">Vérifications</div>'+ck):'')+
-      (ph?('<div class="lbl">Photos preuve</div><div class="gallery">'+ph+'</div>'):'')+
-      '<div style="margin-top:20px;display:flex;gap:10px"><button class="btn" onclick="alert(\'Génération du rapport pour cette mission…\')">📄 Générer le rapport</button>'+
-      '<button class="btn ghost" onclick="document.getElementById(\'modal\').classList.remove(\'on\')">Fermer</button></div>';
+  /* ---------- Périodes ---------- */
+  function inPeriod(dt,p){
+    if(!p)return true; if(!dt)return false;
+    if(p==='today')return dt===TODAY;
+    var x=new Date(dt),n=new Date(TODAY);
+    if(p==='week'){var s=new Date(n);s.setDate(n.getDate()-((n.getDay()+6)%7));return x>=s&&x<=n;}
+    if(p==='month')return dt.slice(0,7)===TODAY.slice(0,7);
+    return true;
   }
-  function openMission(id,rowEl){
-    if(id){
-      sheet.innerHTML='<div class="empty">Chargement…</div>';modal.classList.add('on');
-      fetch('/api/mission?id='+encodeURIComponent(id)).then(function(r){if(!r.ok)throw 0;return r.json();})
-        .then(function(d){sheet.innerHTML=detailHTML(d);})
-        .catch(function(){sheet.innerHTML=detailHTML(rowBasic(rowEl));});
-    }else{sheet.innerHTML=detailHTML(rowBasic(rowEl));modal.classList.add('on');}
-  }
-  function rowBasic(r){return {n:r.querySelector('.nm').textContent,ag:r.querySelector('.ag').textContent,
-    deb:r.querySelector('.hr').textContent,st:r.querySelector('.st').className.split(' ')[1],
-    lab:r.querySelector('.st').textContent,confs:[],incidents:[],photos:[]};}
 
-  document.querySelectorAll('#dash .tab').forEach(function(tb){tb.onclick=function(){
-    document.querySelectorAll('#dash .tab').forEach(function(x){x.classList.remove('on');});tb.classList.add('on');fill('rows',tb.dataset.t);};});
-  document.querySelectorAll('#miss .tab').forEach(function(tb){tb.onclick=function(){
-    document.querySelectorAll('#miss .tab').forEach(function(x){x.classList.remove('on');});tb.classList.add('on');fill('rows2',tb.dataset.t2);};});
-
-  // ---- Rendu (fonctions, ré-utilisables après chargement API) ----
-  function renderAgents(arr){document.getElementById('agrid').innerHTML=arr.map(function(a){
-    return '<div class="card"><div class="hd"><div class="pic">'+(a.in||'A')+'</div><div><div class="nm2">'+a.n+'</div><div class="rl">'+(a.rl||'')+'</div></div></div>'+
-      '<div class="line"><span>Statut</span><span class="pill '+(a.st||'up')+'">'+((a.st||'up')==="up"?"Actif":"Inactif")+'</span></div>'+
-      '<div class="line"><span>'+(a.sem!=null?'Missions (semaine)':'Depuis')+'</span><span>'+(a.sem!=null?a.sem:(a.depuis||'—'))+'</span></div></div>';
-  }).join('');}
-  function renderLogs(arr){document.getElementById('lgrid').innerHTML=arr.map(function(l){
-    return '<div class="card"><div class="hd"><div class="pic">🏠</div><div><div class="nm2">'+l.n+'</div><div class="rl">'+(l.ad||'')+'</div></div></div>'+
-      '<div class="line"><span>Dernier ménage</span><span>'+(l.last||'—')+'</span></div>'+
-      '<div class="line"><span>Suivi</span><span class="pill '+(l.st||'up')+'">'+((l.st||'up')==="up"?"Actif":"En pause")+'</span></div></div>';
-  }).join('');}
-  function renderPhotos(obj){
-    if(obj&&obj.titre){var h=document.querySelector('#photos .panel-h h2');if(h)h.textContent='Photos · '+obj.titre;}
-    var list=(obj&&obj.photos&&obj.photos.length)?obj.photos:null;
-    if(list){document.getElementById('gal').innerHTML=list.map(function(p){
-      return '<div class="ph"><div class="img" style="padding:0"><img src="'+p.url+'" style="width:100%;height:120px;object-fit:cover"></div><div class="cap">'+(p.cap||'Photo')+'</div></div>';}).join('');}
-    else{document.getElementById('gal').innerHTML=PHOTOS.map(function(p){
-      return '<div class="ph"><div class="img" style="background:linear-gradient(135deg,rgba(56,160,255,.18),rgba(99,102,241,.12))">'+p[0]+'</div><div class="cap">'+p[1]+'</div></div>';}).join('');}
+  /* ---------- KPI ---------- */
+  var KPI=[
+    {k:'tot',lab:'Missions réalisées',ic:'🧹',cls:'b1',go:'miss|'},
+    {k:'day',lab:"Missions aujourd'hui",ic:'📅',cls:'b2',go:'miss|today'},
+    {k:'run',lab:'Missions en cours',ic:'⏱️',cls:'b3',go:'miss|run'},
+    {k:'warn',lab:'À vérifier',ic:'⚠️',cls:'b4',go:'miss|warn'},
+    {k:'ag',lab:'Agents actifs',ic:'👥',cls:'b5',go:'agents|up'},
+    {k:'lg',lab:'Logements',ic:'🏠',cls:'b6',go:'logs|'}
+  ];
+  function kpiVals(){
+    var done=MISSIONS.filter(function(m){return m.st!=='run';});
+    return {tot:done.length,
+      day:MISSIONS.filter(function(m){return m.date===TODAY;}).length,
+      run:MISSIONS.filter(function(m){return m.st==='run';}).length,
+      warn:MISSIONS.filter(function(m){return m.st==='warn';}).length,
+      ag:AGENTS.filter(function(a){return a.st==='up';}).length,
+      lg:LOGS.length};
   }
-  function renderReports(arr){var el=document.getElementById('replist');
+  function renderKpis(){
+    var v=kpiVals();
+    $('kpis').innerHTML=KPI.map(function(c){
+      return '<div class="kpi '+c.cls+'" data-goto="'+c.go+'"><div class="lab">'+c.lab+'</div>'+
+        '<div class="num">'+v[c.k]+'</div><div class="go">Ouvrir →</div><div class="ic">'+c.ic+'</div></div>';
+    }).join('');
+  }
+
+  /* ---------- Navigation ---------- */
+  var titles={dash:"Tableau de bord",miss:"Missions",agents:"Agents",logs:"Logements",media:"Médias",reps:"Rapports",ask:"Assistant ALFRED"};
+  function goSec(s){
+    document.querySelectorAll('#nav a').forEach(function(x){x.classList.toggle('on',x.dataset.sec===s);});
+    document.querySelectorAll('.sec').forEach(function(x){x.classList.remove('on');});
+    $(s).classList.add('on'); $('ptitle').textContent=titles[s];
+    document.querySelector('.main').scrollTop=0;
+  }
+  document.querySelectorAll('#nav a').forEach(function(a){a.onclick=function(){goSec(a.dataset.sec);};});
+
+  // Un indicateur ou un bouton "data-goto" ouvre la page avec le bon filtre
+  document.addEventListener('click',function(e){
+    var el=e.target.closest('[data-goto]'); if(!el)return;
+    var p=el.getAttribute('data-goto').split('|'),sec=p[0],f=p[1]||'';
+    goSec(sec);
+    if(sec==='miss'){
+      $('m-per').value=(f==='today')?'today':'';
+      $('m-st').value=(f==='run'||f==='warn'||f==='ok')?f:'';
+      $('m-ag').value='';$('m-lg').value='';renderMissions();
+    }
+    if(sec==='agents'){
+      document.querySelectorAll('#a-tabs .tab').forEach(function(t){t.classList.toggle('on',t.dataset.af===f);});
+      renderAgents();
+    }
+  });
+
+  /* ---------- Missions ---------- */
+  function rowHTML(m){
+    return '<div class="row" data-mid="'+esc(m.id)+'"><div class="ico">🏠</div>'+
+      '<div><div class="nm">'+esc(m.n)+'</div><div class="meta">'+esc(m.date)+' · '+esc(m.nph||0)+' photos'+(m.pb?' · ⚠ '+m.pb+' problème(s)':'')+'</div></div>'+
+      '<div class="ag">'+esc(m.ag)+'</div><div class="hr">'+esc(m.hr)+'</div>'+
+      '<div class="st '+esc(m.st)+'">'+esc(m.lab)+'</div></div>';
+  }
+  function bindRows(el){el.querySelectorAll('.row').forEach(function(r){r.onclick=function(){openMission(r.getAttribute('data-mid'));};});}
+  function renderDash(){
+    var l=MISSIONS.filter(function(m){return m.date===TODAY;});
+    $('rows').innerHTML=l.length?l.map(rowHTML).join(''):'<div class="empty">Aucune mission aujourd\'hui.</div>';
+    bindRows($('rows'));
+  }
+  function missFiltered(){
+    var per=$('m-per').value,ag=$('m-ag').value,lg=$('m-lg').value,st=$('m-st').value;
+    return MISSIONS.filter(function(m){
+      return inPeriod(m.date,per)&&(!ag||m.ag===ag)&&(!lg||m.n===lg)&&(!st||m.st===st);});
+  }
+  function renderMissions(){
+    var l=missFiltered();
+    $('rows2').innerHTML=l.length?l.map(rowHTML).join(''):'<div class="empty">Aucune mission pour ces critères.</div>';
+    $('m-cnt').textContent=l.length+' mission'+(l.length>1?'s':'');
+    bindRows($('rows2'));
+  }
+  $('m-go').onclick=renderMissions;
+  $('m-reset').onclick=function(){$('m-per').value='';$('m-ag').value='';$('m-lg').value='';$('m-st').value='';renderMissions();};
+
+  /* ---------- Agents ---------- */
+  function agentFilter(){var t=document.querySelector('#a-tabs .tab.on');return t?t.dataset.af:'';}
+  function renderAgents(){
+    var f=agentFilter();
+    var l=AGENTS.filter(function(a){return !f||a.st===f;});
+    $('a-cnt').textContent=l.length+' agent'+(l.length>1?'s':'');
+    $('agrid').innerHTML=l.length?l.map(function(a){
+      return '<div class="card" data-ag="'+esc(a.n)+'"><div class="hd"><div class="pic">'+esc(a.in)+'</div>'+
+        '<div><div class="nm2">'+esc(a.n)+'</div><div class="rl">ID Telegram '+esc(a.tg)+'</div></div></div>'+
+        '<div class="line"><span>Statut</span><span class="pill '+esc(a.st)+'">'+(a.st==='up'?'Actif':'Désactivé')+'</span></div>'+
+        '<div class="line"><span>Rôle</span><span class="pill '+(a.role==='admin'?'adm':'up')+'">'+(a.role==='admin'?'Administrateur':'Agent')+'</span></div>'+
+        '<div class="line"><span>Missions (total)</span><span>'+a.tot+'</span></div>'+
+        '<div class="line"><span>Semaine / mois</span><span>'+a.sem+' / '+a.mois+'</span></div>'+
+        '<div class="line"><span>Dernière mission</span><span>'+esc(a.last)+'</span></div></div>';
+    }).join(''):'<div class="empty">Aucun agent.</div>';
+    $('agrid').querySelectorAll('.card').forEach(function(c){c.onclick=function(){openAgent(c.getAttribute('data-ag'));};});
+  }
+  document.querySelectorAll('#a-tabs .tab').forEach(function(t){t.onclick=function(){
+    document.querySelectorAll('#a-tabs .tab').forEach(function(x){x.classList.remove('on');});t.classList.add('on');renderAgents();};});
+  $('a-add').onclick=function(){alert("L'agent s'inscrit lui-même depuis Telegram (/start) : tu valides sa demande ici ou dans le bot. C'est ce qui garantit le lien avec son compte Telegram.");};
+
+  /* ---------- Logements ---------- */
+  function renderLogs(){
+    $('l-cnt').textContent=LOGS.length+' logement'+(LOGS.length>1?'s':'');
+    $('lgrid').innerHTML=LOGS.map(function(l){
+      return '<div class="card" data-lg="'+esc(l.n)+'"><div class="hd"><div class="pic">🏠</div>'+
+        '<div><div class="nm2">'+esc(l.n)+'</div><div class="rl">'+esc(l.ad||'')+'</div></div></div>'+
+        '<div class="line"><span>Dernier ménage</span><span>'+esc(l.last||'—')+'</span></div>'+
+        '<div class="line"><span>Statut</span><span class="pill '+esc(l.st||'up')+'">'+((l.st||'up')==='up'?'Actif':'Maintenance')+'</span></div></div>';
+    }).join('');
+    $('lgrid').querySelectorAll('.card').forEach(function(c){c.onclick=function(){openLog(c.getAttribute('data-lg'));};});
+  }
+  $('l-sync').onclick=function(){alert("Les logements sont tirés de Lodgify — c'est ta source de vérité. Seuls l'accès, le code et les consignes sont ajoutés ici.");};
+
+  /* ---------- Médias (chargement à la demande) ---------- */
+  function renderMedia(){
+    var lg=$('p-lg').value,ag=$('p-ag').value,rm=$('p-rm').value,d1=$('p-d1').value,d2=$('p-d2').value;
+    var l=PHOTOS.filter(function(p){
+      return (!lg||p.lg===lg)&&(!ag||p.ag===ag)&&(!rm||p.rm===rm)&&(!d1||p.date>=d1)&&(!d2||p.date<=d2);});
+    $('p-cnt').textContent=l.length+' photo'+(l.length>1?'s':'');
+    $('p-empty').style.display=l.length?'none':'block';
+    if(!l.length){$('p-empty').innerHTML='Aucune photo pour ces critères.';$('gal').innerHTML='';return;}
+    $('gal').innerHTML=l.map(function(p){
+      var img=p.url?'<img src="'+esc(p.url)+'" loading="lazy" style="width:100%;height:120px;object-fit:cover">'
+                   :'<div class="img" style="background:linear-gradient(135deg,rgba(56,160,255,.18),rgba(99,102,241,.12))">'+p.e+'</div>';
+      return '<div class="ph">'+img+'<div class="cap">'+esc(p.cap)+'<br><span style="opacity:.65">'+esc(p.lg)+' · '+esc(p.date)+'</span></div></div>';
+    }).join('');
+  }
+  $('p-go').onclick=renderMedia;
+  $('p-reset').onclick=function(){['p-lg','p-ag','p-rm','p-d1','p-d2'].forEach(function(i){$(i).value='';});
+    $('gal').innerHTML='';$('p-cnt').textContent='';
+    $('p-empty').style.display='block';
+    $('p-empty').innerHTML="Choisis un filtre puis lance la recherche.<br>Les photos ne se chargent qu'à la demande, pour garder l'application rapide.";};
+
+  /* ---------- Rapports ---------- */
+  function repFiltered(){
+    var per=$('r-per').value,d1=$('r-d1').value,d2=$('r-d2').value,ag=$('r-ag').value,
+        lg=$('r-lg').value,st=$('r-st').value,pb=$('r-pb').value,ph=$('r-ph').value;
+    return MISSIONS.filter(function(m){
+      if(per==='custom'){ if(d1&&m.date<d1)return false; if(d2&&m.date>d2)return false; }
+      else if(!inPeriod(m.date,per))return false;
+      if(ag&&m.ag!==ag)return false; if(lg&&m.n!==lg)return false; if(st&&m.st!==st)return false;
+      if(pb==='y'&&!m.pb)return false; if(pb==='n'&&m.pb)return false;
+      if(ph==='y'&&!m.nph)return false; if(ph==='n'&&m.nph)return false;
+      return true;});
+  }
+  function renderReps(){
+    var l=repFiltered();
+    $('r-cnt').textContent=l.length+' mission'+(l.length>1?'s':'');
+    $('rrows').innerHTML=l.length?l.map(rowHTML).join(''):'<div class="empty">Aucune mission pour ces critères.</div>';
+    bindRows($('rrows'));
+  }
+  $('r-go').onclick=renderReps;
+  $('r-reset').onclick=function(){['r-per','r-d1','r-d2','r-ag','r-lg','r-st','r-pb','r-ph'].forEach(function(i){$(i).value='';});renderReps();};
+  $('r-csv').onclick=function(){
+    var l=repFiltered(),rows=[['Mission','Logement','Agent','Date','Horaires','Durée','Statut','Problèmes','Photos']];
+    l.forEach(function(m){rows.push([m.id,m.n,m.ag,m.date,m.hr,m.dur,m.lab,m.pb,m.nph]);});
+    var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(';');}).join('\n');
+    var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
+    a.download='alfred-rapports.csv';a.click();};
+  $('r-print').onclick=function(){window.print();};
+  $('r-pdf').onclick=function(){alert("L'export PDF sera généré par le serveur (le même rapport que dans Telegram).");};
+  $('r-gen').onclick=function(){var b=$('r-gen');b.textContent='Génération…';
+    fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:''})})
+      .then(function(r){return r.json();}).then(function(){b.textContent='＋ Générer un rapport';hydrate();})
+      .catch(function(){b.textContent='＋ Générer un rapport';alert("Disponible une fois le site en ligne sur ton serveur.");});};
+  function renderReportFiles(arr){
+    var el=$('replist');
     if(!arr||!arr.length){el.innerHTML='<div class="empty">Aucun rapport généré pour l\'instant.</div>';return;}
     el.innerHTML=arr.map(function(r){
-      var dl=r.file?('<a class="btn ghost" href="/api/report-file?file='+encodeURIComponent(r.file)+'" target="_blank">Ouvrir</a>'):'<button class="btn ghost">Télécharger</button>';
-      return '<div class="rep"><div><div class="ti">'+r.ti+'</div><div class="mt">'+r.mt+'</div></div>'+dl+'</div>';}).join('');}
+      var dl=r.file?('<a class="btn ghost sm" href="/api/report-file?file='+encodeURIComponent(r.file)+'" target="_blank">Ouvrir</a>'):'<button class="btn ghost sm">Ouvrir</button>';
+      return '<div class="rep"><div><div class="ti">'+esc(r.ti)+'</div><div class="mt">'+esc(r.mt)+'</div></div>'+dl+'</div>';}).join('');
+  }
 
-  renderAgents(AGENTS);renderLogs(LOGS);renderPhotos(null);renderReports(REPORTS);
+  /* ---------- Fiches (modales) ---------- */
+  var modal=$('modal'),sheet=$('sheet');
+  function closeM(){modal.classList.remove('on');}
+  window.alfredClose=closeM;
+  modal.addEventListener('click',function(e){if(e.target===modal)closeM();});
+  function head(t,s){return '<span class="x" onclick="alfredClose()">✕</span><h3>'+t+'</h3><div style="color:var(--mut);font-size:13.5px">'+s+'</div>';}
 
-  // Navigation sections
-  var titles={dash:"Tableau de bord",miss:"Missions",agents:"Agents",logs:"Logements",photos:"Photos",reps:"Rapports",ask:"Assistant ALFRED"};
-  document.querySelectorAll('#nav a').forEach(function(a){a.onclick=function(){
-    document.querySelectorAll('#nav a').forEach(function(x){x.classList.remove('on');});a.classList.add('on');
-    var s=a.dataset.sec;document.querySelectorAll('.sec').forEach(function(x){x.classList.remove('on');});
-    document.getElementById(s).classList.add('on');document.getElementById('ptitle').textContent=titles[s];};});
+  function openMission(id){
+    var m=MISSIONS.filter(function(x){return x.id===id;})[0];
+    if(!m){return;}
+    sheet.innerHTML='<div class="empty">Chargement…</div>';modal.classList.add('on');
+    fetch('/api/mission?id='+encodeURIComponent(id)).then(function(r){if(!r.ok)throw 0;return r.json();})
+      .then(function(d){sheet.innerHTML=missionHTML(m,d);}).catch(function(){sheet.innerHTML=missionHTML(m,null);});
+  }
+  function missionHTML(m,d){
+    var ph=(d&&d.photos||[]).map(function(p){
+      return '<div class="ph"><img src="'+esc(p.url)+'" loading="lazy" style="width:100%;height:110px;object-fit:cover"><div class="cap">'+esc(p.cap||'Photo')+'</div></div>';}).join('');
+    var inc=(d&&d.incidents||[]).map(function(i){
+      return '<div class="inc'+(i.urgent?' u':'')+'">'+(i.urgent?'🚨 ':'⚠️ ')+esc(i.resume)+'</div>';}).join('');
+    var ck=(d&&d.confs||[]).map(function(c){
+      var cls=c.no?'nn':(c.ok?'y':'nu'),sym=c.no?'✗':(c.ok?'✓':'–');
+      return '<div class="ck"><span class="b '+cls+'">'+sym+'</span><span>'+esc(c.label)+'</span></div>';}).join('');
+    return head('🏠 '+esc(m.n),esc(m.ag)+' · '+esc(m.date))+
+      '<div style="margin-top:10px"><span class="st '+esc(m.st)+'">'+esc(m.lab)+'</span></div>'+
+      '<div class="lbl">Mission</div>'+
+      '<div class="kv"><span>Référence</span><span>'+esc(m.id)+'</span></div>'+
+      '<div class="kv"><span>Horaires</span><span>'+esc(m.hr)+'</span></div>'+
+      '<div class="kv"><span>Durée</span><span>'+esc(m.dur)+'</span></div>'+
+      '<div class="kv"><span>Photos</span><span>'+esc(m.nph)+'</span></div>'+
+      (inc?('<div class="lbl">Problèmes signalés</div>'+inc):'')+
+      (ck?('<div class="lbl">Vérifications</div>'+ck):'')+
+      (ph?('<div class="lbl">Photos preuve</div><div class="gallery">'+ph+'</div>'):'')+
+      '<div class="ro">🔒 Le rapport est en lecture seule — c\'est ta preuve. Tu peux ajouter un commentaire daté ci-dessous.</div>'+
+      '<div class="lbl">Commentaire administrateur</div>'+
+      '<textarea class="cmt" placeholder="Ajouter une remarque (visible dans le rapport)…"></textarea>'+
+      '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'+
+      '<button class="btn sm" onclick="alert(\'Commentaire enregistré (démo).\')">Enregistrer le commentaire</button>'+
+      '<button class="btn ghost sm" onclick="alert(\'Le PDF sera généré par le serveur.\')">📄 PDF</button>'+
+      '<button class="btn ghost sm" onclick="alfredClose()">Fermer</button></div>';
+  }
 
-  // ---- Assistant ----
-  var API=true; // passe à false si le serveur ne répond pas
-  function botReplyLocal(q){q=q.toLowerCase();
-    if(q.indexOf('photo')>=0)return "Voici les photos de la dernière mission. Ouvre l'onglet Photos pour les voir.";
-    if(q.indexOf('incident')>=0)return "1 incident récent : Dansaert 5 — fuite sous l'évier, statut à vérifier.";
-    if(q.indexOf('rapport')>=0)return "Je prépare le rapport… il apparaîtra dans l'onglet Rapports.";
-    if(q.indexOf('aujour')>=0||q.indexOf('nettoy')>=0)return "Aujourd'hui : 5 missions (3 validées, 1 à vérifier, 1 en cours).";
-    return "Bien reçu. (Mode démo — connecte-toi via le serveur pour les vraies réponses d'ALFRED.)";}
-  function addMsg(txt,cls){var m=document.createElement('div');m.className='m '+cls;m.textContent=txt;
-    var box=document.getElementById('msgs');box.appendChild(m);box.scrollTop=box.scrollHeight;return m;}
+  function openAgent(nom){
+    var a=AGENTS.filter(function(x){return x.n===nom;})[0]; if(!a)return;
+    var his=MISSIONS.filter(function(m){return m.ag===nom;});
+    sheet.innerHTML=head('👤 '+esc(a.n),'ID Telegram '+esc(a.tg))+
+      '<div class="lbl">Fiche</div>'+
+      '<div class="kv"><span>Statut</span><span class="pill '+esc(a.st)+'">'+(a.st==='up'?'Actif':'Désactivé')+'</span></div>'+
+      '<div class="kv"><span>Rôle</span><span class="pill '+(a.role==='admin'?'adm':'up')+'">'+(a.role==='admin'?'Administrateur':'Agent')+'</span></div>'+
+      '<div class="kv"><span>Missions (total)</span><span>'+a.tot+'</span></div>'+
+      '<div class="kv"><span>Cette semaine</span><span>'+a.sem+'</span></div>'+
+      '<div class="kv"><span>Ce mois-ci</span><span>'+a.mois+'</span></div>'+
+      '<div class="kv"><span>Dernière mission</span><span>'+esc(a.last)+'</span></div>'+
+      '<div class="kv"><span>Problèmes signalés</span><span>'+a.pb+'</span></div>'+
+      '<div class="ro">🔗 Le statut et le rôle sont partagés avec le bot Telegram : un agent désactivé ici ne peut plus lancer de mission.</div>'+
+      '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'+
+      '<button class="btn sm" onclick="alert(\''+(a.st==='up'?'Agent désactivé':'Agent réactivé')+' (démo).\')">'+(a.st==='up'?'Désactiver':'Réactiver')+'</button>'+
+      '<button class="btn ghost sm" onclick="alert(\'Rôle modifié (démo).\')">Changer le rôle</button>'+
+      '<button class="btn ghost sm" onclick="alfredClose()">Fermer</button></div>'+
+      '<div class="lbl">Historique des missions</div>'+
+      (his.length?'<div class="rows">'+his.map(rowHTML).join('')+'</div>':'<div class="empty">Aucune mission.</div>');
+    modal.classList.add('on');
+    bindRows(sheet);
+  }
+
+  function openLog(nom){
+    var l=LOGS.filter(function(x){return x.n===nom;})[0]; if(!l)return;
+    var his=MISSIONS.filter(function(m){return m.n===nom;});
+    sheet.innerHTML=head('🏠 '+esc(l.n),esc(l.ad))+
+      '<div class="lbl">Depuis Lodgify</div>'+
+      '<div class="kv"><span>Adresse</span><span>'+esc(l.ad)+'</span></div>'+
+      '<div class="kv"><span>Statut</span><span class="pill '+esc(l.st)+'">'+(l.st==='up'?'Actif':'Maintenance')+'</span></div>'+
+      '<div class="kv"><span>Dernier ménage</span><span>'+esc(l.last)+'</span></div>'+
+      '<div class="lbl">Informations d\'accès (propres à ALFRED)</div>'+
+      '<div class="kv"><span>Accès</span><span>'+esc(l.acces)+'</span></div>'+
+      '<div class="kv"><span>Code boîte à clés</span><span class="secret" id="code-h">••••</span></div>'+
+      '<div class="kv"><span>Consignes</span><span>'+esc(l.note||'—')+'</span></div>'+
+      '<div class="ro">🔒 Le code n\'est visible qu\'aux administrateurs, et seulement une fois le site passé en HTTPS.</div>'+
+      '<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">'+
+      '<button class="btn ghost sm" onclick="var e=document.getElementById(\'code-h\');e.textContent=(e.textContent===\'••••\'?\''+esc(l.code)+'\':\'••••\');">Afficher / masquer le code</button>'+
+      '<button class="btn ghost sm" onclick="alert(\'Modification des infos d\\\'accès (démo).\')">Modifier</button>'+
+      '<button class="btn ghost sm" onclick="alfredClose()">Fermer</button></div>'+
+      '<div class="lbl">Historique des missions</div>'+
+      (his.length?'<div class="rows">'+his.map(rowHTML).join('')+'</div>':'<div class="empty">Aucune mission.</div>');
+    modal.classList.add('on');
+    bindRows(sheet);
+  }
+
+  /* ---------- Listes déroulantes ---------- */
+  function fillSelects(){
+    var ags=uniq(AGENTS.map(function(a){return a.n;})),lgs=uniq(LOGS.map(function(l){return l.n;}));
+    [['m-ag',ags],['r-ag',ags],['p-ag',ags],['m-lg',lgs],['r-lg',lgs],['p-lg',lgs]].forEach(function(p){
+      var el=$(p[0]);if(!el)return;var cur=el.value;
+      el.innerHTML='<option value="">Tous</option>'+p[1].map(function(v){return '<option>'+esc(v)+'</option>';}).join('');
+      el.value=cur;});
+  }
+
+  function renderAll(){renderKpis();renderDash();renderMissions();renderAgents();renderLogs();renderReps();}
+  fillSelects();renderAll();renderReportFiles(REPORTS);
+
+  /* ---------- Assistant ---------- */
+  function botLocal(q){q=q.toLowerCase();
+    if(q.indexOf('photo')>=0)return "Ouvre l'onglet Médias et filtre par logement ou par date.";
+    if(q.indexOf('incident')>=0||q.indexOf('problème')>=0)return "2 missions avec problème ce mois-ci : Louise 12 et Dansaert 5.";
+    if(q.indexOf('rapport')>=0)return "Utilise les filtres de l'onglet Rapports, puis exporte en CSV ou PDF.";
+    if(q.indexOf('aujour')>=0)return "Aujourd'hui : 3 missions (1 validée, 1 à vérifier, 1 en cours).";
+    return "Bien reçu. (Mode démo — connecte-toi via ton serveur pour les vraies réponses d'ALFRED.)";}
+  function addMsg(t,c){var m=document.createElement('div');m.className='m '+c;m.textContent=t;
+    var b=$('msgs');b.appendChild(m);b.scrollTop=b.scrollHeight;return m;}
   function send(q){if(!q)return;addMsg(q,'me');
-    if(!API){setTimeout(function(){addMsg(botReplyLocal(q),'bot');},400);return;}
-    var wait=addMsg('…','bot');
+    if(!API){setTimeout(function(){addMsg(botLocal(q),'bot');},350);return;}
+    var w=addMsg('…','bot');
     fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:q})})
-      .then(function(r){return r.json();})
-      .then(function(j){wait.textContent=j.answer||botReplyLocal(q);
-        var box=document.getElementById('msgs');box.scrollTop=box.scrollHeight;})
-      .catch(function(){wait.textContent=botReplyLocal(q);});}
-  document.getElementById('ask-send').onclick=function(){var i=document.getElementById('ask-in');send(i.value.trim());i.value='';};
-  document.getElementById('ask-in').addEventListener('keydown',function(e){if(e.key==='Enter'){send(this.value.trim());this.value='';}});
-  document.querySelectorAll('#sugg .chip').forEach(function(c){c.onclick=function(){
-    document.querySelector('#nav a[data-sec=ask]');send(c.textContent);};});
+      .then(function(r){return r.json();}).then(function(j){w.textContent=j.answer||botLocal(q);
+        var b=$('msgs');b.scrollTop=b.scrollHeight;}).catch(function(){w.textContent=botLocal(q);});}
+  $('ask-send').onclick=function(){var i=$('ask-in');send(i.value.trim());i.value='';};
+  $('ask-in').addEventListener('keydown',function(e){if(e.key==='Enter'){send(this.value.trim());this.value='';}});
+  document.querySelectorAll('#sugg .chip').forEach(function(c){c.onclick=function(){goSec('ask');send(c.textContent);};});
 
-  // Bouton générer un rapport
-  var repBtn=document.querySelector('#reps .btn');
-  if(repBtn)repBtn.onclick=function(){repBtn.textContent='Génération…';
-    fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:''})})
-      .then(function(r){return r.json();}).then(function(){repBtn.textContent='＋ Générer un rapport';hydrate();})
-      .catch(function(){repBtn.textContent='＋ Générer un rapport';alert("Disponible une fois le site en ligne.");});};
-
-  // ---- Chargement des vraies données (si le serveur répond) ----
-  function setKpis(t){var k=document.querySelectorAll('#dash .kpi .num');if(!k.length)return;
-    var done=t.done||[],today=t.today||[];
-    var val=today.filter(function(m){return m.st==='ok';}).length;
-    var ver=today.filter(function(m){return m.st==='warn';}).length;
-    k[0].textContent=today.length;k[1].textContent=val;k[2].textContent=ver;}
+  /* ---------- Vraies données si le serveur répond ---------- */
   function hydrate(){
     fetch('/api/missions').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(t){
-      DATA=t;document.querySelectorAll('#dash .tab').forEach(function(x,i){var n=[t.today,t.soon,t.done][i]; if(x.querySelector('.c'))x.querySelector('.c').textContent=n?n.length:0;});
-      document.querySelectorAll('#miss .tab').forEach(function(x,i){var n=[t.today,t.soon,t.done][i]; if(x.querySelector('.c'))x.querySelector('.c').textContent=n?n.length:0;});
-      fill('rows','today');fill('rows2','today');setKpis(t);
+      var all=[].concat(t.today||[],t.done||[]).map(function(m){
+        return {id:m.id||'',n:m.n,ag:m.ag,date:m.date||'',hr:m.hr||'',dur:m.dur||'—',
+                st:m.st,lab:m.lab,pb:m.pb||0,nph:m.photos||0};});
+      if(all.length){MISSIONS=all;fillSelects();renderAll();}
     }).catch(function(){API=false;});
-    fetch('/api/agents').then(function(r){return r.json();}).then(function(a){if(a&&a.length)renderAgents(a);}).catch(function(){});
-    fetch('/api/logements').then(function(r){return r.json();}).then(function(a){if(a&&a.length)renderLogs(a);}).catch(function(){});
-    fetch('/api/photos').then(function(r){return r.json();}).then(function(o){renderPhotos(o);}).catch(function(){});
-    fetch('/api/reports').then(function(r){return r.json();}).then(function(a){if(a)renderReports(a);}).catch(function(){});
+    fetch('/api/agents').then(function(r){return r.json();}).then(function(a){
+      if(a&&a.length){AGENTS=a.map(function(x){
+        return {n:x.n,in:x.in||'A',tg:x.tg||'—',role:x.role||'agent',st:x.st||'up',
+                tot:x.tot||0,sem:x.sem||0,mois:x.mois||0,last:x.last||'—',pb:x.pb||0};});
+        fillSelects();renderKpis();renderAgents();}}).catch(function(){});
+    fetch('/api/logements').then(function(r){return r.json();}).then(function(a){
+      if(a&&a.length){LOGS=a.map(function(x){
+        return {n:x.n,ad:x.ad||'',last:x.last||'—',st:x.st||'up',acces:x.acces||'—',code:x.code||'—',note:x.note||''};});
+        fillSelects();renderKpis();renderLogs();}}).catch(function(){});
+    fetch('/api/reports').then(function(r){return r.json();}).then(function(a){if(a)renderReportFiles(a);}).catch(function(){});
   }
   hydrate();
 
-  // Fond étoiles discret
-  var cvs=document.getElementById('net'),ctx=cvs.getContext('2d'),W,H,P=[];
+  /* ---------- Fond étoilé ---------- */
+  var cvs=$('net'),ctx=cvs.getContext('2d'),W,H,P=[];
   function rs(){W=cvs.width=innerWidth;H=cvs.height=innerHeight;}rs();addEventListener('resize',rs);
   var N=Math.min(80,Math.floor(innerWidth*innerHeight/22000));
   for(var k=0;k<N;k++)P.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,r:Math.random()*1.3+.5,ph:Math.random()*6.28,tw:Math.random()*.03+.008});
@@ -445,6 +704,7 @@
     for(var p,i=0;i<P.length;i++){p=P[i];p.ph+=p.tw;var al=.35+Math.sin(p.ph)*.28;ctx.fillStyle='rgba(160,205,255,'+al+')';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.2832);ctx.fill();}
     ctx.shadowBlur=0;requestAnimationFrame(lp);}
   lp();
+})();
 </script>
 </body>
 </html>
