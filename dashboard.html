@@ -193,11 +193,15 @@
     <!-- ================= MISSIONS ================= -->
     <section class="sec" id="miss">
       <div class="panel">
-        <div class="panel-h"><h2>Missions</h2></div>
+        <div class="panel-h"><h2>Missions</h2>
+          <span style="font-size:12.5px;color:var(--mut)">Ton espace de contrôle : filtre, ouvre une fiche, traite ce qui coince.</span></div>
         <div class="filters">
           <div class="fld"><label>Période</label><select id="m-per">
             <option value="">Toutes</option><option value="today">Aujourd'hui</option>
-            <option value="week">Cette semaine</option><option value="month">Ce mois-ci</option></select></div>
+            <option value="week">Cette semaine</option><option value="month">Ce mois-ci</option>
+            <option value="custom">Personnalisée</option></select></div>
+          <div class="fld"><label>Du</label><input type="date" id="m-d1"></div>
+          <div class="fld"><label>Au</label><input type="date" id="m-d2"></div>
           <div class="fld"><label>Agent</label><select id="m-ag"><option value="">Tous</option></select></div>
           <div class="fld"><label>Logement</label><select id="m-lg"><option value="">Tous</option></select></div>
           <div class="fld"><label>Statut</label><select id="m-st">
@@ -205,9 +209,15 @@
             <option value="warn">À vérifier</option><option value="run">En cours</option></select></div>
           <div class="fld"><label>Traitement</label><select id="m-tr">
             <option value="">Tous</option><option value="0">Non traité</option><option value="1">Traité</option></select></div>
+          <div class="fld"><label>Problème</label><select id="m-pb">
+            <option value="">Peu importe</option><option value="y">Avec problème</option><option value="n">Sans problème</option></select></div>
+          <div class="fld"><label>Photos</label><select id="m-ph">
+            <option value="">Peu importe</option><option value="y">Avec photos</option><option value="n">Sans photo</option></select></div>
         </div>
         <div class="fbar"><button class="btn sm" id="m-go">Filtrer</button>
           <button class="btn ghost sm" id="m-reset">Réinitialiser</button>
+          <button class="btn ghost sm" id="m-csv">📊 Export CSV</button>
+          <button class="btn ghost sm" id="m-print">🖨️ Imprimer</button>
           <span class="cnt" id="m-cnt"></span></div>
         <div class="rows" id="rows2"></div>
       </div>
@@ -262,34 +272,14 @@
     <!-- ================= RAPPORTS ================= -->
     <section class="sec" id="reps">
       <div class="panel">
-        <div class="panel-h"><h2>Rapports</h2></div>
-        <div class="filters">
-          <div class="fld"><label>Période</label><select id="r-per">
-            <option value="">Toutes</option><option value="today">Aujourd'hui</option>
-            <option value="week">Cette semaine</option><option value="month">Ce mois-ci</option>
-            <option value="custom">Personnalisée</option></select></div>
-          <div class="fld"><label>Du</label><input type="date" id="r-d1"></div>
-          <div class="fld"><label>Au</label><input type="date" id="r-d2"></div>
-          <div class="fld"><label>Agent</label><select id="r-ag"><option value="">Tous</option></select></div>
-          <div class="fld"><label>Logement</label><select id="r-lg"><option value="">Tous</option></select></div>
-          <div class="fld"><label>Statut</label><select id="r-st">
-            <option value="">Tous</option><option value="ok">Validée</option><option value="warn">À vérifier</option></select></div>
-          <div class="fld"><label>Problème</label><select id="r-pb">
-            <option value="">Peu importe</option><option value="y">Avec problème</option><option value="n">Sans problème</option></select></div>
-          <div class="fld"><label>Photos</label><select id="r-ph">
-            <option value="">Peu importe</option><option value="y">Avec photos</option><option value="n">Sans photo</option></select></div>
-        </div>
+        <div class="panel-h"><h2>Rapports</h2>
+          <button class="btn" id="r-gen">＋ Générer un rapport</button></div>
+        <div class="ro" style="margin:0 0 18px">📄 Un rapport est un <b>document</b> que tu peux ouvrir, télécharger et envoyer à un propriétaire.
+          Il est créé à partir des missions actuellement filtrées dans l'onglet <b>Missions</b>.</div>
         <div class="fbar">
-          <button class="btn sm" id="r-go">Filtrer</button>
-          <button class="btn ghost sm" id="r-reset">Réinitialiser</button>
-          <button class="btn ghost sm" id="r-pdf">📄 PDF</button>
-          <button class="btn ghost sm" id="r-csv">📊 CSV</button>
-          <button class="btn ghost sm" id="r-print">🖨️ Imprimer</button>
-          <span class="cnt" id="r-cnt"></span>
+          <span id="r-scope" style="font-size:13px;color:var(--mut)"></span>
+          <button class="btn ghost sm" data-goto="miss|">Choisir les missions →</button>
         </div>
-        <div class="rows" id="rrows"></div>
-        <div class="panel-h" style="margin:22px 0 12px"><h2>Rapports générés</h2>
-          <button class="btn sm" id="r-gen">＋ Générer un rapport</button></div>
         <div id="replist"></div>
       </div>
     </section>
@@ -463,19 +453,43 @@
     bindRows($('rows'));
   }
   function missFiltered(){
-    var per=$('m-per').value,ag=$('m-ag').value,lg=$('m-lg').value,st=$('m-st').value,tr=$('m-tr').value;
+    var per=$('m-per').value,d1=$('m-d1').value,d2=$('m-d2').value,ag=$('m-ag').value,
+        lg=$('m-lg').value,st=$('m-st').value,tr=$('m-tr').value,pb=$('m-pb').value,ph=$('m-ph').value;
     return MISSIONS.filter(function(m){
+      if(per==='custom'){ if(d1&&m.date<d1)return false; if(d2&&m.date>d2)return false; }
+      else if(!inPeriod(m.date,per))return false;
       if(tr==='0'&&m.done)return false; if(tr==='1'&&!m.done)return false;
-      return inPeriod(m.date,per)&&(!ag||m.ag===ag)&&(!lg||m.n===lg)&&(!st||m.st===st);});
+      if(ag&&m.ag!==ag)return false; if(lg&&m.n!==lg)return false; if(st&&m.st!==st)return false;
+      if(pb==='y'&&!m.pb)return false; if(pb==='n'&&m.pb)return false;
+      if(ph==='y'&&!m.nph)return false; if(ph==='n'&&m.nph)return false;
+      return true;});
+  }
+  function scopeLabel(){
+    var l=missFiltered(),p=$('m-per').value,ag=$('m-ag').value,lg=$('m-lg').value;
+    var bits=[];
+    if(p==='today')bits.push("aujourd'hui");else if(p==='week')bits.push('cette semaine');
+    else if(p==='month')bits.push('ce mois-ci');else if(p==='custom')bits.push('période choisie');
+    if(ag)bits.push(ag); if(lg)bits.push(lg);
+    return l.length+' mission'+(l.length>1?'s':'')+(bits.length?' · '+bits.join(' · '):' · toutes périodes');
   }
   function renderMissions(){
     var l=missFiltered();
     $('rows2').innerHTML=l.length?l.map(rowHTML).join(''):'<div class="empty">Aucune mission pour ces critères.</div>';
     $('m-cnt').textContent=l.length+' mission'+(l.length>1?'s':'');
     bindRows($('rows2'));
+    var sc=$('r-scope'); if(sc)sc.textContent='Sélection actuelle : '+scopeLabel();
   }
+  var M_FIELDS=['m-per','m-d1','m-d2','m-ag','m-lg','m-st','m-tr','m-pb','m-ph'];
   $('m-go').onclick=renderMissions;
-  $('m-reset').onclick=function(){['m-per','m-ag','m-lg','m-st','m-tr'].forEach(function(i){$(i).value='';});renderMissions();};
+  $('m-reset').onclick=function(){M_FIELDS.forEach(function(i){$(i).value='';});renderMissions();};
+  $('m-print').onclick=function(){window.print();};
+  $('m-csv').onclick=function(){
+    var l=missFiltered(),rows=[['Référence','Logement','Agent','Date','Horaires','Durée','Statut','Traitement','Motif','Problèmes','Photos']];
+    l.forEach(function(m){rows.push([refOf(m),m.n,m.ag,m.date,m.hr,m.dur,m.lab,
+      (m.st==='warn'?(m.done?'Traité':'Non traité'):''),(m.why||''),m.pb,m.nph]);});
+    var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(';');}).join('\n');
+    var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
+    a.download='alfred-missions.csv';a.click();};
 
   /* ---------- Agents ---------- */
   function agentFilter(){var t=document.querySelector('#a-tabs .tab.on');return t?t.dataset.af:'';}
@@ -532,34 +546,6 @@
     $('p-empty').innerHTML="Choisis un filtre puis lance la recherche.<br>Les photos ne se chargent qu'à la demande, pour garder l'application rapide.";};
 
   /* ---------- Rapports ---------- */
-  function repFiltered(){
-    var per=$('r-per').value,d1=$('r-d1').value,d2=$('r-d2').value,ag=$('r-ag').value,
-        lg=$('r-lg').value,st=$('r-st').value,pb=$('r-pb').value,ph=$('r-ph').value;
-    return MISSIONS.filter(function(m){
-      if(per==='custom'){ if(d1&&m.date<d1)return false; if(d2&&m.date>d2)return false; }
-      else if(!inPeriod(m.date,per))return false;
-      if(ag&&m.ag!==ag)return false; if(lg&&m.n!==lg)return false; if(st&&m.st!==st)return false;
-      if(pb==='y'&&!m.pb)return false; if(pb==='n'&&m.pb)return false;
-      if(ph==='y'&&!m.nph)return false; if(ph==='n'&&m.nph)return false;
-      return true;});
-  }
-  function renderReps(){
-    var l=repFiltered();
-    $('r-cnt').textContent=l.length+' mission'+(l.length>1?'s':'');
-    $('rrows').innerHTML=l.length?l.map(rowHTML).join(''):'<div class="empty">Aucune mission pour ces critères.</div>';
-    bindRows($('rrows'));
-  }
-  $('r-go').onclick=renderReps;
-  $('r-reset').onclick=function(){['r-per','r-d1','r-d2','r-ag','r-lg','r-st','r-pb','r-ph'].forEach(function(i){$(i).value='';});renderReps();};
-  $('r-csv').onclick=function(){
-    var l=repFiltered(),rows=[['Référence','Logement','Agent','Date','Horaires','Durée','Statut','Traitement','Motif','Problèmes','Photos']];
-    l.forEach(function(m){rows.push([refOf(m),m.n,m.ag,m.date,m.hr,m.dur,m.lab,
-      (m.st==='warn'?(m.done?'Traité':'Non traité'):''),(m.why||''),m.pb,m.nph]);});
-    var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(';');}).join('\n');
-    var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
-    a.download='alfred-rapports.csv';a.click();};
-  $('r-print').onclick=function(){window.print();};
-  $('r-pdf').onclick=function(){alert("L'export PDF sera généré par le serveur (le même rapport que dans Telegram).");};
   $('r-gen').onclick=function(){var b=$('r-gen');b.textContent='Génération…';
     fetch('/api/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({q:''})})
       .then(function(r){return r.json();}).then(function(){b.textContent='＋ Générer un rapport';hydrate();})
@@ -624,7 +610,7 @@
     var m=MISSIONS.filter(function(x){return x.id===id;})[0]; if(!m)return;
     var n=$('tr-note'); if(n)m.note=n.value;
     m.done=m.done?0:1;
-    renderKpis();renderDash();renderMissions();renderReps();
+    renderKpis();renderDash();renderMissions();
     openMission(id);
   };
   window.alfredNote=function(id){
@@ -688,7 +674,7 @@
       el.value=cur;});
   }
 
-  function renderAll(){renderKpis();renderDash();renderMissions();renderAgents();renderLogs();renderReps();}
+  function renderAll(){renderKpis();renderDash();renderMissions();renderAgents();renderLogs();}
   fillSelects();renderAll();renderReportFiles(REPORTS);
 
   /* ---------- Assistant ---------- */
