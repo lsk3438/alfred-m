@@ -28,7 +28,7 @@
   .brand span{display:inline-block;opacity:0;transform:translateY(34px) rotateX(-60deg);filter:blur(8px);
     background:linear-gradient(180deg,#f0f8ff,#82c8ff 52%,#4f7bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
     animation:letterIn .75s cubic-bezier(.2,.8,.2,1) forwards}
-  .brand::after{content:"";position:absolute;left:-25%;top:0;width:32%;height:100%;
+  .brand::after{content:"";position:absolute;left:-25%;top:0;width:32%;height:100%;pointer-events:none;
     background:linear-gradient(105deg,transparent,rgba(255,255,255,.5),transparent);filter:blur(4px);
     transform:skewX(-18deg);opacity:0;animation:shine 3s ease-in-out 1.3s infinite}
   .divider{height:2px;width:0;margin:20px auto 0;border-radius:2px;background:linear-gradient(90deg,transparent,#38bdf8,#6366f1,transparent);
@@ -45,22 +45,22 @@
     background:radial-gradient(60% 60% at 50% 40%,rgba(56,140,255,.30),transparent 70%);
     filter:blur(14px);animation:breathe 4.5s ease-in-out infinite}
   /* bord fin permanent */
-  .login::before{content:"";position:absolute;inset:-1px;border-radius:23px;padding:1px;
+  .login::before{content:"";position:absolute;inset:-1px;border-radius:23px;padding:1px;pointer-events:none;
     background:linear-gradient(180deg,rgba(130,185,255,.40),rgba(99,102,241,.14));
     -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
   /* comète lumineuse qui glisse le long du bord */
-  .login::after{content:"";position:absolute;inset:-1.5px;border-radius:23px;padding:1.5px;
+  .login::after{content:"";position:absolute;inset:-1.5px;border-radius:23px;padding:1.5px;pointer-events:none;
     background:conic-gradient(from 0deg,transparent 0 70%,rgba(56,189,248,.15) 74%,#38bdf8 84%,#bdeeff 90%,#38bdf8 95%,transparent 100%);
     -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
     filter:drop-shadow(0 0 6px rgba(90,200,255,.9));animation:spin 4.5s linear infinite}
   .field{position:relative;margin-top:14px}
-  .field i{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-style:normal;font-size:16px;opacity:.7}
+  .field i{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-style:normal;font-size:16px;opacity:.7;pointer-events:none}
   .field input{width:100%;padding:13px 14px 13px 42px;border-radius:13px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;color:#fff;background:rgba(255,255,255,.06);border:1px solid rgba(150,190,255,.28);outline:none;transition:.2s}
   .field input::placeholder{color:rgba(220,232,255,.5)}
   .field input:focus{border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,.25);background:rgba(255,255,255,.1)}
   .btn{position:relative;overflow:hidden;width:100%;margin-top:20px;padding:14px;border:none;cursor:pointer;border-radius:13px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;color:#02122e;background:linear-gradient(90deg,#38bdf8,#6366f1);box-shadow:0 12px 30px rgba(59,130,246,.5);transition:transform .15s}
   .btn:hover{transform:translateY(-2px)}
-  .btn .sh{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.6) 50%,transparent 70%);background-size:200% 100%;animation:shineb 2.4s linear infinite}
+  .btn .sh{position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.6) 50%,transparent 70%);background-size:200% 100%;animation:shineb 2.4s linear infinite}
   .secure{text-align:center;margin-top:13px;font-size:12.5px;font-weight:500;color:rgba(190,215,255,.6)}
   .err{text-align:center;margin-top:12px;font-size:13px;font-weight:600;color:#ff9aa2;min-height:18px}
 
