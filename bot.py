@@ -276,6 +276,7 @@ T = {
         "back_too_late": "La mission a déjà commencé. Utilise /annuler si tu dois vraiment l'arrêter.",
         "mission_closed_admin": "⚠️ Ta mission sur {name} a été clôturée par le responsable. Si tu es encore sur place, relance-la avec /start.",
         "mission_deleted_admin": "⚠️ Ta mission sur {name} a été annulée par le responsable.",
+        "general_note": "⚠️ IMPORTANT — Signale ici tout problème constaté dans le logement (casse, panne, tache, objet oublié…) avec le bouton « Signaler un problème ». Et remplis bien ton rapport : au moindre retour négatif d'un client, c'est CE rapport qui prouve que le ménage a été fait correctement. C'est ta protection. 🛡️",
         "sec_done": "✅ {titre} — c'est bon !",
         "sec_next": "✅ Suivant",
         "sec_photos_list": "📸 Photos à envoyer :",
@@ -476,6 +477,7 @@ T = {
         "back_too_late": "The mission has already started. Use /annuler if you really need to stop it.",
         "mission_closed_admin": "⚠️ Your mission at {name} was closed by the manager. If you're still on site, restart it with /start.",
         "mission_deleted_admin": "⚠️ Your mission at {name} was cancelled by the manager.",
+        "general_note": "⚠️ IMPORTANT — Report here any issue found in the property (damage, breakdown, stain, forgotten item…) using the “Report a problem” button. And fill in your report properly: if a client complains, THIS report proves the cleaning was done correctly. It's your protection. 🛡️",
         "follow": "Just follow the current steps 🙂 Use the buttons and send the requested photos/videos.",
         "mission_cancel": "🚫 Current mission cancelled. You can start over with /start.",
         "mission_none": "No mission in progress to cancel. 🙂",
@@ -596,6 +598,7 @@ T = {
         "back_too_late": "La misión ya ha comenzado. Usa /annuler si realmente debes pararla.",
         "mission_closed_admin": "⚠️ Tu misión en {name} ha sido cerrada por el responsable. Si sigues allí, reiníciala con /start.",
         "mission_deleted_admin": "⚠️ Tu misión en {name} ha sido cancelada por el responsable.",
+        "general_note": "⚠️ IMPORTANTE — Señala aquí cualquier problema en el alojamiento (daño, avería, mancha, objeto olvidado…) con el botón «Señalar un problema». Y rellena bien tu informe: ante la menor queja de un cliente, ESTE informe prueba que la limpieza se hizo correctamente. Es tu protección. 🛡️",
         "follow": "Solo sigue los pasos actuales 🙂 Usa los botones y envía las fotos/vídeos pedidos.",
         "mission_cancel": "🚫 Misión en curso cancelada. Puedes empezar de nuevo con /start.",
         "mission_none": "No hay ninguna misión en curso que cancelar. 🙂",
@@ -716,6 +719,7 @@ T = {
         "back_too_late": "المهمة بدأت بالفعل. استخدم /annuler إذا كنت مضطراً لإيقافها.",
         "mission_closed_admin": "⚠️ تم إغلاق مهمتك في {name} من قبل المسؤول. إذا كنت لا تزال هناك، أعد البدء عبر /start.",
         "mission_deleted_admin": "⚠️ تم إلغاء مهمتك في {name} من قبل المسؤول.",
+        "general_note": "⚠️ مهم — أبلغ هنا عن أي مشكلة في السكن (ضرر، عطل، بقعة، غرض منسي…) عبر زر «الإبلاغ عن مشكلة». واملأ تقريرك جيداً: عند أي شكوى من العميل، هذا التقرير يثبت أن التنظيف تم بشكل صحيح. إنه حمايتك. 🛡️",
         "follow": "فقط اتبع الخطوات الحالية 🙂 استخدم الأزرار وأرسل الصور/الفيديوهات المطلوبة.",
         "mission_cancel": "🚫 تم إلغاء المهمة الجارية. يمكنك البدء من جديد عبر /start.",
         "mission_none": "لا توجد مهمة جارية لإلغائها. 🙂",
@@ -836,6 +840,7 @@ T = {
         "back_too_late": "Misiunea a început deja. Folosește /annuler dacă chiar trebuie oprită.",
         "mission_closed_admin": "⚠️ Misiunea ta la {name} a fost închisă de responsabil. Dacă ești încă acolo, reia cu /start.",
         "mission_deleted_admin": "⚠️ Misiunea ta la {name} a fost anulată de responsabil.",
+        "general_note": "⚠️ IMPORTANT — Semnalează aici orice problemă din locuință (stricăciune, defecțiune, pată, obiect uitat…) cu butonul «Semnalează o problemă». Și completează bine raportul: la cea mai mică reclamație a unui client, ACEST raport dovedește că curățenia a fost făcută corect. Este protecția ta. 🛡️",
         "follow": "Urmează pur și simplu pașii curenți 🙂 Folosește butoanele și trimite pozele/videourile cerute.",
         "mission_cancel": "🚫 Misiune în curs anulată. Poți reîncepe cu /start.",
         "mission_none": "Nicio misiune în curs de anulat. 🙂",
@@ -889,7 +894,7 @@ def label_fr(key: str) -> str:
 # CHECKLIST (codee en dur ; libelles traduits via les cles cl_*)
 # =====================================================================
 CHECKLIST = [
-    {"titre": "1. 🛏️ Chambres", "repeat": True, "photos_min": 3, "points": [
+    {"titre": "1. 🛏️ Chambres", "repeat": True, "photos_min": 3, "points_critiques": [1], "points": [
         "Lit refait avec linge propre (draps + housse + taies), borde, sans tache",
         "Aucun poil / cheveu sur le lit",
         "Surfaces depoussierees (tables de nuit, lampes, etageres, plinthes)",
@@ -899,13 +904,16 @@ CHECKLIST = [
         "Vue d'ensemble",
         "Lit fait",
         "Sous le lit",
-        "Sol",
     ]},
-    {"titre": "2. 🍳 Cuisine", "photos_min": 4, "points": [
-        "Lave-vaisselle vide",
+    {"titre": "2. 🍳 Cuisine", "photos_min": 4, "points_critiques": [0, 1, 2, 3, 4, 5, 6, 7, 8], "points": [
+        "Lave-vaisselle vide (si present)",
+        "Four interieur nettoye",
+        "Micro-ondes interieur nettoye",
+        "Frigo vide et congelateur nettoye",
         "Evier + plan de travail propres et degraisses",
         "Bouilloire + cafetiere propres et detartrees",
         "Torchons + eponge propres",
+        "Vaisselle, couverts et verres propres",
         "Produit vaisselle present",
     ], "photos": [
         "Vue d'ensemble",
@@ -916,24 +924,32 @@ CHECKLIST = [
         "Evier",
         "Tiroir / armoires vaisselle et casseroles",
     ]},
-    {"titre": "3. 🚿 Salle de bain", "repeat": True, "photos_min": 3, "critiques": [3, 4], "points": [
+    {"titre": "3. 🚿 Salle de bain", "repeat": True, "photos_min": 3, "critiques": [3, 4],
+     "points_critiques": [0, 1, 2, 3, 4], "points": [
         "Lavabo lave (vasque + robinetterie)",
-        "Miroir, carrelage et joints propres (sans traces ni moisissure)",
+        "Miroir propre",
+        "Joints propres (sans moisissure)",
+        "Douche et baignoire nettoyees",
+        "Siphon vide, cheveux retires",
     ], "photos": [
         "Vue d'ensemble",
         "Miroir",
         "Evier",
         "Douche / baignoire",
         "Siphon",
-        "Sol",
     ]},
-    {"titre": "4. 🚽 Toilettes", "repeat": True, "photos_min": 2, "critiques": [1], "points": [
+    {"titre": "4. 🚽 Toilettes", "repeat": True, "photos_min": 2, "critiques": [3],
+     "points_critiques": [0, 1], "points": [
+        "Interieur de la cuvette propre (pas de depot noir)",
+        "Lunette de WC propre",
         "Papier toilette present (au moins 2 rouleaux)",
     ], "photos": [
         "Vue d'ensemble",
+        "Papier toilette",
+        "Interieur de la cuvette",
         "WC lunette ouverte",
     ]},
-    {"titre": "5. 🛋️ Salon", "photos_min": 2, "points": [
+    {"titre": "5. 🛋️ Salon", "photos_min": 2, "points_critiques": [0], "points": [
         "Canape propre, sans tache",
         "Coussins remis en place",
         "Surfaces depoussierees + poignees / interrupteurs essuyes",
@@ -941,11 +957,10 @@ CHECKLIST = [
         "Telecommande(s) presente(s) + piles OK",
     ], "photos": [
         "Vue d'ensemble",
-        "Sol",
-        "Table / chaises",
         "Canapes",
     ]},
-    {"titre": "6. ✅ General (fin de menage)", "photos_min": 1, "critiques": [0], "points_critiques": [10, 12], "points": [
+    {"titre": "6. ✅ General (fin de menage)", "photos_min": 1, "critiques": [0],
+     "points_critiques": [10, 11, 12, 14], "note_key": "general_note", "points": [
         "Tous les sols aspires (toutes les pieces)",
         "Tous les sols laves (toutes les pieces)",
         "Toutes les vitres et fenetres sans traces",
@@ -960,13 +975,14 @@ CHECKLIST = [
         "Serviettes et draps fournis pour le nombre de voyageurs",
         "Lumieres eteintes + fenetres fermees",
         "Porte verrouillee",
+        "Cles remises dans la boite a cles",
     ], "photos": [
         "Cles remises dans la boite a cles",
     ]},
 ]
 
 # --- Traductions de la checklist (auto par Claude, mises en cache sur disque) ---
-CHECKLIST_I18N_FILE = os.path.join(BASE_DIR, "checklist_i18n_v3.json")
+CHECKLIST_I18N_FILE = os.path.join(BASE_DIR, "checklist_i18n_v4.json")
 CHECKLIST_CACHE = {"fr": CHECKLIST}
 try:
     with open(CHECKLIST_I18N_FILE, encoding="utf-8") as _f:
@@ -3272,10 +3288,13 @@ async def send_step(context, chat_id, state) -> None:
         return
     pcrit = set(CHECKLIST[i_sec].get("points_critiques", [])) if 0 <= i_sec < len(CHECKLIST) else set()
     points = "\n".join((("🔴 " if i in pcrit else "•  ") + p) for i, p in enumerate(sec.get("points", [])))
+    # Message fort optionnel pour certaines sections (ex. rappel rapport en fin de menage)
+    note_key = CHECKLIST[i_sec].get("note_key") if 0 <= i_sec < len(CHECKLIST) else None
+    bloc_note = ("\n\n" + t(lang, note_key)) if note_key else ""
     txt = (f"{sec['titre']}   ·  {n}/{total}\n"
            f"{_rooms_bar(i_sec, total)}\n\n"
            f"{t(lang, 'sec_actions_intro')}\n{points}\n\n"
-           f"{t(lang, 'sec_actions_hint')}")
+           f"{t(lang, 'sec_actions_hint')}{bloc_note}")
     await context.bot.send_message(chat_id, txt, reply_markup=_actions_kb(lang))
 
 
