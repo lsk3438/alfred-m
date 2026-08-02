@@ -259,14 +259,7 @@ T = {
         "btn_done": "✅ J'ai terminé le ménage",
         "btn_incident": "⚠️ Signaler un problème",
         "sec_points_intro": "Un coup d'œil rapide 👇",
-        "sec_photos_intro": "📸 Photos à envoyer ({n}) :",
         "sec_instructions": "Envoie les photos 📷 puis appuie sur ✅",
-        "sec_validate": "✅ Section validée",
-        "sec_count_light": "📷 {c}/{n}",
-        "sec_need_more": "📸 Encore {r} — {c}/{n}",
-        "sec_review": "🔎 J'ai regardé tes photos. À revoir :\n{list}\n\nTu peux les refaire, ou valider quand même 👇",
-        "sec_btn_force": "✅ Valider quand même",
-        "sec_btn_redo": "📷 Refaire des photos",
         "sec_redo": "Ok 👍 renvoie les photos concernées.",
         "sec_actions_intro": "🧹 À FAIRE dans cette pièce :",
         "sec_actions_hint": "Quand c'est fait, appuie sur « ✅ C'est fait ».",
@@ -414,6 +407,15 @@ T = {
         "a_b_agents": "👥 Manage agents",
         "a_b_logements": "🏠 Assign properties",
         "a_b_admins": "🧑‍💼 Manage managers",
+        "a_b_lodgify": "🏨 Lodgify management",
+        "a_lodgify": ("🏨 Lodgify management\n\nJust tell me what you want to do — I'll handle Lodgify. Examples:\n\n"
+                      "📖 « List my upcoming bookings »\n"
+                      "📅 « Show the calendar for Studio Hydraulique »\n"
+                      "💬 « Read the conversation for booking 6142944261 »\n"
+                      "🔒 « Block Studio Hydraulique from the 10th to the 12th »\n"
+                      "✉️ « Message the guest of booking X: welcome, code 1234 »\n"
+                      "💳 « Create a €150 payment link for booking Y »\n\n"
+                      "⚠️ Every action that changes Lodgify will ask you to confirm before it goes out. Type /start to exit."),
         "a_reports": "📊 Report mode on.\nAsk your question (units cleaned today, urgent incidents this week, « generate a report »…). Type /start to exit.",
         "a_agents_none": "👥 No agent yet. When an agent registers for your company, you'll get a message with an Authorize button.",
         "a_agents_mine": "👥 Your agents:",
@@ -497,6 +499,8 @@ T = {
         "btn_role_agent": "🧹 Cleaning agent",
         "reg_ask_nom": "Great! What's your first and last name?",
         "reg_admin_entreprise": "What's the name of your company?",
+        "reg_admin_choose_co": "Join an existing company, or create your own:",
+        "btn_new_company": "➕ Create a new company",
         "reg_admin_role": "What's your role (e.g. manager, cleaning supervisor)?",
         "reg_agent_choose_co": "Which company do you work for? Pick from the list 👇",
         "reg_no_company": "No company is registered yet. Ask your manager to create their account first (as a manager).",
@@ -537,6 +541,15 @@ T = {
         "a_b_agents": "👥 Gestionar agentes",
         "a_b_logements": "🏠 Asignar alojamientos",
         "a_b_admins": "🧑‍💼 Gestionar responsables",
+        "a_b_lodgify": "🏨 Gestión de Lodgify",
+        "a_lodgify": ("🏨 Gestión de Lodgify\n\nEscríbeme directamente lo que quieres hacer — yo me encargo de Lodgify. Ejemplos:\n\n"
+                      "📖 « Lista mis próximas reservas »\n"
+                      "📅 « Muestra el calendario del Studio Hydraulique »\n"
+                      "💬 « Lee la conversación de la reserva 6142944261 »\n"
+                      "🔒 « Bloquea el Studio Hydraulique del 10 al 12 »\n"
+                      "✉️ « Escribe al huésped de la reserva X: bienvenido, código 1234 »\n"
+                      "💳 « Crea un enlace de pago de 150€ para la reserva Y »\n\n"
+                      "⚠️ Cada acción que modifique Lodgify te pedirá confirmación antes de enviarse. Escribe /start para salir."),
         "a_reports": "📊 Modo informe activado.\nHaz tu pregunta (alojamientos limpiados hoy, incidentes urgentes de la semana, « genera un informe »…). Pulsa /start para salir.",
         "a_agents_none": "👥 Ningún agente por ahora. Cuando un agente se registre para tu empresa, recibirás un mensaje con un botón Autorizar.",
         "a_agents_mine": "👥 Tus agentes:",
@@ -620,6 +633,8 @@ T = {
         "btn_role_agent": "🧹 Agente de limpieza",
         "reg_ask_nom": "¡Perfecto! ¿Cuál es tu nombre y apellido?",
         "reg_admin_entreprise": "¿Cuál es el nombre de tu empresa?",
+        "reg_admin_choose_co": "Únete a una empresa existente o crea la tuya:",
+        "btn_new_company": "➕ Crear una nueva empresa",
         "reg_admin_role": "¿Cuál es tu rol (ej. gerente, responsable de limpieza)?",
         "reg_agent_choose_co": "¿Para qué empresa trabajas? Elige en la lista 👇",
         "reg_no_company": "Aún no hay ninguna empresa registrada. Pide a tu responsable que cree primero su cuenta (como responsable).",
@@ -660,6 +675,15 @@ T = {
         "a_b_agents": "👥 إدارة العمال",
         "a_b_logements": "🏠 تعيين الشقق",
         "a_b_admins": "🧑‍💼 إدارة المسؤولين",
+        "a_b_lodgify": "🏨 إدارة Lodgify",
+        "a_lodgify": ("🏨 إدارة Lodgify\n\nاكتب لي مباشرة ما تريد فعله — سأتولى Lodgify. أمثلة:\n\n"
+                      "📖 « اعرض حجوزاتي القادمة »\n"
+                      "📅 « أظهر تقويم Studio Hydraulique »\n"
+                      "💬 « اقرأ محادثة الحجز 6142944261 »\n"
+                      "🔒 « احجب Studio Hydraulique من 10 إلى 12 »\n"
+                      "✉️ « راسل نزيل الحجز X: مرحبًا، الرمز 1234 »\n"
+                      "💳 « أنشئ رابط دفع بقيمة 150€ للحجز Y »\n\n"
+                      "⚠️ كل إجراء يعدّل Lodgify سيطلب تأكيدك قبل التنفيذ. اكتب /start للخروج."),
         "a_reports": "📊 وضع التقارير مُفعّل.\nاطرح سؤالك (الشقق المنظّفة اليوم، الحوادث العاجلة هذا الأسبوع، « أنشئ تقريراً »…). اضغط /start للخروج.",
         "a_agents_none": "👥 لا يوجد عامل بعد. عندما يسجّل عامل لشركتك، ستصلك رسالة بزر التفعيل.",
         "a_agents_mine": "👥 عمالك:",
@@ -743,6 +767,8 @@ T = {
         "btn_role_agent": "🧹 عامل تنظيف",
         "reg_ask_nom": "ممتاز! ما اسمك الأول واسم العائلة؟",
         "reg_admin_entreprise": "ما اسم شركتك؟",
+        "reg_admin_choose_co": "انضم إلى شركة موجودة، أو أنشئ شركتك الخاصة:",
+        "btn_new_company": "➕ إنشاء شركة جديدة",
         "reg_admin_role": "ما هو دورك (مثال: مدير، مسؤول تنظيف)؟",
         "reg_agent_choose_co": "لأي شركة تعمل؟ اختر من القائمة 👇",
         "reg_no_company": "لا توجد أي شركة مسجّلة بعد. اطلب من مسؤولك إنشاء حسابه أولاً (كمسؤول).",
@@ -783,6 +809,15 @@ T = {
         "a_b_agents": "👥 Gestionează agenții",
         "a_b_logements": "🏠 Atribuie locuințele",
         "a_b_admins": "🧑‍💼 Gestionează responsabilii",
+        "a_b_lodgify": "🏨 Gestionare Lodgify",
+        "a_lodgify": ("🏨 Gestionare Lodgify\n\nScrie-mi direct ce vrei să faci — mă ocup eu de Lodgify. Exemple:\n\n"
+                      "📖 « Listează rezervările mele viitoare »\n"
+                      "📅 « Arată calendarul pentru Studio Hydraulique »\n"
+                      "💬 « Citește conversația rezervării 6142944261 »\n"
+                      "🔒 « Blochează Studio Hydraulique din 10 până în 12 »\n"
+                      "✉️ « Scrie-i oaspetelui rezervării X: bun venit, cod 1234 »\n"
+                      "💳 « Creează un link de plată de 150€ pentru rezervarea Y »\n\n"
+                      "⚠️ Fiecare acțiune care modifică Lodgify îți va cere confirmarea înainte de trimitere. Scrie /start pentru a ieși."),
         "a_reports": "📊 Mod raport activat.\nPune-ți întrebarea (locuințe curățate azi, incidente urgente din săptămână, « generează un raport »…). Apasă /start pentru a ieși.",
         "a_agents_none": "👥 Niciun agent deocamdată. Când un agent se înscrie pentru firma ta, primești un mesaj cu un buton Autorizează.",
         "a_agents_mine": "👥 Agenții tăi:",
@@ -866,6 +901,8 @@ T = {
         "btn_role_agent": "🧹 Agent de curățenie",
         "reg_ask_nom": "Perfect! Care este numele și prenumele tău?",
         "reg_admin_entreprise": "Care este numele firmei tale?",
+        "reg_admin_choose_co": "Alătură-te unei firme existente sau creează-o pe a ta:",
+        "btn_new_company": "➕ Creează o firmă nouă",
         "reg_admin_role": "Care este rolul tău (ex: manager, responsabil curățenie)?",
         "reg_agent_choose_co": "Pentru ce firmă lucrezi? Alege din listă 👇",
         "reg_no_company": "Încă nu este înregistrată nicio firmă. Roagă-ți responsabilul să-și creeze mai întâi contul (ca responsabil).",
@@ -2247,27 +2284,6 @@ async def on_logset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await render_logements(query, chat_id)
 
 
-async def on_logtog(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Admin : ajoute/retire un logement de SON entreprise."""
-    query = update.callback_query
-    await query.answer()
-    chat_id = query.from_user.id
-    if not is_admin(chat_id):
-        await query.answer("Reserve aux admins.", show_alert=True)
-        return
-    macomp = admin_company(chat_id) or ""
-    if not macomp:
-        await query.answer("Ton entreprise n'est pas definie.", show_alert=True)
-        return
-    pid = query.data.split(":", 1)[1]
-    if co_key(property_company(pid)) == co_key(macomp):
-        PROPERTY_COMPANY.pop(str(pid), None)
-    else:
-        PROPERTY_COMPANY[str(pid)] = macomp
-    _save_property_company()
-    await render_logements(query, chat_id)
-
-
 async def on_deladmin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Bouton ❌ Retirer un responsable (admin principal uniquement)."""
     query = update.callback_query
@@ -3293,6 +3309,11 @@ async def on_video(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(t(lang, "video_avant_ok"), reply_markup=menage_keyboard(lang))
         return
 
+    # On ne demande plus de video : si l'agent en envoie une pendant les photos d'arrivee,
+    # on le lui dit gentiment et on garde le bon clavier (photos d'arrivee).
+    if m and m["etape"] == ETAPE_PHOTOS_AVANT:
+        await update.message.reply_text(t(lang, "not_video"), reply_markup=_avant_kb(lang))
+        return
     await update.message.reply_text(t(lang, "not_video"), reply_markup=welcome_keyboard(lang))
 
 
@@ -3583,43 +3604,6 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(t(lang, "sec_photo_unseen"))
 
 
-async def on_photo_keep(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """L'agent garde quand meme une photo signalee (le controle reste note dans le rapport)."""
-    query = update.callback_query
-    await query.answer()
-    chat_id = query.from_user.id
-    state = get_state(chat_id)
-    lang = state.get("lang") or "fr"
-    m = state.get("mission")
-    if m:
-        m["photo_check"] = None
-    await query.edit_message_text(t(lang, "photo_ok"))
-
-
-async def on_photo_retake(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """L'agent reprend la photo : on retire la photo douteuse et son controle."""
-    query = update.callback_query
-    await query.answer()
-    chat_id = query.from_user.id
-    state = get_state(chat_id)
-    lang = state.get("lang") or "fr"
-    m = state.get("mission")
-    pc = m.get("photo_check") if m else None
-    if m and pc:
-        path = pc.get("path")
-        m["media"]["photos"] = [p for p in m["media"]["photos"] if p.get("path") != path]
-        m["controles"] = [c for c in m.get("controles", []) if c.get("path") != path]
-        if m.get("sec_photos", 0) > 0:
-            m["sec_photos"] -= 1
-        try:
-            if path and os.path.exists(path):
-                os.remove(path)
-        except Exception:
-            logger.exception("Echec suppression photo reprise")
-        m["photo_check"] = None
-    await query.edit_message_text(t(lang, "photo_retake"))
-
-
 async def resume_checklist(context, chat_id, state) -> None:
     """Reprise apres un incident, a l'endroit ou on en etait."""
     await send_step(context, chat_id, state)
@@ -3878,15 +3862,12 @@ def main() -> None:
     app.add_handler(CallbackQueryHandler(on_del_no, pattern=r"^delmissno$"))
     app.add_handler(CallbackQueryHandler(on_lodg_ok, pattern=r"^lodgok$"))
     app.add_handler(CallbackQueryHandler(on_lodg_no, pattern=r"^lodgno$"))
-    app.add_handler(CallbackQueryHandler(on_photo_keep, pattern=r"^pkeep$"))
-    app.add_handler(CallbackQueryHandler(on_photo_retake, pattern=r"^pretake$"))
     app.add_handler(CallbackQueryHandler(on_auth, pattern=r"^auth:"))
     app.add_handler(CallbackQueryHandler(on_admin_panel, pattern=r"^adm:"))
     app.add_handler(CallbackQueryHandler(on_delagent, pattern=r"^delagent:"))
     app.add_handler(CallbackQueryHandler(on_deladmin, pattern=r"^deladmin:"))
     app.add_handler(CallbackQueryHandler(on_logpick, pattern=r"^logpick:"))
     app.add_handler(CallbackQueryHandler(on_logset, pattern=r"^logset:"))
-    app.add_handler(CallbackQueryHandler(on_logtog, pattern=r"^logtog:"))
     app.add_handler(CallbackQueryHandler(on_reg_role, pattern=r"^reg:role:"))
     app.add_handler(CallbackQueryHandler(on_reg_company, pattern=r"^regco:"))
     app.add_handler(CallbackQueryHandler(on_reg_new_company, pattern=r"^regnewco$"))
