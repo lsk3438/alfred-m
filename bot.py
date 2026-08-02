@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import re
+import unicodedata
 
 import httpx
 from dotenv import load_dotenv
@@ -251,7 +252,7 @@ T = {
         "btn_start": "🧹 Démarrer ma mission",
         "btn_lang": "🌐 Changer de langue",
         "which_appart": "Super ! 🏠 Choisis l'appartement que tu vas nettoyer aujourd'hui :",
-        "appart_chosen": "Parfait, c'est parti pour {name} ✅\n\nPremière étape : filme une courte vidéo de l'état du logement à ton arrivée (séjour, chambres, cuisine, salle de bain). 📹",
+        "appart_chosen": "Parfait, c'est parti pour {name} ✅\n\nPremière étape : filme une vidéo COURTE (20 secondes max) de l'état du logement à ton arrivée (séjour, chambres, cuisine, salle de bain). 📹",
         "video_avant_ok": "Vidéo d'arrivée bien reçue ✓\n\nTu peux commencer le ménage 🧽 Prends ton temps et fais les choses bien. Quand tout est terminé, appuie sur le bouton ci-dessous. 👇",
         "btn_done": "✅ J'ai terminé le ménage",
         "btn_incident": "⚠️ Signaler un problème",
@@ -390,7 +391,7 @@ T = {
         "btn_start": "🧹 Start my mission",
         "btn_lang": "🌐 Change language",
         "which_appart": "Great! 🏠 Choose the apartment you're cleaning today:",
-        "appart_chosen": "Perfect, let's go with {name} ✅\n\nFirst step: film a short video of the apartment's condition when you arrive (living room, bedrooms, kitchen, bathroom). 📹",
+        "appart_chosen": "Perfect, let's go with {name} ✅\n\nFirst step: film a SHORT video (20 seconds max) of the apartment's condition when you arrive (living room, bedrooms, kitchen, bathroom). 📹",
         "video_avant_ok": "Arrival video received ✓\n\nYou can start cleaning 🧽 Take your time and do it well. When everything is done, tap the button below. 👇",
         "btn_done": "✅ I've finished cleaning",
         "btn_incident": "⚠️ Report a problem",
@@ -511,7 +512,7 @@ T = {
         "btn_start": "🧹 Empezar mi misión",
         "btn_lang": "🌐 Cambiar idioma",
         "which_appart": "¡Genial! 🏠 Elige el apartamento que vas a limpiar hoy:",
-        "appart_chosen": "Perfecto, vamos con {name} ✅\n\nPrimer paso: graba un vídeo corto del estado del apartamento al llegar (salón, dormitorios, cocina, baño). 📹",
+        "appart_chosen": "Perfecto, vamos con {name} ✅\n\nPrimer paso: graba un vídeo CORTO (20 segundos máx.) del estado del apartamento al llegar (salón, dormitorios, cocina, baño). 📹",
         "video_avant_ok": "Vídeo de llegada recibido ✓\n\nPuedes empezar la limpieza 🧽 Tómate tu tiempo y hazlo bien. Cuando todo esté listo, pulsa el botón de abajo. 👇",
         "btn_done": "✅ He terminado la limpieza",
         "btn_incident": "⚠️ Reportar un problema",
@@ -632,7 +633,7 @@ T = {
         "btn_start": "🧹 ابدأ مهمتي",
         "btn_lang": "🌐 تغيير اللغة",
         "which_appart": "رائع! 🏠 اختر الشقة التي ستنظفها اليوم:",
-        "appart_chosen": "ممتاز، لنبدأ مع {name} ✅\n\nالخطوة الأولى: صوّر فيديو قصيراً لحالة الشقة عند وصولك (الصالة، غرف النوم، المطبخ، الحمام). 📹",
+        "appart_chosen": "ممتاز، لنبدأ مع {name} ✅\n\nالخطوة الأولى: صوّر فيديو قصيراً (20 ثانية كحد أقصى) لحالة الشقة عند وصولك (الصالة، غرف النوم، المطبخ، الحمام). 📹",
         "video_avant_ok": "تم استلام فيديو الوصول ✓\n\nيمكنك البدء بالتنظيف 🧽 خذ وقتك وأنجز العمل جيداً. عند الانتهاء من كل شيء، اضغط الزر بالأسفل. 👇",
         "btn_done": "✅ أنهيت التنظيف",
         "btn_incident": "⚠️ الإبلاغ عن مشكلة",
@@ -753,7 +754,7 @@ T = {
         "btn_start": "🧹 Începe misiunea mea",
         "btn_lang": "🌐 Schimbă limba",
         "which_appart": "Super! 🏠 Alege apartamentul pe care îl cureți azi:",
-        "appart_chosen": "Perfect, mergem cu {name} ✅\n\nPrimul pas: filmează un video scurt cu starea apartamentului la sosire (living, dormitoare, bucătărie, baie). 📹",
+        "appart_chosen": "Perfect, mergem cu {name} ✅\n\nPrimul pas: filmează un video SCURT (20 secunde max) cu starea apartamentului la sosire (living, dormitoare, bucătărie, baie). 📹",
         "video_avant_ok": "Video de sosire primit ✓\n\nPoți începe curățenia 🧽 Lucrează pe îndelete și fă treabă bună. Când ai terminat tot, apasă butonul de mai jos. 👇",
         "btn_done": "✅ Am terminat curățenia",
         "btn_incident": "⚠️ Raportează o problemă",
@@ -2379,69 +2380,109 @@ def _img_data_uri(path) -> str | None:
 
 
 REPORT_CSS = """
-:root{--ink:#0b1f17;--muted:#6b7b74;--line:#e7ece9;--bg:#eef1f0;--green:#0f7a4f;--green2:#16a34a;--gold:#c8a24a;--ok-bg:#e7f6ec;--ok-tx:#10733f}
+:root{--blue:#38bdf8;--ind:#6366f1;--ink:#0b1220;--mut:#68738a;--line:#e6ebf3;--bg:#eef2f8;
+      --ok-bg:#e6f7ee;--ok-tx:#0f7a4f;--warn-bg:#fdf2e3;--warn-tx:#a8650d}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{font-family:'Segoe UI',-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-.page{max-width:880px;margin:24px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px rgba(8,30,22,.10)}
-.cover{position:relative;padding:40px 44px 34px;color:#fff;background:radial-gradient(1200px 300px at 80% -40%,rgba(255,255,255,.18),transparent),linear-gradient(135deg,#0b3d2a 0%,#0f7a4f 55%,#16a34a 100%)}
+body{font-family:'Rajdhani','Segoe UI',-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+.page{max-width:900px;margin:22px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(6,14,40,.16)}
+.cover{position:relative;padding:38px 44px 30px;color:#eaf2ff;overflow:hidden;
+  background:radial-gradient(900px 300px at 85% -30%,rgba(56,189,248,.35),transparent),linear-gradient(135deg,#01040d 0%,#08183f 55%,#0d2b66 100%)}
 .cover .row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-.logo{display:flex;align-items:center;gap:12px}
-.logo .mark{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800}
-.logo .name{font-size:20px;font-weight:800;letter-spacing:.3px}
-.logo .tag{font-size:12px;opacity:.85;margin-top:1px}
-.cover h1{margin:26px 0 4px;font-size:26px;font-weight:800}
-.cover .when{font-size:13px;opacity:.9}
-.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px}
-.kpi{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:14px 16px}
-.kpi .num{font-size:26px;font-weight:800;line-height:1}
-.kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.6px;opacity:.9;margin-top:6px}
-.body{padding:30px 44px 12px}
-.synth{background:#f6f9f7;border:1px solid var(--line);border-left:4px solid var(--green);border-radius:12px;padding:16px 18px;margin:0 0 26px;font-size:14px}
-.synth h3{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--green)}
-.mission{border:1px solid var(--line);border-radius:14px;margin:0 0 26px;overflow:hidden}
-.m-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px 20px;background:#f6f9f7;border-bottom:1px solid var(--line)}
-.m-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;margin:0}
-.m-title .ico{width:30px;height:30px;border-radius:9px;background:#e7f6ec;display:flex;align-items:center;justify-content:center;font-size:16px}
-.badge{font-size:11.5px;font-weight:800;padding:6px 13px;border-radius:999px;letter-spacing:.3px;white-space:nowrap}
+.logo{display:flex;align-items:center;gap:13px}
+.logo .mark{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,var(--blue),var(--ind));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:#02122e;box-shadow:0 8px 22px rgba(56,130,246,.5)}
+.logo .name{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:800;letter-spacing:2px}
+.logo .tag{font-size:12px;opacity:.75;margin-top:2px;letter-spacing:1px}
+.cover .kind{text-align:right;font-size:11px;letter-spacing:1px;opacity:.85;text-transform:uppercase}
+.cover h1{font-family:'Orbitron',sans-serif;margin:24px 0 4px;font-size:22px;font-weight:700;letter-spacing:.5px}
+.cover .when{font-size:13px;opacity:.8}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+.kpi{background:rgba(255,255,255,.08);border:1px solid rgba(150,190,255,.22);border-radius:13px;padding:14px 16px}
+.kpi .num{font-family:'Orbitron';font-size:24px;font-weight:800;line-height:1}
+.kpi .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;opacity:.8;margin-top:6px}
+.body{padding:28px 40px 10px}
+.synth{background:#f2f7ff;border:1px solid #dbe7fb;border-left:4px solid var(--blue);border-radius:12px;padding:15px 18px;margin:0 0 24px;font-size:14px}
+.synth h3{margin:0 0 6px;font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:#185fa5}
+.mission{border:1px solid var(--line);border-radius:15px;margin:0 0 24px;overflow:hidden}
+.m-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:15px 20px;background:linear-gradient(135deg,#f4f8ff,#eef3fb);border-bottom:1px solid var(--line)}
+.m-title{display:flex;align-items:center;gap:11px;font-size:17px;font-weight:700;margin:0}
+.m-title .ico{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,rgba(56,189,248,.2),rgba(99,102,241,.14));display:flex;align-items:center;justify-content:center;font-size:16px}
+.m-title .ref{font-size:11.5px;color:var(--mut);font-weight:600;margin-left:2px;font-family:'Orbitron'}
+.badge{font-size:11.5px;font-weight:800;padding:6px 14px;border-radius:999px;white-space:nowrap}
 .badge.ok{background:var(--ok-bg);color:var(--ok-tx)}
-.badge.warn{background:#fdf2e3;color:#a8650d}
+.badge.warn{background:var(--warn-bg);color:var(--warn-tx)}
 .m-body{padding:18px 20px}
-.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px}
-.meta .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
-.meta .val{font-size:14.5px;font-weight:700;margin-top:3px}
-.sec{font-size:12px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.7px;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.meta{display:flex;flex-wrap:wrap;gap:22px;margin-bottom:4px}
+.meta .lab{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut)}
+.meta .val{font-size:14.5px;font-weight:700;margin-top:2px}
+.sec{font-size:11.5px;font-weight:800;color:#185fa5;text-transform:uppercase;letter-spacing:.8px;margin:20px 0 11px;display:flex;align-items:center;gap:8px}
 .sec::after{content:"";flex:1;height:1px;background:var(--line)}
-.checks{display:grid;grid-template-columns:1fr 1fr;gap:4px 22px}
-.check{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #f2f5f3;font-size:13.5px}
-.check .dot{width:18px;height:18px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
-.dot.y{background:var(--green2)}.dot.n{background:#dc2626}.dot.na{background:#b3bdb8}
-.check .txt{flex:1}.check .num{font-weight:800;color:var(--green)}
-.inc{display:flex;gap:10px;align-items:flex-start;background:#fff8ee;border:1px solid #f6e2bf;border-left:4px solid var(--gold);border-radius:10px;padding:11px 14px;margin:8px 0;font-size:13.5px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:3px 22px}
+.check{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid #f1f5fa;font-size:13.5px}
+.check .dot{width:19px;height:19px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;background:#16a34a}
+.check .dot.n{background:#dc2626}
+.inc{display:flex;gap:10px;align-items:flex-start;background:#fff8ee;border:1px solid #f6e2bf;border-left:4px solid #c8a24a;border-radius:10px;padding:11px 14px;margin:8px 0;font-size:13.5px}
 .inc.urg{background:#fef2f2;border-color:#f6cccc;border-left-color:#dc2626}.inc .u{font-weight:800;color:#dc2626}
-.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.gallery figure{margin:0;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#f6f9f7}
-.gallery img{width:100%;height:120px;object-fit:cover;display:block}
-.gallery figcaption{padding:7px 9px;font-size:11.5px;color:var(--muted);text-align:center}
-.foot{padding:18px 44px 30px;text-align:center;color:var(--muted);font-size:11.5px;border-top:1px solid var(--line)}
-.foot b{color:var(--green)}
-@media print{body{background:#fff}.page{box-shadow:none;margin:0;max-width:none;border-radius:0}.mission,.synth{break-inside:avoid}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.room{margin:14px 0 8px;font-size:13.5px;font-weight:700;color:var(--ink)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:11px;margin-bottom:4px}
+.gallery a{display:block;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:#f4f8ff;text-decoration:none}
+.gallery img{width:100%;height:115px;object-fit:cover;display:block}
+.gallery .cap{padding:7px 9px;font-size:11px;color:var(--mut);text-align:center}
+.lb{position:fixed;inset:0;background:rgba(2,8,24,.92);display:none;align-items:center;justify-content:center;z-index:99;padding:22px}
+.lb:target{display:flex}
+.lb img{max-width:94vw;max-height:88vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.lb .cl{position:absolute;top:18px;right:26px;color:#fff;font-size:30px;text-decoration:none;font-weight:700}
+.foot{padding:16px 40px 28px;text-align:center;color:var(--mut);font-size:11.5px;border-top:1px solid var(--line)}
+.foot b{color:#185fa5}
+@media print{body{background:#fff}.page{box-shadow:none;margin:0;max-width:none;border-radius:0}
+  .mission,.synth{break-inside:avoid}.cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .gallery a{pointer-events:none}}
 """
 
 
-def _build_html_report(matches, titre, company="", synthese="") -> str:
+def _report_ref(nom, date10) -> str:
+    base = unicodedata.normalize("NFD", nom or "")
+    base = "".join(c for c in base if unicodedata.category(c) != "Mn")
+    base = "".join(c for c in base if c.isalpha()).upper()[:3] or "MIS"
+    p = (date10 or "").split("-")
+    dd = (p[2] + p[1] + p[0][2:]) if (len(p) == 3 and len(p[0]) == 4) else ""
+    return base + "-" + dd
+
+
+def _duree_txt(deb_iso, fin_iso) -> str:
+    try:
+        a = datetime.datetime.fromisoformat(deb_iso)
+        b = datetime.datetime.fromisoformat(fin_iso)
+        mn = int((b - a).total_seconds() // 60)
+        if mn < 0:
+            return "—"
+        return (f"{mn // 60}h{mn % 60:02d}") if mn >= 60 else f"{mn} min"
+    except Exception:
+        return "—"
+
+
+def _build_html_report(matches, titre, company="", synthese="", mode="client") -> str:
+    """Genere un rapport HTML (photos integrees, imprimable en PDF).
+    mode = 'client' (epure, pour le proprietaire) ou 'interne' (detaille, pour l'admin)."""
+    client = (mode != "interne")
     n_ok = sum(1 for d in matches if d.get("statut") == "Valide")
     n_warn = len(matches) - n_ok
-    company = company or "Genius BnB"
+    company = company or "Cosmopolitan Colours"
     mono = (company.strip()[:1] or "A").upper()
     gen = datetime.datetime.now().strftime("%d/%m/%Y à %H:%M")
+    kind = "Rapport client" if client else "Rapport interne"
+    lightboxes = []
+    _lb = [0]
+
     h = ["<!doctype html><html lang='fr'><head><meta charset='utf-8'>",
          f"<meta name='viewport' content='width=device-width,initial-scale=1'><title>{_esc(titre)}</title>",
+         "<link rel='preconnect' href='https://fonts.googleapis.com'>",
+         "<link href='https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&family=Rajdhani:wght@400;500;600;700&display=swap' rel='stylesheet'>",
          f"<style>{REPORT_CSS}</style></head><body><div class='page'>",
          "<div class='cover'><div class='row'>",
          f"<div class='logo'><div class='mark'>{_esc(mono)}</div>"
          f"<div><div class='name'>{_esc(company)}</div><div class='tag'>Conciergerie &amp; ménage</div></div></div>",
-         "<div style='text-align:right;font-size:12px;opacity:.9'>Rapport qualité<br>preuve d'intervention</div>",
+         f"<div class='kind'>{_esc(kind)}<br>preuve d'intervention</div>",
          "</div>",
          "<h1>Rapport de ménage</h1>",
          f"<div class='when'>Généré le {gen} &nbsp;·&nbsp; {len(matches)} mission(s)</div>",
@@ -2451,8 +2492,10 @@ def _build_html_report(matches, titre, company="", synthese="") -> str:
          f"<div class='kpi'><div class='num'>{n_warn}</div><div class='lab'>À vérifier</div></div>"
          "</div></div>",
          "<div class='body'>"]
-    if synthese:
-        h.append(f"<div class='synth'><h3>🧠 Synthèse</h3>{_esc(synthese)}</div>")
+
+    if synthese and not client:
+        h.append(f"<div class='synth'><h3>Synthèse</h3>{_esc(synthese)}</div>")
+
     for d in matches:
         appart = d.get("appart", {}).get("nom_interne", "?")
         date = str(d.get("heure_debut", ""))[:10]
@@ -2460,46 +2503,76 @@ def _build_html_report(matches, titre, company="", synthese="") -> str:
         ok = statut == "Valide"
         deb = str(d.get("heure_debut", ""))[11:16]
         fin = str(d.get("heure_fin", ""))[11:16]
+        ref = _report_ref(appart, date)
+        badge_txt = "✓ Validé" if ok else ("⚠ " + (statut or "À vérifier"))
         h.append("<div class='mission'>")
-        h.append(f"<div class='m-head'><h2 class='m-title'><span class='ico'>🏠</span> {_esc(appart)}</h2>"
-                 f"<span class='badge {'ok' if ok else 'warn'}'>{'✓ ' if ok else '⚠ '}{_esc(statut)}</span></div>")
+        h.append(f"<div class='m-head'><h2 class='m-title'><span class='ico'>🏠</span> {_esc(appart)}"
+                 f"<span class='ref'>{_esc(ref)}</span></h2>"
+                 f"<span class='badge {'ok' if ok else 'warn'}'>{_esc(badge_txt)}</span></div>")
         h.append("<div class='m-body'>")
-        h.append("<div class='meta'>"
-                 f"<div><div class='lab'>Date</div><div class='val'>{_esc(date)}</div></div>"
-                 f"<div><div class='lab'>Agent</div><div class='val'>{_esc(d.get('agent', {}).get('prenom') or '-')}</div></div>"
-                 f"<div><div class='lab'>Horaire</div><div class='val'>{_esc(deb)} → {_esc(fin)}</div></div>"
-                 "</div>")
-        inc = d.get("incidents", [])
-        if inc:
-            h.append("<div class='sec'>Incidents signalés</div>")
-            for i in inc:
+        # Métadonnées : l'agent n'apparaît que sur le rapport interne
+        meta = [f"<div><div class='lab'>Date</div><div class='val'>{_esc(date)}</div></div>",
+                f"<div><div class='lab'>Horaire</div><div class='val'>{_esc(deb)} → {_esc(fin)}</div></div>",
+                f"<div><div class='lab'>Durée</div><div class='val'>{_esc(_duree_txt(d.get('heure_debut',''), d.get('heure_fin','')))}</div></div>"]
+        if not client:
+            meta.insert(1, f"<div><div class='lab'>Agent</div><div class='val'>{_esc(d.get('agent', {}).get('prenom') or '-')}</div></div>")
+        h.append("<div class='meta'>" + "".join(meta) + "</div>")
+
+        # Incidents : sur le rapport client, on masque les notes automatiques de l'IA
+        incidents = d.get("incidents", []) or []
+        def _is_auto(i):
+            return str(i.get("resume") or "").strip().lower().startswith("contrôle photo") \
+                or str(i.get("resume") or "").strip().lower().startswith("controle photo")
+        show_inc = [i for i in incidents if (not client or not _is_auto(i))]
+        if show_inc:
+            h.append("<div class='sec'>Points signalés</div>")
+            for i in show_inc:
                 urg = " urg" if i.get("urgent") else ""
                 tag = "<span class='u'>URGENT — </span>" if i.get("urgent") else ""
-                h.append(f"<div class='inc{urg}'>⚠️ <div>{tag}{_esc(i.get('resume'))}</div></div>")
-        conf = d.get("confirmations", {})
-        if conf:
-            h.append("<div class='sec'>Vérifications</div><div class='checks'>")
-            for k, v in conf.items():
-                if v is True:
-                    h.append(f"<div class='check'><span class='dot y'>✓</span><span class='txt'>{_esc(k)}</span></div>")
-                elif v is False:
-                    h.append(f"<div class='check'><span class='dot n'>✗</span><span class='txt'>{_esc(k)}</span></div>")
-                elif str(v).upper() == "N/A":
-                    h.append(f"<div class='check'><span class='dot na'>–</span><span class='txt'>{_esc(k)}</span></div>")
-                else:
-                    h.append(f"<div class='check'><span class='txt'>{_esc(k)}</span><span class='num'>{_esc(v)}</span></div>")
+                h.append(f"<div class='inc{urg}'>⚠️ <div>{tag}{_esc(i.get('resume') or i.get('texte') or '-')}</div></div>")
+
+        # Prestations réalisées (sections certifiées)
+        conf = d.get("confirmations", {}) or {}
+        certifs = [(k, v) for k, v in conf.items() if v is True or v is False]
+        if certifs:
+            h.append("<div class='sec'>Prestations réalisées</div><div class='checks'>")
+            for k, v in certifs:
+                cls = "" if v is True else " n"
+                sym = "✓" if v is True else "✗"
+                h.append(f"<div class='check'><span class='dot{cls}'>{sym}</span><span class='txt'>{_esc(k)}</span></div>")
             h.append("</div>")
-        photos = [p for p in d.get("photos", []) if _img_data_uri(p.get("path", ""))]
+
+        # Photos groupées par pièce, cliquables (agrandissement)
+        photos = [p for p in d.get("photos", []) if isinstance(p, dict) and _img_data_uri(p.get("path", ""))]
         if photos:
-            h.append(f"<div class='sec'>Photos preuve ({len(photos)})</div><div class='gallery'>")
+            groupes = {}
             for ph in photos:
-                uri = _img_data_uri(ph.get("path", ""))
-                h.append(f"<figure><img src='{uri}'><figcaption>{_esc(ph.get('point', ''))}</figcaption></figure>")
-            h.append("</div>")
+                point = ph.get("point", "") or "Photos"
+                parts = point.split(" — ", 1)
+                piece = parts[0].strip() if parts else "Photos"
+                libelle = parts[1].strip() if len(parts) > 1 else point
+                groupes.setdefault(piece, []).append((libelle, ph.get("path", "")))
+            h.append(f"<div class='sec'>Photos preuve ({len(photos)})</div>")
+            for piece, items in groupes.items():
+                h.append(f"<div class='room'>{_esc(piece)}</div><div class='gallery'>")
+                for libelle, path in items:
+                    uri = _img_data_uri(path)
+                    _lb[0] += 1
+                    lid = f"ph{_lb[0]}"
+                    lightboxes.append(f"<div class='lb' id='{lid}'><a class='cl' href='#'>✕</a>"
+                                      f"<a href='#'><img src='{uri}' alt=''></a></div>")
+                    h.append(f"<a href='#{lid}'><img src='{uri}' alt=''>"
+                             f"<div class='cap'>{_esc(libelle)}</div></a>")
+                h.append("</div>")
         h.append("</div></div>")
-    h.append(f"<div class='foot'>Document généré automatiquement par <b>ALFRED</b> · {_esc(company)} · Confidentiel</div>")
-    h.append("</div></body></html>")
-    path = os.path.join(EXPORTS_DIR, f"rapport_{_stamp()}.html")
+
+    h.append(f"<div class='foot'>Document généré par <b>ALFRED</b> · {_esc(company)}"
+             + ("" if client else " · Usage interne — confidentiel") + "</div>")
+    h.append("</div>")
+    h.extend(lightboxes)
+    h.append("</body></html>")
+    suffix = "client" if client else "interne"
+    path = os.path.join(EXPORTS_DIR, f"rapport_{suffix}_{_stamp()}.html")
     with open(path, "w", encoding="utf-8") as f:
         f.write("".join(h))
     return path
@@ -3167,12 +3240,24 @@ async def on_video(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     video = update.message.video or update.message.video_note
 
     if m and m["etape"] == ETAPE_VIDEO_AVANT:
-        tg_file = await video.get_file()
-        path = os.path.join(MEDIA_DIR, f"{chat_id}_{_stamp()}_avant.mp4")
-        await tg_file.download_to_drive(path)
-        m["media"]["video_avant"] = path
+        # Telegram interdit aux bots de telecharger un fichier > 20 Mo (une video d'1 min depasse).
+        # On ne bloque JAMAIS l'agent : si le telechargement echoue, on garde la reference Telegram
+        # (file_id) et on passe quand meme au menage.
+        path = None
+        try:
+            taille = getattr(video, "file_size", 0) or 0
+            if taille and taille > 19_000_000:
+                raise RuntimeError("video trop volumineuse pour le telechargement bot")
+            tg_file = await video.get_file()
+            path = os.path.join(MEDIA_DIR, f"{chat_id}_{_stamp()}_avant.mp4")
+            await tg_file.download_to_drive(path)
+            m["media"]["video_avant"] = path
+            logger.info("Video AVANT telechargee : %s", path)
+        except Exception:
+            fid = getattr(video, "file_id", "") or ""
+            m["media"]["video_avant"] = ("tg:" + fid) if fid else None
+            logger.warning("Video AVANT non telechargee (taille %s) -> file_id conserve", taille)
         m["etape"] = ETAPE_MENAGE
-        logger.info("Video AVANT recue : %s", path)
         await update.message.reply_text(t(lang, "video_avant_ok"), reply_markup=menage_keyboard(lang))
         return
 
