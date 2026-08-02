@@ -252,8 +252,10 @@ T = {
         "btn_start": "🧹 Démarrer ma mission",
         "btn_lang": "🌐 Changer de langue",
         "which_appart": "Super ! 🏠 Choisis l'appartement que tu vas nettoyer aujourd'hui :",
-        "appart_chosen": "Parfait, c'est parti pour {name} ✅\n\nPremière étape : filme une vidéo COURTE (20 secondes max) de l'état du logement à ton arrivée (séjour, chambres, cuisine, salle de bain). 📹",
-        "video_avant_ok": "Vidéo d'arrivée bien reçue ✓\n\nTu peux commencer le ménage 🧽 Prends ton temps et fais les choses bien. Quand tout est terminé, appuie sur le bouton ci-dessous. 👇",
+        "appart_chosen": "Parfait, c'est parti pour {name} ✅\n\n📷 D'abord, photographie chaque pièce dans l'état où tu la trouves à ton arrivée (séjour, chambres, cuisine, salle de bain). Envoie toutes les photos, puis appuie sur « Commencer le ménage ».",
+        "btn_avant_done": "✅ Commencer le ménage",
+        "avant_photo_ok": "📷 Photo d'arrivée reçue ✓",
+        "video_avant_ok": "Photos d'arrivée bien reçues ✓\n\nTu peux commencer le ménage 🧽 Prends ton temps et fais les choses bien. Quand tout est terminé, appuie sur le bouton ci-dessous. 👇",
         "btn_done": "✅ J'ai terminé le ménage",
         "btn_incident": "⚠️ Signaler un problème",
         "sec_points_intro": "Un coup d'œil rapide 👇",
@@ -391,8 +393,10 @@ T = {
         "btn_start": "🧹 Start my mission",
         "btn_lang": "🌐 Change language",
         "which_appart": "Great! 🏠 Choose the apartment you're cleaning today:",
-        "appart_chosen": "Perfect, let's go with {name} ✅\n\nFirst step: film a SHORT video (20 seconds max) of the apartment's condition when you arrive (living room, bedrooms, kitchen, bathroom). 📹",
-        "video_avant_ok": "Arrival video received ✓\n\nYou can start cleaning 🧽 Take your time and do it well. When everything is done, tap the button below. 👇",
+        "appart_chosen": "Perfect, let's go with {name} ✅\n\n📷 First, photograph each room in the state you find it on arrival (living room, bedrooms, kitchen, bathroom). Send all the photos, then tap “Start cleaning”.",
+        "btn_avant_done": "✅ Start cleaning",
+        "avant_photo_ok": "📷 Arrival photo received ✓",
+        "video_avant_ok": "Arrival photos received ✓\n\nYou can start cleaning 🧽 Take your time and do it well. When everything is done, tap the button below. 👇",
         "btn_done": "✅ I've finished cleaning",
         "btn_incident": "⚠️ Report a problem",
         "menage_done": "Well done! 👏 Now the final check, step by step (a few photos + verifications). It's quick, just follow along.",
@@ -512,8 +516,10 @@ T = {
         "btn_start": "🧹 Empezar mi misión",
         "btn_lang": "🌐 Cambiar idioma",
         "which_appart": "¡Genial! 🏠 Elige el apartamento que vas a limpiar hoy:",
-        "appart_chosen": "Perfecto, vamos con {name} ✅\n\nPrimer paso: graba un vídeo CORTO (20 segundos máx.) del estado del apartamento al llegar (salón, dormitorios, cocina, baño). 📹",
-        "video_avant_ok": "Vídeo de llegada recibido ✓\n\nPuedes empezar la limpieza 🧽 Tómate tu tiempo y hazlo bien. Cuando todo esté listo, pulsa el botón de abajo. 👇",
+        "appart_chosen": "Perfecto, vamos con {name} ✅\n\n📷 Primero, fotografía cada estancia en el estado en que la encuentras al llegar (salón, dormitorios, cocina, baño). Envía todas las fotos, luego pulsa «Empezar la limpieza».",
+        "btn_avant_done": "✅ Empezar la limpieza",
+        "avant_photo_ok": "📷 Foto de llegada recibida ✓",
+        "video_avant_ok": "Fotos de llegada recibidas ✓\n\nPuedes empezar la limpieza 🧽 Tómate tu tiempo y hazlo bien. Cuando todo esté listo, pulsa el botón de abajo. 👇",
         "btn_done": "✅ He terminado la limpieza",
         "btn_incident": "⚠️ Reportar un problema",
         "menage_done": "¡Bien hecho! 👏 Pasamos al control final, paso a paso (algunas fotos + verificaciones). Es rápido, solo déjate guiar.",
@@ -633,8 +639,10 @@ T = {
         "btn_start": "🧹 ابدأ مهمتي",
         "btn_lang": "🌐 تغيير اللغة",
         "which_appart": "رائع! 🏠 اختر الشقة التي ستنظفها اليوم:",
-        "appart_chosen": "ممتاز، لنبدأ مع {name} ✅\n\nالخطوة الأولى: صوّر فيديو قصيراً (20 ثانية كحد أقصى) لحالة الشقة عند وصولك (الصالة، غرف النوم، المطبخ، الحمام). 📹",
-        "video_avant_ok": "تم استلام فيديو الوصول ✓\n\nيمكنك البدء بالتنظيف 🧽 خذ وقتك وأنجز العمل جيداً. عند الانتهاء من كل شيء، اضغط الزر بالأسفل. 👇",
+        "appart_chosen": "ممتاز، لنبدأ مع {name} ✅\n\n📷 أولاً، صوّر كل غرفة بالحالة التي تجدها عند وصولك (الصالة، غرف النوم، المطبخ، الحمام). أرسل كل الصور، ثم اضغط «ابدأ التنظيف».",
+        "btn_avant_done": "✅ ابدأ التنظيف",
+        "avant_photo_ok": "📷 تم استلام صورة الوصول ✓",
+        "video_avant_ok": "تم استلام صور الوصول ✓\n\nيمكنك البدء بالتنظيف 🧽 خذ وقتك وأنجز العمل جيداً. عند الانتهاء من كل شيء، اضغط الزر بالأسفل. 👇",
         "btn_done": "✅ أنهيت التنظيف",
         "btn_incident": "⚠️ الإبلاغ عن مشكلة",
         "menage_done": "أحسنت! 👏 ننتقل الآن إلى الفحص النهائي، خطوة بخطوة (بعض الصور + تأكيدات). الأمر سريع، فقط اتبع الإرشادات.",
@@ -754,8 +762,10 @@ T = {
         "btn_start": "🧹 Începe misiunea mea",
         "btn_lang": "🌐 Schimbă limba",
         "which_appart": "Super! 🏠 Alege apartamentul pe care îl cureți azi:",
-        "appart_chosen": "Perfect, mergem cu {name} ✅\n\nPrimul pas: filmează un video SCURT (20 secunde max) cu starea apartamentului la sosire (living, dormitoare, bucătărie, baie). 📹",
-        "video_avant_ok": "Video de sosire primit ✓\n\nPoți începe curățenia 🧽 Lucrează pe îndelete și fă treabă bună. Când ai terminat tot, apasă butonul de mai jos. 👇",
+        "appart_chosen": "Perfect, mergem cu {name} ✅\n\n📷 Întâi, fotografiază fiecare cameră în starea în care o găsești la sosire (living, dormitoare, bucătărie, baie). Trimite toate pozele, apoi apasă «Începe curățenia».",
+        "btn_avant_done": "✅ Începe curățenia",
+        "avant_photo_ok": "📷 Poză de sosire primită ✓",
+        "video_avant_ok": "Poze de sosire primite ✓\n\nPoți începe curățenia 🧽 Lucrează pe îndelete și fă treabă bună. Când ai terminat tot, apasă butonul de mai jos. 👇",
         "btn_done": "✅ Am terminat curățenia",
         "btn_incident": "⚠️ Raportează o problemă",
         "menage_done": "Bravo! 👏 Trecem la verificarea finală, pas cu pas (câteva poze + confirmări). E rapid, lasă-te ghidat.",
@@ -1044,6 +1054,7 @@ async def get_checklist(lang: str) -> list:
 AGENTS: dict[int, dict] = {}
 
 ETAPE_VIDEO_AVANT = "attente_video_avant"
+ETAPE_PHOTOS_AVANT = "attente_photos_avant"
 ETAPE_MENAGE = "menage_en_cours"
 ETAPE_CHECKLIST = "checklist"
 ETAPE_VIDEO_FIN = "attente_video_fin"
@@ -1099,6 +1110,7 @@ def _sanitize_mission(st: dict) -> None:
     media.setdefault("video_fin", None)
     m["media"] = media
     m.setdefault("sec_index", 0)
+    m.setdefault("avant", 0)
     m.setdefault("sec_phase", "photos")
     m.setdefault("sec_photos", 0)
     m.setdefault("sec_seen", [])
@@ -1187,9 +1199,10 @@ def display_name(chat_id, state=None) -> str:
 def new_mission(property_id: str, name: str) -> dict:
     return {
         "property_id": property_id, "name": name,
-        "etape": ETAPE_VIDEO_AVANT,
+        "etape": ETAPE_PHOTOS_AVANT,
         "sec_index": 0, "sec_photos": 0, "checklist": None,
         "media": {"video_avant": None, "photos": [], "video_fin": None},
+        "avant": 0,
         "confirmations": {}, "incidents": [], "controles": [],
         "incident_retour": None, "incident_pending": {},
         "debut": datetime.datetime.now().isoformat(timespec="seconds"),
@@ -3209,22 +3222,41 @@ async def on_appart_click(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     name = state.get("apparts_today", {}).get(property_id, f"Appart {property_id}")
     state["mission"] = new_mission(property_id, name)
     logger.info("Mission demarree : chat_id=%s appart=%s", chat_id, name)
-    # Filet anti-erreur : tant que la video d'arrivee n'est pas envoyee, l'agent
-    # peut revenir en arriere s'il s'est trompe de logement.
-    kb = InlineKeyboardMarkup([[InlineKeyboardButton(t(lang, "btn_wrong_appart"),
-                                                    callback_data="reappart")]])
-    await query.edit_message_text(t(lang, "appart_chosen", name=name), reply_markup=kb)
+    # Etape photos d'arrivee. Tant qu'aucune photo n'est envoyee, l'agent peut
+    # revenir en arriere s'il s'est trompe de logement.
+    await query.edit_message_text(t(lang, "appart_chosen", name=name), reply_markup=_avant_kb(lang))
+
+
+def _avant_kb(lang):
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton(t(lang, "btn_avant_done"), callback_data="avantok")],
+        [InlineKeyboardButton(t(lang, "btn_wrong_appart"), callback_data="reappart")],
+    ])
+
+
+async def on_avant_done(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """L'agent a fini les photos d'arrivee -> on passe au menage."""
+    query = update.callback_query
+    await query.answer()
+    chat_id = query.from_user.id
+    state = get_state(chat_id)
+    lang = state.get("lang") or "fr"
+    m = state.get("mission")
+    if not m or m.get("etape") != ETAPE_PHOTOS_AVANT:
+        return
+    m["etape"] = ETAPE_MENAGE
+    await query.edit_message_text(t(lang, "video_avant_ok"), reply_markup=menage_keyboard(lang))
 
 
 async def on_reappart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """L'agent s'est trompe de logement : on annule et on reaffiche la liste.
-    Possible uniquement AVANT la video d'arrivee (apres, il y a du travail a perdre)."""
+    Possible tant que le menage n'a pas commence (etape photos d'arrivee)."""
     query = update.callback_query
     chat_id = query.from_user.id
     state = get_state(chat_id)
     lang = state.get("lang") or "fr"
     m = state.get("mission")
-    if m and m.get("etape") != ETAPE_VIDEO_AVANT:
+    if m and m.get("etape") != ETAPE_PHOTOS_AVANT:
         await query.answer(t(lang, "back_too_late"), show_alert=True)
         return
     state["mission"] = None
@@ -3499,6 +3531,18 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await tg_file.download_to_drive(path)
         m["incident_pending"]["photo"] = path
         await update.message.reply_text(t(lang, "incident_photo_ok"))
+        return
+
+    # Photos de l'etat A L'ARRIVEE (avant le menage)
+    if m and m["etape"] == ETAPE_PHOTOS_AVANT:
+        photo = update.message.photo[-1]
+        tg_file = await photo.get_file()
+        m["avant"] = m.get("avant", 0) + 1
+        path = os.path.join(MEDIA_DIR, f"{chat_id}_{_stamp()}_avant{m['avant']}.jpg")
+        await tg_file.download_to_drive(path)
+        m["media"]["photos"].append({"point": f"📷 État à l'arrivée — Photo {m['avant']}", "path": path})
+        logger.info("Photo arrivee %s recue : %s", m["avant"], path)
+        await update.message.reply_text(t(lang, "avant_photo_ok"), reply_markup=_avant_kb(lang))
         return
 
     if not (m and m["etape"] == ETAPE_CHECKLIST and m["sec_index"] < len(_cl(m))):
@@ -3851,6 +3895,7 @@ def main() -> None:
     app.add_handler(CallbackQueryHandler(on_begin, pattern=r"^begin$"))
     app.add_handler(CallbackQueryHandler(on_appart_click, pattern=r"^appart:"))
     app.add_handler(CallbackQueryHandler(on_reappart, pattern=r"^reappart$"))
+    app.add_handler(CallbackQueryHandler(on_avant_done, pattern=r"^avantok$"))
     app.add_handler(CallbackQueryHandler(on_fin_menage, pattern=r"^finmenage$"))
     app.add_handler(CallbackQueryHandler(on_ck, pattern=r"^ck:"))
     app.add_handler(CallbackQueryHandler(on_incident, pattern=r"^incident$"))
