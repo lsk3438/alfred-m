@@ -3601,18 +3601,19 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await tg_file.download_to_drive(path)
         m["media"]["photos"].append({"point": f"📷 État à l'arrivée — Photo {m['avant']}", "path": path})
         logger.info("Photo arrivee %s recue : %s", m["avant"], path)
-        # Option 2 : une SEULE ligne de statut, toujours en bas de la conversation.
-        # On supprime l'ancienne et on la renvoie, avec le bouton "Commencer le menage".
+        # Une SEULE ligne de statut : affichee une fois, puis mise a jour SUR PLACE
+        # (pas de suppression/renvoi -> aucun clignotement).
+        text = t(lang, "avant_status", n=m["avant"])
         old = m.get("avant_msg_id")
         if old:
             try:
-                await context.bot.delete_message(chat_id, old)
+                await context.bot.edit_message_text(
+                    text, chat_id=chat_id, message_id=old, reply_markup=_avant_start_kb(lang))
             except Exception:
-                pass
-        sent = await context.bot.send_message(
-            chat_id, t(lang, "avant_status", n=m["avant"]),
-            reply_markup=_avant_start_kb(lang))
-        m["avant_msg_id"] = sent.message_id
+                old = None
+        if not old:
+            sent = await context.bot.send_message(chat_id, text, reply_markup=_avant_start_kb(lang))
+            m["avant_msg_id"] = sent.message_id
         return
 
     if not (m and m["etape"] == ETAPE_CHECKLIST and m["sec_index"] < len(_cl(m))):
@@ -3647,18 +3648,19 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             {"attendu": libelle, "desc": f"{libelle} : {probleme}", "path": path})
     logger.info("Photo section %s : reconnue=%s, probleme=%s -> %s", titre, match or "?", probleme or "-", path)
 
-    # Option 2 : une seule barre d'action, deplacee en bas a chaque photo.
+    # Une seule barre d'action : affichee une fois, puis mise a jour SUR PLACE (sans clignotement).
     detail = t(lang, "sec_bar_ok", x=match) if match else t(lang, "sec_bar_q")
+    text = t(lang, "sec_bar", n=m["sec_photos"], detail=detail)
     old = m.get("sec_msg_id")
     if old:
         try:
-            await context.bot.delete_message(chat_id, old)
+            await context.bot.edit_message_text(
+                text, chat_id=chat_id, message_id=old, reply_markup=_section_kb(lang))
         except Exception:
-            pass
-    bar = await context.bot.send_message(
-        chat_id, t(lang, "sec_bar", n=m["sec_photos"], detail=detail),
-        reply_markup=_section_kb(lang))
-    m["sec_msg_id"] = bar.message_id
+            old = None
+    if not old:
+        bar = await context.bot.send_message(chat_id, text, reply_markup=_section_kb(lang))
+        m["sec_msg_id"] = bar.message_id
 
 
 async def resume_checklist(context, chat_id, state) -> None:
