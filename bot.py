@@ -279,6 +279,10 @@ T = {
         "sec_photos_list": "📸 Photos à envoyer :",
         "sec_photo_seen": "📷 Reçue — {x} ✓",
         "sec_photo_unseen": "📷 Reçue ✓",
+        "sec_bar_none": "📸 Envoie tes photos 📷 puis appuie sur « Suivant » 👇",
+        "sec_bar": "📸 {n} photo(s) · {detail}\nQuand tu as tout envoyé, appuie sur « Suivant » 👇",
+        "sec_bar_ok": "reconnue : {x} ✓",
+        "sec_bar_q": "photo reçue ✓",
         "sec_recap_missing": "⚠️ Il manque : {miss}",
         "sec_recap_issues": "⚠️ À revoir :\n{iss}",
         "sec_complete": "📷 Compléter",
@@ -466,6 +470,10 @@ T = {
         "sec_next": "✅ Next",
         "sec_photo_seen": "📷 Received — {x} ✓",
         "sec_photo_unseen": "📷 Received ✓",
+        "sec_bar_none": "📸 Send your photos 📷 then tap « Next » 👇",
+        "sec_bar": "📸 {n} photo(s) · {detail}\nWhen you've sent everything, tap « Next » 👇",
+        "sec_bar_ok": "recognized: {x} ✓",
+        "sec_bar_q": "photo received ✓",
         "sec_recap_missing": "⚠️ Missing: {miss}",
         "sec_recap_issues": "⚠️ To review:\n{iss}",
         "sec_complete": "📷 Add photos",
@@ -601,6 +609,10 @@ T = {
         "sec_next": "✅ Siguiente",
         "sec_photo_seen": "📷 Recibida — {x} ✓",
         "sec_photo_unseen": "📷 Recibida ✓",
+        "sec_bar_none": "📸 Envía tus fotos 📷 y luego pulsa « Siguiente » 👇",
+        "sec_bar": "📸 {n} foto(s) · {detail}\nCuando hayas enviado todo, pulsa « Siguiente » 👇",
+        "sec_bar_ok": "reconocida: {x} ✓",
+        "sec_bar_q": "foto recibida ✓",
         "sec_recap_missing": "⚠️ Falta: {miss}",
         "sec_recap_issues": "⚠️ Revisar:\n{iss}",
         "sec_complete": "📷 Añadir fotos",
@@ -736,6 +748,10 @@ T = {
         "sec_next": "✅ التالي",
         "sec_photo_seen": "📷 تم الاستلام — {x} ✓",
         "sec_photo_unseen": "📷 تم الاستلام ✓",
+        "sec_bar_none": "📸 أرسل صورك 📷 ثم اضغط « التالي » 👇",
+        "sec_bar": "📸 {n} صورة · {detail}\nعندما ترسل كل شيء، اضغط « التالي » 👇",
+        "sec_bar_ok": "تم التعرف: {x} ✓",
+        "sec_bar_q": "تم استلام الصورة ✓",
         "sec_recap_missing": "⚠️ ناقص: {miss}",
         "sec_recap_issues": "⚠️ للمراجعة:\n{iss}",
         "sec_complete": "📷 إضافة صور",
@@ -871,6 +887,10 @@ T = {
         "sec_next": "✅ Următorul",
         "sec_photo_seen": "📷 Primită — {x} ✓",
         "sec_photo_unseen": "📷 Primită ✓",
+        "sec_bar_none": "📸 Trimite pozele 📷 apoi apasă « Următorul » 👇",
+        "sec_bar": "📸 {n} poză(e) · {detail}\nCând ai trimis tot, apasă « Următorul » 👇",
+        "sec_bar_ok": "recunoscută: {x} ✓",
+        "sec_bar_q": "poză primită ✓",
         "sec_recap_missing": "⚠️ Lipsește: {miss}",
         "sec_recap_issues": "⚠️ De verificat:\n{iss}",
         "sec_complete": "📷 Adaugă poze",
@@ -3461,7 +3481,11 @@ async def send_photos_step(context, chat_id, state) -> None:
     photos = "\n".join((("🔴 " if i in crit else "•  ") + ph) for i, ph in enumerate(sec.get("photos", [])))
     txt = (f"{t(lang, 'sec_photos_now')}\n{photos}\n\n"
            f"{t(lang, 'sec_photos_hint')}")
-    await context.bot.send_message(chat_id, txt, reply_markup=_section_kb(lang))
+    # Liste de reference (ce qu'il faut photographier) : sans boutons.
+    await context.bot.send_message(chat_id, txt)
+    # Barre d'action unique, toujours en bas, qui porte le bouton "Suivant".
+    bar = await context.bot.send_message(chat_id, t(lang, "sec_bar_none"), reply_markup=_section_kb(lang))
+    m["sec_msg_id"] = bar.message_id
 
 
 async def advance_step(context, chat_id, state) -> None:
@@ -3518,6 +3542,7 @@ async def on_ck(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await query.answer()
         m["sec_issues"] = []
         await query.edit_message_text(t(lang, "sec_redo"), reply_markup=_section_kb(lang))
+        m["sec_msg_id"] = query.message.message_id  # cette barre suivra les prochaines photos
         return
 
     # Passer quand meme (photos manquantes ou soucis assumes par l'agent)
@@ -3622,10 +3647,18 @@ async def on_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             {"attendu": libelle, "desc": f"{libelle} : {probleme}", "path": path})
     logger.info("Photo section %s : reconnue=%s, probleme=%s -> %s", titre, match or "?", probleme or "-", path)
 
-    if match:
-        await update.message.reply_text(t(lang, "sec_photo_seen", x=match))
-    else:
-        await update.message.reply_text(t(lang, "sec_photo_unseen"))
+    # Option 2 : une seule barre d'action, deplacee en bas a chaque photo.
+    detail = t(lang, "sec_bar_ok", x=match) if match else t(lang, "sec_bar_q")
+    old = m.get("sec_msg_id")
+    if old:
+        try:
+            await context.bot.delete_message(chat_id, old)
+        except Exception:
+            pass
+    bar = await context.bot.send_message(
+        chat_id, t(lang, "sec_bar", n=m["sec_photos"], detail=detail),
+        reply_markup=_section_kb(lang))
+    m["sec_msg_id"] = bar.message_id
 
 
 async def resume_checklist(context, chat_id, state) -> None:
